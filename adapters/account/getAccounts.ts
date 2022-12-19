@@ -14,7 +14,7 @@ interface GetAccountsJsonResponse {
 // NOTE: this is done for demonstration purposes only
 export default async function getAccounts(origin: string): Promise<Account[] | undefined> {
   try {
-    const res = await fetch(origin + "api/accounts", { method: "GET" });
+    const res = await fetch(origin + "/api/accounts", { method: "GET" });
     const { accounts } = (await res.json()) as GetAccountsJsonResponse;
     return accounts.map((account) => ({
       id: account.id,
