@@ -10,9 +10,11 @@ interface GetAccountsJsonResponse {
   }[];
 }
 
-export default async function getAccounts(): Promise<Account[] | undefined> {
+// TODO: replace origin to nest_host env var when backend dev is ready
+// NOTE: this is done for demonstration purposes only
+export default async function getAccounts(origin: string): Promise<Account[] | undefined> {
   try {
-    const res = await fetch("http://localhost:3000/api/accounts", { method: "GET" });
+    const res = await fetch(origin + "api/accounts", { method: "GET" });
     const { accounts } = (await res.json()) as GetAccountsJsonResponse;
     return accounts.map((account) => ({
       id: account.id,

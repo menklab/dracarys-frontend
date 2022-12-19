@@ -1,4 +1,5 @@
 import { GetServerSideProps } from "next";
+import absoluteUrl from "next-absolute-url";
 import dynamic from "next/dynamic";
 import getAccounts from "~/adapters/account/getAccounts";
 import { Account } from "~/interfaces/account";
@@ -19,8 +20,9 @@ export default function Home({ accounts }: HomeProps) {
   );
 }
 
-export const getServerSideProps: GetServerSideProps<HomeProps> = async () => {
-  const accounts = await getAccounts();
+export const getServerSideProps: GetServerSideProps<HomeProps> = async ({ req }) => {
+  const { origin } = absoluteUrl(req);
+  const accounts = await getAccounts(origin);
   if (!accounts) return { props: { accounts: [] } };
 
   // issue: https://github.com/vercel/next.js/discussions/11209

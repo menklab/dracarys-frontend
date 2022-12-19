@@ -1,4 +1,5 @@
 import Konva from "konva";
+import absoluteUrl from "next-absolute-url";
 import { useRef } from "react";
 import updateAccount from "~/adapters/account/updateAccount";
 import { Connection } from "~/interfaces/connection";
@@ -13,7 +14,8 @@ export default function KonvaProvider({ accounts, children }: KonvaProviderProps
     redraw: () => stageRef.current?.draw(),
     findNode: (nodeId) => stageRef.current?.findOne(`#${nodeId}`),
     saveAccountPosition: async (accountId, dragTo, cancelDragCb) => {
-      const res = await updateAccount({ accountId, newPosition: dragTo });
+      const { origin } = absoluteUrl();
+      const res = await updateAccount(origin, { accountId, newPosition: dragTo });
       if (!res.ok) {
         // TODO: show error
         cancelDragCb();
