@@ -3,6 +3,9 @@ import CssBaseline from "@mui/material/CssBaseline";
 import { ThemeProvider } from "@mui/material/styles";
 import type { AppProps as AppPropsBase } from "next/app";
 import Head from "next/head";
+import { SnackbarProvider as NotistackProvider } from "notistack";
+import NetworkStatus from "~/components/NetworkStatus";
+import { NOTISTACK_ANCHOR_ORIGIN, NOTISTACK_AUTO_HIDE_DURATION, NOTISTACK_MAX_SNACK } from "~/constants/notistack";
 import createEmotionCache from "~/utils/createEmotionCache";
 import theme from "~/utils/muiTheme";
 
@@ -21,7 +24,14 @@ export default function App(props: AppProps) {
       </Head>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <Component {...pageProps} />
+        <NotistackProvider
+          maxSnack={NOTISTACK_MAX_SNACK}
+          autoHideDuration={NOTISTACK_AUTO_HIDE_DURATION}
+          anchorOrigin={NOTISTACK_ANCHOR_ORIGIN}
+        >
+          <Component {...pageProps} />
+          <NetworkStatus />
+        </NotistackProvider>
       </ThemeProvider>
     </CacheProvider>
   );

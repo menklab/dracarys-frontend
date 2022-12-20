@@ -1,5 +1,6 @@
 import Konva from "konva";
 import absoluteUrl from "next-absolute-url";
+import { useSnackbar } from "notistack";
 import { useRef } from "react";
 import updateAccount from "~/adapters/account/updateAccount";
 import { Connection } from "~/interfaces/connection";
@@ -8,16 +9,18 @@ import { KonvaContext } from "./context";
 import { KonvaContextActions, KonvaProviderProps } from "./types";
 
 export default function KonvaProvider({ accounts, children }: KonvaProviderProps) {
+  const { enqueueSnackbar } = useSnackbar();
   const stageRef = useRef<Konva.Stage>(null);
 
   const actions: KonvaContextActions = {
     redraw: () => stageRef.current?.draw(),
     findNode: (nodeId) => stageRef.current?.findOne(`#${nodeId}`),
     saveAccountPosition: async (accountId, dragTo, cancelDragCb) => {
-      const { origin } = absoluteUrl();
-      const res = await updateAccount(origin, { accountId, newPosition: dragTo });
-      if (!res.ok) {
-        // TODO: show error
+      try {
+        const { origin } = absoluteUrl();
+        await updateAccount(origin, { accountId, newPosition: dragTo });
+      } catch (e) {
+        enqueueSnackbar((e as Error).message, { variant: "error" });
         cancelDragCb();
         actions.repositionArrows(accountId);
       }
