@@ -17,6 +17,7 @@ specifiers:
   konva: ^8.3.14
   next: 13.0.6
   next-absolute-url: ^1.2.2
+  notistack: ^2.0.8
   prettier: ^2.8.1
   prettier-plugin-organize-imports: ^3.2.1
   react: 18.2.0
@@ -36,6 +37,7 @@ dependencies:
   konva: 8.3.14
   next: 13.0.6_672uxklweod7ene3nqtsh262ca
   next-absolute-url: 1.2.2
+  notistack: 2.0.8_lb7ttukhs3guqcbwzmtorbxhkm
   react: 18.2.0
   react-dom: 18.2.0_react@18.2.0
   react-konva: 18.2.3_b37p36zhls44rqmxgh4mahumjq
@@ -2299,6 +2301,29 @@ packages:
 
   /node-releases/2.0.7:
     resolution: {integrity: sha512-EJ3rzxL9pTWPjk5arA0s0dgXpnyiAbJDE6wHT62g7VsgrgQgmmZ+Ru++M1BFofncWja+Pnn3rEr3fieRySAdKQ==}
+    dev: false
+
+  /notistack/2.0.8_lb7ttukhs3guqcbwzmtorbxhkm:
+    resolution: {integrity: sha512-/IY14wkFp5qjPgKNvAdfL5Jp6q90+MjgKTPh4c81r/lW70KeuX6b9pE/4f8L4FG31cNudbN9siiFS5ql1aSLRw==}
+    peerDependencies:
+      '@emotion/react': ^11.4.1
+      '@emotion/styled': ^11.3.0
+      '@mui/material': ^5.0.0
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0
+      react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0
+    peerDependenciesMeta:
+      '@emotion/react':
+        optional: true
+      '@emotion/styled':
+        optional: true
+    dependencies:
+      '@emotion/react': 11.10.5_xl5my4wapvq2ctl7qwehtbgorq
+      '@emotion/styled': 11.10.5_3djhvnr4jirfvebjqpipo7gthy
+      '@mui/material': 5.11.0_lskpmcsdi7ipu6qpuapyu56ihm
+      clsx: 1.2.1
+      hoist-non-react-statics: 3.3.2
+      react: 18.2.0
+      react-dom: 18.2.0_react@18.2.0
     dev: false
 
   /object-assign/4.1.1:
