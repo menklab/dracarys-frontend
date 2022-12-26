@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "dev:doppler,": "doppler run -- next dev",
+    "dev:doppler": "doppler run -- next dev",
     "build:doppler": "doppler run -- next build",
     "start:doppler": "doppler run -- next start"
   },
