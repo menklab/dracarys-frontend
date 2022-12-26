@@ -3,10 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "doppler run -- next dev",
+    "dev": "next dev",
     "build": "next build",
-    "localbuild": "doppler run -- next build",
-    "start": "doppler run -- next start",
+    "start": "next start",
+    "dopplerdev": "doppler run -- next dev",
+    "dopplerbuild": "doppler run -- next build",
+    "dopplerstart": "doppler run -- next start",
     "lint": "doppler run -- next lint"
   },
   "dependencies": {
