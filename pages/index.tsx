@@ -2,6 +2,7 @@ import { GetServerSideProps } from "next";
 import absoluteUrl from "next-absolute-url";
 import dynamic from "next/dynamic";
 import getAccounts from "~/adapters/account/getAccounts";
+import Layout from "~/components/Layout";
 import { Account } from "~/interfaces/account";
 const KonvaProvider = dynamic(() => import("~/contexts/konva/provider"), { ssr: false });
 const KonvaStage = dynamic(() => import("~/components/konva/Stage"), { ssr: false });
@@ -12,11 +13,11 @@ interface HomeProps {
 
 export default function Home({ accounts }: HomeProps) {
   return (
-    <div>
+    <Layout>
       <KonvaProvider accounts={accounts}>
         <KonvaStage />
       </KonvaProvider>
-    </div>
+    </Layout>
   );
 }
 

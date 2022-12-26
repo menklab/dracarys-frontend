@@ -61,7 +61,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       if (accountId === 0) return res.status(500).send("Error occurred while moving this account!");
       const idx = accounts.findIndex((account) => account.id === accountId);
       if (idx !== -1) accounts[idx].pos = newPosition;
-      await new Promise((resolve) => setTimeout(resolve, 1000));
       return res.status(200).end();
   }
 
