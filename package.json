@@ -6,10 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "dopplerdev": "doppler run -- next dev",
-    "dopplerbuild": "doppler run -- next build",
-    "dopplerstart": "doppler run -- next start",
-    "lint": "doppler run -- next lint"
+    "dev:doppler,": "doppler run -- next dev",
+    "build:doppler": "doppler run -- next build",
+    "start:doppler": "doppler run -- next start"
   },
   "dependencies": {
     "@emotion/cache": "^11.10.5",
