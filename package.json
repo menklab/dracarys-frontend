@@ -3,11 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "doppler run -- next dev",
+    "dev": "next dev",
     "build": "next build",
-    "localbuild": "doppler run -- next build",
-    "start": "doppler run -- next start",
-    "lint": "doppler run -- next lint"
+    "start": "next start",
+    "dev:doppler": "doppler run -- next dev",
+    "build:doppler": "doppler run -- next build",
+    "start:doppler": "doppler run -- next start"
   },
   "dependencies": {
     "@emotion/cache": "^11.10.5",
