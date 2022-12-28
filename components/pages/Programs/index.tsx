@@ -1,19 +1,21 @@
 import Layout from "~/components/Layout";
-import AppBarContent from "~/components/pages/Programs/AppBarContent";
+import { ProgramsPageProvider } from "~/components/pages/Programs/context";
+import CreateProgramDialog from "~/components/pages/Programs/CreateProgramDialog";
 import DrawerContent from "~/components/pages/Programs/DrawerContent";
-import usePrograms from "~/components/pages/Programs/usePrograms";
+import View from "~/components/pages/Programs/View";
+import { Program } from "~/interfaces/program";
 
 interface ProgramsProps {
-  programs: any[];
+  programs: Program[];
 }
 
-// NOTE: page example with layout
 export default function Programs({ programs }: ProgramsProps) {
-  const program = usePrograms({ programs });
-
   return (
-    <Layout drawerContent={<DrawerContent />} appBarContent={<AppBarContent />}>
-      <div></div>
-    </Layout>
+    <ProgramsPageProvider programs={programs}>
+      <Layout drawerContent={<DrawerContent />}>
+        <View />
+        <CreateProgramDialog />
+      </Layout>
+    </ProgramsPageProvider>
   );
 }
