@@ -50,6 +50,7 @@ const accounts: BackendAccountInterface[] = [
 ];
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  // res.setHeader("Set-Cookie", serialize("token", "token_cookie_value", { path: "/" }));
   switch (req.method) {
     case "GET":
       return res.status(200).json({ accounts });

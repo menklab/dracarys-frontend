@@ -1,7 +1,9 @@
 import LogoutIcon from "@mui/icons-material/Logout";
 import { AppBar, Box, Button, Drawer, List, ListItem, ListItemButton, ListItemText, Toolbar } from "@mui/material";
 import ListItemIcon from "@mui/material/ListItemIcon";
-import { ReactNode } from "react";
+import { useRouter } from "next/router";
+import { ReactNode, useEffect } from "react";
+import useAuth from "~/components/Auth/useAuth";
 import { LAYOUT_DRAWER_WIDTH } from "~/constants/layout";
 
 interface LayoutProps {
@@ -12,6 +14,21 @@ interface LayoutProps {
 
 export default function Layout(props: LayoutProps) {
   const { appBarContent, drawerContent, children } = props;
+  const router = useRouter();
+
+  const {
+    data: { pubKey },
+    actions: { provider, disconnectFromPhantom },
+  } = useAuth();
+  const pubKetString = pubKey ? pubKey.toBase58() : "";
+  const logOut = provider ? disconnectFromPhantom : undefined;
+
+  useEffect(() => {
+    if (provider && !pubKey) {
+      console.log("redirect to /login");
+      router.push("/login");
+    }
+  }, [pubKey]);
 
   return (
     <Box sx={{ display: "flex" }}>
@@ -50,7 +67,7 @@ export default function Layout(props: LayoutProps) {
               display: "inline-block",
             }}
           >
-            A2WW236565SWA231A234D2EKJ23453123213
+            {pubKetString}
           </Button>
         </Toolbar>
 
@@ -58,7 +75,7 @@ export default function Layout(props: LayoutProps) {
 
         <List sx={{ mt: "auto" }}>
           <ListItem>
-            <ListItemButton>
+            <ListItemButton onClick={logOut}>
               <ListItemIcon>
                 <LogoutIcon />
               </ListItemIcon>

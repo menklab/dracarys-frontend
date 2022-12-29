@@ -18,6 +18,7 @@
     "@mui/icons-material": "^5.11.0",
     "@mui/material": "^5.11.0",
     "@next/font": "^13.0.6",
+    "axios": "^1.2.2",
     "clsx": "^1.2.1",
     "konva": "^8.3.14",
     "next": "13.0.6",
