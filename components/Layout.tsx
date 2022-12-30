@@ -59,10 +59,10 @@ export default function Layout(props: LayoutProps) {
         <List sx={{ mt: "auto" }}>
           <ListItem>
             <ListItemButton>
-              <ListItemIcon>
+              <ListItemText>Disconnect wallet</ListItemText>
+              <ListItemIcon sx={{ minWidth: "unset" }}>
                 <LogoutIcon />
               </ListItemIcon>
-              <ListItemText>Sign Out</ListItemText>
             </ListItemButton>
           </ListItem>
         </List>
