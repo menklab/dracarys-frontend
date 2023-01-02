@@ -11,13 +11,6 @@ interface HomeProps {
   accounts: Account[];
 }
 
-declare global {
-  interface Window {
-    solana: any;
-    phantom: any;
-  }
-}
-
 export default function Home({ accounts }: HomeProps) {
   return (
     <Layout>

@@ -1,29 +1,33 @@
 import { Button, Container, Stack } from "@mui/material";
+import { GetServerSideProps } from "next";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
-import useAuth from "~/components/Auth/useAuth";
+import { useAuth } from "~/contexts/auth/hooks";
 
-export default function Login() {
+interface LoginProps {
+  isAuthorized?: boolean;
+}
+
+export default function Login(props: LoginProps) {
+  const { isAuthorized } = props;
   const router = useRouter();
+
   const {
-    data: { pubKey },
     actions: { connectToPhantom },
   } = useAuth();
 
   useEffect(() => {
-    console.log(pubKey, "check redireckt");
-    if (pubKey) {
-      console.log("redirect to /");
-      // router.push("/");
+    if (isAuthorized) {
+      router.push("/");
     }
-  }, [pubKey]);
+  });
 
   return (
     <Container maxWidth="lg">
-      <Stack direction="row" justifyContent="space-around" alignItems="center" spacing={2} sx={{ height: "100vh" }}>
+      <Stack direction="column" justifyContent="space-around" alignItems="center" spacing={2} sx={{ height: "100vh" }}>
         <Button
-          onClick={() => {
-            connectToPhantom();
+          onClick={async () => {
+            await connectToPhantom();
           }}
         >
           Login
@@ -32,3 +36,12 @@ export default function Login() {
     </Container>
   );
 }
+
+export const getServerSideProps: GetServerSideProps<LoginProps> = async ({ req }) => {
+  const authSid = req?.cookies["connect.sid"];
+  let isAuthorized = false;
+  if (authSid) {
+    isAuthorized = true;
+  }
+  return { props: { isAuthorized } };
+};
