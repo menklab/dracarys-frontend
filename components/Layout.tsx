@@ -16,16 +16,14 @@ export default function Layout(props: LayoutProps) {
   return (
     <Box sx={{ display: "flex" }}>
       <AppBar
-        elevation={0}
         position="fixed"
-        color="secondary"
+        color="inherit"
         sx={{ width: `calc(100% - ${LAYOUT_DRAWER_WIDTH}px)`, ml: `${LAYOUT_DRAWER_WIDTH}px` }}
       >
         <Toolbar>{appBarContent}</Toolbar>
       </AppBar>
 
       <Drawer
-        PaperProps={{ sx: { backgroundColor: "secondary.main", border: 0 } }}
         sx={{
           width: LAYOUT_DRAWER_WIDTH,
           flexShrink: 0,
@@ -68,7 +66,7 @@ export default function Layout(props: LayoutProps) {
         </List>
       </Drawer>
 
-      <Box component="main" sx={{ flexGrow: 1, bgcolor: "background.default" }}>
+      <Box component="main" sx={{ flexGrow: 1 }}>
         <Toolbar />
         {children}
       </Box>

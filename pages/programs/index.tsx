@@ -1,6 +1,6 @@
 import { GetServerSideProps } from "next";
 import absoluteUrl from "next-absolute-url";
-import getPrograms from "~/adapters/programs/getPrograms";
+import getPrograms from "~/adapters/program/getPrograms";
 import Programs from "~/components/pages/Programs";
 import { Program } from "~/interfaces/program";
 

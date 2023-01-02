@@ -1,11 +1,11 @@
 import absoluteUrl from "next-absolute-url";
 
-interface UpdateProgramBody {
+interface CreateProgramBody {
   name: string;
 }
 
 // TODO: replace origin to nest_host env var when backend dev is ready
-export default async function createProgram(body: UpdateProgramBody): Promise<void> {
+export default async function createProgram(body: CreateProgramBody): Promise<void> {
   const { origin } = absoluteUrl();
   const res = await fetch(origin + "/api/programs", {
     method: "POST",
