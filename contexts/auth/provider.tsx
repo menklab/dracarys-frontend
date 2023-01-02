@@ -1,5 +1,6 @@
 import cookie from "js-cookie";
 import { useRouter } from "next/router";
+import { useSnackbar } from "notistack";
 import { useEffect, useState } from "react";
 import getMsg from "~/adapters/auth/getMsg";
 import validateMsg from "~/adapters/auth/validateMsg";
@@ -19,36 +20,41 @@ export default function AuthProvider({ children }: AuthProviderProps) {
   const [sid, setSid] = useState<string | undefined>();
   const [provider, setProvider] = useState<Provider | undefined>();
   const [pubKey, setPubKey] = useState<PubKey>();
+  const { enqueueSnackbar } = useSnackbar();
 
   const connectToBE = async () => {
     if (!pubKey) return;
     const { message } = await getMsg("http://localhost:8080");
     const encodedMessage = new TextEncoder().encode(message);
-    const signedMessage = await provider?.signMessage(encodedMessage, "utf8");
-    const signature = signedMessage?.signature;
-    const signatureString = btoa(String.fromCharCode.apply(null, signature as number[]));
-    const pubKeyString = pubKey.toBase58();
-    console.log("request", {
-      pubKey: pubKeyString,
-      message: message,
-      signature: signatureString,
-    });
+    try {
+      const signedMessage = await provider?.signMessage(encodedMessage, "utf8");
+      const signature = signedMessage?.signature;
+      const signatureString = btoa(String.fromCharCode.apply(null, signature as number[]));
+      const pubKeyString = pubKey.toBase58();
 
-    const response = await validateMsg("http://localhost:8080", {
-      pubKey: pubKeyString,
-      message: message,
-      signature: signatureString,
-    });
+      const response = await validateMsg("http://localhost:8080", {
+        pubKey: pubKeyString,
+        message: message,
+        signature: signatureString,
+      });
 
-    if (response) {
-      router.push("/");
+      if (response) {
+        router.push("/");
+      }
+    } catch (e) {
+      cookie.remove("connect.sid");
+      enqueueSnackbar((e as Error).message, { variant: "error" });
     }
   };
 
   const connectToPhantom = async () => {
-    const resp = await provider?.connect();
-    const pubKey = resp?.publicKey;
-    setPubKey(pubKey);
+    try {
+      const resp = await provider?.connect();
+      const pubKey = resp?.publicKey;
+      setPubKey(pubKey);
+    } catch (e) {
+      enqueueSnackbar((e as Error).message, { variant: "error" });
+    }
   };
 
   const disconnectFromPhantom = async () => {
@@ -78,7 +84,7 @@ export default function AuthProvider({ children }: AuthProviderProps) {
     if (window.solana.isPhantom) {
       setProvider(window.phantom.solana);
     } else {
-      throw new Error("Phantom wallet is required!!");
+      enqueueSnackbar("Phantom wallet is required!!", { variant: "error" });
     }
   }, []);
 

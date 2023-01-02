@@ -7,7 +7,6 @@ export default async function getMsg(origin: string) {
   const res = await fetch(origin + "/api/auth/requestMessage", {
     credentials: "include",
     method: "GET",
-    headers: { "Content-Type": "application/json" },
   });
   if (!res.ok) throw new Error(await res.text());
 

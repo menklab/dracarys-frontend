@@ -30,12 +30,7 @@ export default function Login(props: LoginProps) {
         <Typography variant="body1" sx={{ maxWidth: 380, textAlign: "center" }}>
           By logging in you are agreeing to the manufacterers <br /> Privacy Policy and Terms of use.
         </Typography>
-        <Button
-          variant="contained"
-          onClick={async () => {
-            await connectToPhantom();
-          }}
-        >
+        <Button variant="contained" onClick={connectToPhantom}>
           Login
         </Button>
       </Stack>

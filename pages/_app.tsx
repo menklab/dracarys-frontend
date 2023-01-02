@@ -20,22 +20,22 @@ export default function App(props: AppProps) {
   const { Component, emotionCache = clientSideEmotionCache, pageProps } = props;
   return (
     <CacheProvider value={emotionCache}>
-      <AuthProvider>
-        <Head>
-          <meta name="viewport" content="initial-scale=1, width=device-width" />
-        </Head>
-        <ThemeProvider theme={theme}>
-          <CssBaseline />
-          <NotistackProvider
-            maxSnack={NOTISTACK_MAX_SNACK}
-            autoHideDuration={NOTISTACK_AUTO_HIDE_DURATION}
-            anchorOrigin={NOTISTACK_ANCHOR_ORIGIN}
-          >
+      <Head>
+        <meta name="viewport" content="initial-scale=1, width=device-width" />
+      </Head>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <NotistackProvider
+          maxSnack={NOTISTACK_MAX_SNACK}
+          autoHideDuration={NOTISTACK_AUTO_HIDE_DURATION}
+          anchorOrigin={NOTISTACK_ANCHOR_ORIGIN}
+        >
+          <AuthProvider>
             <Component {...pageProps} />
             <NetworkStatus />
-          </NotistackProvider>
-        </ThemeProvider>
-      </AuthProvider>
+          </AuthProvider>
+        </NotistackProvider>
+      </ThemeProvider>
     </CacheProvider>
   );
 }
