@@ -8,7 +8,7 @@ import {
   KONVA_CONNECTION_OFFSET,
 } from "~/constants/konva";
 import { Position } from "~/interfaces/position";
-import { Line } from "~/types/line";
+import { Line } from "~/types/konva";
 
 export const getAccountGroupId = (accountId: number) => `account-group-${accountId}`;
 export const getAccountRectId = (accountId: number) => `account-rect-${accountId}`;
