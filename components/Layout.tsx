@@ -3,6 +3,7 @@ import { AppBar, Box, Button, Drawer, List, ListItem, ListItemButton, ListItemTe
 import ListItemIcon from "@mui/material/ListItemIcon";
 import { ReactNode } from "react";
 import { LAYOUT_DRAWER_WIDTH } from "~/constants/layout";
+import { useAuth } from "~/contexts/auth/hooks";
 
 interface LayoutProps {
   appBarContent?: ReactNode;
@@ -12,6 +13,17 @@ interface LayoutProps {
 
 export default function Layout(props: LayoutProps) {
   const { appBarContent, drawerContent, children } = props;
+
+  const {
+    data: { pubKey },
+    actions: { provider, disconnectFromPhantom },
+  } = useAuth();
+  const pubKeyString = pubKey ? pubKey.toBase58() : "";
+  const logOut = provider
+    ? () => {
+        disconnectFromPhantom();
+      }
+    : undefined;
 
   return (
     <Box sx={{ display: "flex" }}>
@@ -48,7 +60,7 @@ export default function Layout(props: LayoutProps) {
               display: "inline-block",
             }}
           >
-            A2WW236565SWA231A234D2EKJ23453123213
+            {pubKeyString}
           </Button>
         </Toolbar>
 
@@ -56,7 +68,7 @@ export default function Layout(props: LayoutProps) {
 
         <List sx={{ mt: "auto" }}>
           <ListItem>
-            <ListItemButton>
+            <ListItemButton onClick={logOut}>
               <ListItemText>Disconnect wallet</ListItemText>
               <ListItemIcon sx={{ minWidth: "unset" }}>
                 <LogoutIcon />

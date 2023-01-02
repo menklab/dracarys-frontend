@@ -6,6 +6,7 @@ import Head from "next/head";
 import { SnackbarProvider as NotistackProvider } from "notistack";
 import NetworkStatus from "~/components/NetworkStatus";
 import { NOTISTACK_ANCHOR_ORIGIN, NOTISTACK_AUTO_HIDE_DURATION, NOTISTACK_MAX_SNACK } from "~/constants/notistack";
+import AuthProvider from "~/contexts/auth/provider";
 import createEmotionCache from "~/utils/createEmotionCache";
 import theme from "~/utils/muiTheme";
 
@@ -29,8 +30,10 @@ export default function App(props: AppProps) {
           autoHideDuration={NOTISTACK_AUTO_HIDE_DURATION}
           anchorOrigin={NOTISTACK_ANCHOR_ORIGIN}
         >
-          <Component {...pageProps} />
-          <NetworkStatus />
+          <AuthProvider>
+            <Component {...pageProps} />
+            <NetworkStatus />
+          </AuthProvider>
         </NotistackProvider>
       </ThemeProvider>
     </CacheProvider>
