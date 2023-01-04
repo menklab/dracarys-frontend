@@ -1,16 +1,16 @@
-import absoluteUrl from "next-absolute-url";
+import { API_ROUTES } from "~/constants/api_routes";
 
 interface UpdateProgramBody {
   name: string;
 }
 
-// TODO: replace origin to nest_host env var when backend dev is ready
+// FE usage only
 export default async function updateProgram(programId: number, body: UpdateProgramBody): Promise<void> {
-  const { origin } = absoluteUrl();
-  const res = await fetch(origin + `/api/programs/${programId}`, {
-    method: "PATCH",
+  const res = await fetch(API_ROUTES.PROGRAM(programId), {
     body: JSON.stringify(body),
+    method: "PATCH",
     headers: { "Content-Type": "application/json" },
+    credentials: "include",
   });
   if (!res.ok) throw new Error(await res.text());
 }

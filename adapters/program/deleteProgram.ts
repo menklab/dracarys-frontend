@@ -1,8 +1,7 @@
-import absoluteUrl from "next-absolute-url";
+import { API_ROUTES } from "~/constants/api_routes";
 
-// TODO: replace origin to nest_host env var when backend dev is ready
+// FE usage only
 export default async function deleteProgram(programId: number): Promise<void> {
-  const { origin } = absoluteUrl();
-  const res = await fetch(origin + `/api/programs/${programId}`, { method: "DELETE" });
+  const res = await fetch(API_ROUTES.PROGRAM(programId), { method: "DELETE", credentials: "include" });
   if (!res.ok) throw new Error(await res.text());
 }

@@ -1,12 +1,13 @@
+import { API_ROUTES } from "~/constants/api_routes";
+
 interface validateMsgBody {
   pubKey: string;
   message: string;
   signature: string;
 }
 
-// TODO: replace origin to nest_host env var when backend dev is ready
-export default async function validateMsg(origin: string, body: validateMsgBody): Promise<boolean> {
-  const res = await fetch(origin + "/api/auth/validateMessage", {
+export default async function validateMsg(body: validateMsgBody): Promise<boolean> {
+  const res = await fetch(API_ROUTES.VALIDATE_MESSAGE(), {
     method: "POST",
     body: JSON.stringify(body),
     headers: { "Content-Type": "application/json" },

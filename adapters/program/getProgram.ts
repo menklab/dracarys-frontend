@@ -1,13 +1,11 @@
+import { API_ROUTES } from "~/constants/api_routes";
 import { Program } from "~/interfaces/program";
 
-interface GetProgramJsonResponse {
-  program: Program;
-}
+type GetProgramJsonResponse = { id: number; name: string; createdAt: string; updatedAt: string };
 
-// TODO: replace origin to nest_host env var when backend dev is ready
-export default async function getProgram(origin: string, programId: number): Promise<Program> {
-  const res = await fetch(origin + `/api/programs/${programId}`, { method: "GET" });
+// SSR usage only
+export default async function getProgram(sid: string, programId: number): Promise<Program> {
+  const res = await fetch(API_ROUTES.PROGRAM(programId), { method: "GET", headers: { cookie: `connect.sid=${sid}` } });
   if (!res.ok) throw new Error(await res.text());
-  const data = (await res.json()) as GetProgramJsonResponse;
-  return data.program;
+  return { ...((await res.json()) as GetProgramJsonResponse) };
 }

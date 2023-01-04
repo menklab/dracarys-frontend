@@ -2,5 +2,6 @@ export const ROUTES = {
   HOME: () => "/",
   LOGIN: () => "/login",
   PROGRAMS: () => "/programs",
-  PROGRAM: (programId: number) => `/programs/${programId}`,
+  ACCOUNTS: (programId: number) => `/programs/${programId}/accounts`,
+  INSTRUCTIONS: (programId: number) => `/programs/${programId}/instructions`,
 } as const;
