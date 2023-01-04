@@ -9,20 +9,22 @@ export default function View() {
   return (
     <Box>
       <List sx={{ p: 0 }}>
-        {programs.map((program) => (
-          <Link
-            key={`program-${program.id}`}
-            href={ROUTES.PROGRAM(program.id)}
-            style={{ textDecoration: "none", color: "unset" }}
-          >
-            <ListItem disablePadding>
-              <ListItemButton>
-                <ListItemText>{program.name}</ListItemText>
-              </ListItemButton>
-            </ListItem>
-            <Divider />
-          </Link>
-        ))}
+        {programs
+          .sort((a, b) => new Date(b.createdAt).valueOf() - new Date(a.createdAt).valueOf())
+          .map((program) => (
+            <Link
+              key={`program-${program.id}`}
+              href={ROUTES.ACCOUNTS(program.id)}
+              style={{ textDecoration: "none", color: "unset" }}
+            >
+              <ListItem disablePadding>
+                <ListItemButton>
+                  <ListItemText>{program.name}</ListItemText>
+                </ListItemButton>
+              </ListItem>
+              <Divider />
+            </Link>
+          ))}
       </List>
     </Box>
   );

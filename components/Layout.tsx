@@ -1,5 +1,6 @@
 import LogoutIcon from "@mui/icons-material/Logout";
-import { AppBar, Box, Button, Drawer, List, ListItem, ListItemButton, ListItemText, Toolbar } from "@mui/material";
+import { LoadingButton } from "@mui/lab";
+import { AppBar, Box, Drawer, List, ListItem, ListItemButton, ListItemText, Toolbar } from "@mui/material";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import { ReactNode } from "react";
 import { LAYOUT_DRAWER_WIDTH } from "~/constants/layout";
@@ -48,7 +49,8 @@ export default function Layout(props: LayoutProps) {
         anchor="left"
       >
         <Toolbar sx={{ justifyContent: "center" }}>
-          <Button
+          <LoadingButton
+            loading={!pubKeyString}
             variant="contained"
             sx={{
               width: 240,
@@ -57,11 +59,11 @@ export default function Layout(props: LayoutProps) {
               textOverflow: "ellipsis",
               whiteSpace: "nowrap",
               overflow: "hidden",
-              display: "inline-block",
+              ...(pubKeyString ? { display: "inline-block" } : {}),
             }}
           >
-            {pubKeyString}
-          </Button>
+            {pubKeyString ? pubKeyString : "ㅤ"}
+          </LoadingButton>
         </Toolbar>
 
         {drawerContent}

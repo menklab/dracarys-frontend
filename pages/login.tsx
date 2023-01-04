@@ -1,27 +1,13 @@
 import { Button, Container, Stack } from "@mui/material";
 import Typography from "@mui/material/Typography";
 import { GetServerSideProps } from "next";
-import { useRouter } from "next/router";
-import { useEffect } from "react";
+import { ROUTES } from "~/constants/routes";
 import { useAuth } from "~/contexts/auth/hooks";
 
-interface LoginProps {
-  isAuthorized?: boolean;
-}
-
-export default function Login(props: LoginProps) {
-  const { isAuthorized } = props;
-  const router = useRouter();
-
+export default function Login() {
   const {
     actions: { connectToPhantom },
   } = useAuth();
-
-  useEffect(() => {
-    if (isAuthorized) {
-      router.push("/");
-    }
-  });
 
   return (
     <Container maxWidth="lg">
@@ -38,11 +24,8 @@ export default function Login(props: LoginProps) {
   );
 }
 
-export const getServerSideProps: GetServerSideProps<LoginProps> = async ({ req }) => {
+export const getServerSideProps: GetServerSideProps = async ({ req }) => {
   const authSid = req?.cookies["connect.sid"];
-  let isAuthorized = false;
-  if (authSid) {
-    isAuthorized = true;
-  }
-  return { props: { isAuthorized } };
+  if (authSid) return { redirect: { permanent: false, destination: ROUTES.PROGRAMS() }, props: {} };
+  return { props: {} };
 };
