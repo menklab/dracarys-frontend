@@ -16,5 +16,6 @@ export const getServerSideProps: GetServerSideProps<ProgramAccountsPageProps> = 
   const { programId } = params || {};
   const { origin } = absoluteUrl(req);
   const programs = await getProgram(origin, Number(programId));
+  console.log(programs);
   return { props: { program: JSON.parse(JSON.stringify(programs)) } };
 };

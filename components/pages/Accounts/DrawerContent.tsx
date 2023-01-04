@@ -1,14 +1,33 @@
+import AddIcon from "@mui/icons-material/Add";
 import CancelIcon from "@mui/icons-material/Cancel";
 import CheckIcon from "@mui/icons-material/Check";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import EditIcon from "@mui/icons-material/Edit";
-import { IconButton, List, ListItem, ListItemIcon, ListItemText, TextField } from "@mui/material";
-import { Fragment } from "react";
+import ExpandLess from "@mui/icons-material/ExpandLess";
+import ExpandMore from "@mui/icons-material/ExpandMore";
+import {
+  Collapse,
+  Divider,
+  IconButton,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  TextField,
+} from "@mui/material";
+import { Fragment, useState } from "react";
 import { SubmitHandler } from "react-hook-form";
 import { useAccountsPage } from "~/components/pages/Accounts/context";
 import { EditProgramNameSchemaType, useEditProgramNameForm } from "~/forms/editProgramName";
 
 export default function DrawerContent() {
+  const [open, setOpen] = useState(true);
+
+  const handleClick = () => {
+    setOpen(!open);
+  };
+
   const {
     program,
     editProgramName,
@@ -69,6 +88,24 @@ export default function DrawerContent() {
           )}
         </ListItemText>
       </ListItem>
+      <Divider />
+      <ListItem
+        secondaryAction={
+          <IconButton onClick={handleClick}>
+            <AddIcon />
+          </IconButton>
+        }
+      >
+        <IconButton onClick={handleClick}>{open ? <ExpandLess /> : <ExpandMore />}</IconButton>
+        <ListItemText>Accounts</ListItemText>
+      </ListItem>
+      <Collapse in={open} timeout="auto" unmountOnExit>
+        <List component="div" disablePadding>
+          <ListItemButton sx={{ pl: 7 }}>
+            <ListItemText primary="Starred" />
+          </ListItemButton>
+        </List>
+      </Collapse>
     </List>
   );
 }
