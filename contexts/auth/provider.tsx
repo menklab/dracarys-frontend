@@ -4,6 +4,7 @@ import { useSnackbar } from "notistack";
 import { useEffect, useState } from "react";
 import getMsg from "~/adapters/auth/getMsg";
 import validateMsg from "~/adapters/auth/validateMsg";
+import { ROUTES } from "~/constants/routes";
 import { PubKey } from "~/types/phantom";
 import { AuthContext } from "./context";
 import { AuthProviderProps, Provider } from "./types";
@@ -24,7 +25,7 @@ export default function AuthProvider({ children }: AuthProviderProps) {
 
   const connectToBE = async () => {
     if (!pubKey) return;
-    const { message } = await getMsg("http://localhost:8080");
+    const { message } = await getMsg();
     const encodedMessage = new TextEncoder().encode(message);
     try {
       const signedMessage = await provider?.signMessage(encodedMessage, "utf8");
@@ -32,14 +33,14 @@ export default function AuthProvider({ children }: AuthProviderProps) {
       const signatureString = btoa(String.fromCharCode.apply(null, signature as number[]));
       const pubKeyString = pubKey.toBase58();
 
-      const response = await validateMsg("http://localhost:8080", {
+      const response = await validateMsg({
         pubKey: pubKeyString,
         message: message,
         signature: signatureString,
       });
 
       if (response) {
-        router.push("/");
+        return await router.push(ROUTES.HOME());
       }
     } catch (e) {
       cookie.remove("connect.sid");
@@ -61,7 +62,7 @@ export default function AuthProvider({ children }: AuthProviderProps) {
     await provider?.disconnect();
     cookie.remove("connect.sid");
     setSid(undefined);
-    router.push("/login");
+    return await router.push(ROUTES.LOGIN());
   };
 
   useEffect(() => {

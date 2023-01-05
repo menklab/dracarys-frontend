@@ -1,16 +1,16 @@
-import absoluteUrl from "next-absolute-url";
+import { API_ROUTES } from "~/constants/api_routes";
 
 interface CreateProgramBody {
   name: string;
 }
 
-// TODO: replace origin to nest_host env var when backend dev is ready
+// FE usage only
 export default async function createProgram(body: CreateProgramBody): Promise<void> {
-  const { origin } = absoluteUrl();
-  const res = await fetch(origin + "/api/programs", {
-    method: "POST",
+  const res = await fetch(API_ROUTES.PROGRAMS(), {
     body: JSON.stringify(body),
+    method: "POST",
     headers: { "Content-Type": "application/json" },
+    credentials: "include",
   });
   if (!res.ok) throw new Error(await res.text());
 }

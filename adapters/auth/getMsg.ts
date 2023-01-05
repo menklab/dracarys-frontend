@@ -1,10 +1,11 @@
+import { API_ROUTES } from "~/constants/api_routes";
+
 interface secretMsgBody {
   message: string;
 }
 
-// TODO: replace origin to nest_host env var when backend dev is ready
-export default async function getMsg(origin: string) {
-  const res = await fetch(origin + "/api/auth/requestMessage", {
+export default async function getMsg() {
+  const res = await fetch(API_ROUTES.REQUEST_MESSAGE(), {
     credentials: "include",
     method: "GET",
   });
