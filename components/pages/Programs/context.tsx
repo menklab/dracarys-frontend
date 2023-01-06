@@ -2,6 +2,7 @@ import { useSnackbar } from "notistack";
 import { createContext, ReactNode, useContext, useState } from "react";
 import createProgram from "~/adapters/program/createProgram";
 import useTriggerSSR from "~/hooks/useTriggerSSR";
+import { ApiException } from "~/interfaces/error";
 import { Program } from "~/interfaces/program";
 
 interface ProgramsPageContextDefaultValue {
@@ -29,7 +30,7 @@ export const ProgramsPageProvider = ({ programs, children }: ProgramsPageProvide
       await createProgram({ name });
       await triggerSSR();
     } catch (e) {
-      enqueueSnackbar((e as Error).message, { variant: "error" });
+      for (const error of (e as ApiException).errors) enqueueSnackbar(error.message, { variant: "error" });
     }
   };
 

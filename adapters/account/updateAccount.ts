@@ -1,4 +1,6 @@
+import { ApiException } from "~/interfaces/error";
 import { Position } from "~/interfaces/position";
+import isApiException from "~/utils/isApiException";
 
 interface UpdateAccountBody {
   accountId: number;
@@ -13,5 +15,8 @@ export default async function updateAccount(origin: string, body: UpdateAccountB
     body: JSON.stringify(body),
     headers: { "Content-Type": "application/json" },
   });
-  if (!res.ok) throw new Error(await res.text());
+  if (!res.ok) {
+    const exception = (await res.json()) as ApiException;
+    if (isApiException(exception)) throw exception;
+  }
 }

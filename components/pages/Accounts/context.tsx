@@ -6,6 +6,7 @@ import updateProgram from "~/adapters/program/updateProgram";
 import { LAYOUT_DEFAULT_VIEW_VARIANT } from "~/constants/layout";
 import { ROUTES } from "~/constants/routes";
 import useTriggerSSR from "~/hooks/useTriggerSSR";
+import { ApiException } from "~/interfaces/error";
 import { Program } from "~/interfaces/program";
 import { LayoutViewVariant } from "~/types/layout";
 
@@ -54,7 +55,7 @@ export const AccountsPageProvider = ({ program, children }: AccountsPageProvider
       setIsDeleteProgramDialogOpen(false);
       await router.push(ROUTES.PROGRAMS());
     } catch (e) {
-      enqueueSnackbar((e as Error).message, { variant: "error" });
+      for (const error of (e as ApiException).errors) enqueueSnackbar(error.message, { variant: "error" });
     }
     setIsProgramDeleting(false);
   };
@@ -65,7 +66,7 @@ export const AccountsPageProvider = ({ program, children }: AccountsPageProvider
       await triggerSSR();
       setIsEditingProgramName(false);
     } catch (e) {
-      enqueueSnackbar((e as Error).message, { variant: "error" });
+      for (const error of (e as ApiException).errors) enqueueSnackbar(error.message, { variant: "error" });
     }
   };
 

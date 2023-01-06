@@ -1,4 +1,6 @@
 import { API_ROUTES } from "~/constants/api_routes";
+import { ApiException } from "~/interfaces/error";
+import isApiException from "~/utils/isApiException";
 
 interface CreateProgramBody {
   name: string;
@@ -12,5 +14,8 @@ export default async function createProgram(body: CreateProgramBody): Promise<vo
     headers: { "Content-Type": "application/json" },
     credentials: "include",
   });
-  if (!res.ok) throw new Error(await res.text());
+  if (!res.ok) {
+    const exception = (await res.json()) as ApiException;
+    if (isApiException(exception)) throw exception;
+  }
 }

@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import getMsg from "~/adapters/auth/getMsg";
 import validateMsg from "~/adapters/auth/validateMsg";
 import { ROUTES } from "~/constants/routes";
+import { ApiException } from "~/interfaces/error";
 import { PubKey } from "~/types/phantom";
 import { AuthContext } from "./context";
 import { AuthProviderProps, Provider } from "./types";
@@ -44,7 +45,7 @@ export default function AuthProvider({ children }: AuthProviderProps) {
       }
     } catch (e) {
       cookie.remove("connect.sid");
-      enqueueSnackbar((e as Error).message, { variant: "error" });
+      for (const error of (e as ApiException).errors) enqueueSnackbar(error.message, { variant: "error" });
     }
   };
 
@@ -85,7 +86,7 @@ export default function AuthProvider({ children }: AuthProviderProps) {
     if (window.solana.isPhantom) {
       setProvider(window.phantom.solana);
     } else {
-      enqueueSnackbar("Phantom wallet is required!!", { variant: "error" });
+      enqueueSnackbar("Phantom wallet is required!", { variant: "error" });
     }
   }, []);
 
