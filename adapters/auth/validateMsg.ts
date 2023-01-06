@@ -1,6 +1,4 @@
 import { API_ROUTES } from "~/constants/api_routes";
-import { ApiException } from "~/interfaces/error";
-import isApiException from "~/utils/isApiException";
 
 interface validateMsgBody {
   pubKey: string;
@@ -15,9 +13,6 @@ export default async function validateMsg(body: validateMsgBody): Promise<boolea
     headers: { "Content-Type": "application/json" },
     credentials: "include",
   });
-  if (!res.ok) {
-    const exception = (await res.json()) as ApiException;
-    if (isApiException(exception)) throw exception;
-  }
+  if (!res.ok) throw await res.json();
   return await res.json();
 }
