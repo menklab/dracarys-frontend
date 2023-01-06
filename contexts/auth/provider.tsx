@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import getMsg from "~/adapters/auth/getMsg";
 import validateMsg from "~/adapters/auth/validateMsg";
 import { ROUTES } from "~/constants/routes";
-import { ApiException } from "~/interfaces/error";
+import useErrorHandler from "~/hooks/useErrorHandler";
 import { PubKey } from "~/types/phantom";
 import { AuthContext } from "./context";
 import { AuthProviderProps, Provider } from "./types";
@@ -22,6 +22,7 @@ export default function AuthProvider({ children }: AuthProviderProps) {
   const [sid, setSid] = useState<string | undefined>();
   const [provider, setProvider] = useState<Provider | undefined>();
   const [pubKey, setPubKey] = useState<PubKey>();
+  const { displayCaughtError } = useErrorHandler();
   const { enqueueSnackbar } = useSnackbar();
 
   const connectToBE = async () => {
@@ -45,7 +46,7 @@ export default function AuthProvider({ children }: AuthProviderProps) {
       }
     } catch (e) {
       cookie.remove("connect.sid");
-      for (const error of (e as ApiException).errors) enqueueSnackbar(error.message, { variant: "error" });
+      displayCaughtError(e);
     }
   };
 
@@ -55,7 +56,7 @@ export default function AuthProvider({ children }: AuthProviderProps) {
       const pubKey = resp?.publicKey;
       setPubKey(pubKey);
     } catch (e) {
-      enqueueSnackbar((e as Error).message, { variant: "error" });
+      displayCaughtError(e);
     }
   };
 

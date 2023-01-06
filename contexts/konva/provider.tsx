@@ -1,16 +1,15 @@
 import Konva from "konva";
 import absoluteUrl from "next-absolute-url";
-import { useSnackbar } from "notistack";
 import { useRef } from "react";
 import updateAccount from "~/adapters/account/updateAccount";
+import useErrorHandler from "~/hooks/useErrorHandler";
 import { Connection } from "~/interfaces/connection";
-import { ApiException } from "~/interfaces/error";
 import { calculatePointsForConnection, getAccountGroupId, getConnectionId } from "~/utils/konva";
 import { KonvaContext } from "./context";
 import { KonvaContextActions, KonvaProviderProps } from "./types";
 
 export default function KonvaProvider({ accounts, children }: KonvaProviderProps) {
-  const { enqueueSnackbar } = useSnackbar();
+  const { displayCaughtError } = useErrorHandler();
   const stageRef = useRef<Konva.Stage>(null);
 
   const actions: KonvaContextActions = {
@@ -21,7 +20,7 @@ export default function KonvaProvider({ accounts, children }: KonvaProviderProps
         const { origin } = absoluteUrl();
         await updateAccount(origin, { accountId, newPosition: dragTo });
       } catch (e) {
-        for (const error of (e as ApiException).errors) enqueueSnackbar(error.message, { variant: "error" });
+        displayCaughtError(e);
         cancelDragCb();
         actions.repositionArrows(accountId);
       }

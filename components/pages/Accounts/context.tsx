@@ -1,12 +1,11 @@
 import { useRouter } from "next/router";
-import { useSnackbar } from "notistack";
 import { createContext, ReactNode, useContext, useState } from "react";
 import deleteProgram from "~/adapters/program/deleteProgram";
 import updateProgram from "~/adapters/program/updateProgram";
 import { LAYOUT_DEFAULT_VIEW_VARIANT } from "~/constants/layout";
 import { ROUTES } from "~/constants/routes";
+import useErrorHandler from "~/hooks/useErrorHandler";
 import useTriggerSSR from "~/hooks/useTriggerSSR";
-import { ApiException } from "~/interfaces/error";
 import { Program } from "~/interfaces/program";
 import { LayoutViewVariant } from "~/types/layout";
 
@@ -36,7 +35,7 @@ interface AccountsPageProviderProps {
 
 export const AccountsPageProvider = ({ program, children }: AccountsPageProviderProps) => {
   const router = useRouter();
-  const { enqueueSnackbar } = useSnackbar();
+  const { displayCaughtError } = useErrorHandler();
   const { triggerSSR } = useTriggerSSR();
   const [viewVariant, setViewVariant] = useState<LayoutViewVariant>(LAYOUT_DEFAULT_VIEW_VARIANT);
   const [isDeleteProgramDialogOpen, setIsDeleteProgramDialogOpen] = useState<boolean>(false);
@@ -55,7 +54,7 @@ export const AccountsPageProvider = ({ program, children }: AccountsPageProvider
       setIsDeleteProgramDialogOpen(false);
       await router.push(ROUTES.PROGRAMS());
     } catch (e) {
-      for (const error of (e as ApiException).errors) enqueueSnackbar(error.message, { variant: "error" });
+      displayCaughtError(e);
     }
     setIsProgramDeleting(false);
   };
@@ -66,7 +65,7 @@ export const AccountsPageProvider = ({ program, children }: AccountsPageProvider
       await triggerSSR();
       setIsEditingProgramName(false);
     } catch (e) {
-      for (const error of (e as ApiException).errors) enqueueSnackbar(error.message, { variant: "error" });
+      displayCaughtError(e);
     }
   };
 
