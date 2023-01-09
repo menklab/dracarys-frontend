@@ -15,7 +15,7 @@ export default function Login() {
         <Typography variant="h3">Login</Typography>
         <Typography variant="body1" sx={{ maxWidth: 380, textAlign: "center" }}>
           By logging in you are agreeing to the manufacterers <br /> Privacy Policy and Terms of use. **
-          {process.env.NEST_HOST}**
+          {process.env.NEST_HOST}** DOPPLER_ENVIRONMENT - {process.env.DOPPLER_ENVIRONMENT}**
         </Typography>
         <Button variant="contained" onClick={connectToPhantom}>
           Login
