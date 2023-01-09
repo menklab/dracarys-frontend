@@ -9,6 +9,8 @@ export default function Login() {
     actions: { connectToPhantom },
   } = useAuth();
 
+  console.log(process.env);
+
   return (
     <Container maxWidth="lg">
       <Stack direction="column" justifyContent="center" alignItems="center" spacing={2} sx={{ height: "100vh" }}>
