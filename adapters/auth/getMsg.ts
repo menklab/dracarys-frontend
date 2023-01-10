@@ -9,7 +9,6 @@ export default async function getMsg() {
     credentials: "include",
     method: "GET",
   });
-  if (!res.ok) throw new Error(await res.text());
-
+  if (!res.ok) throw await res.json();
   return (await res.json()) as secretMsgBody;
 }

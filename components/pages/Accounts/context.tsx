@@ -1,11 +1,11 @@
 import { useRouter } from "next/router";
-import { useSnackbar } from "notistack";
 import { createContext, ReactNode, useContext, useState } from "react";
 import createAccount from "~/adapters/account/createAccount";
 import deleteProgram from "~/adapters/program/deleteProgram";
 import updateProgram from "~/adapters/program/updateProgram";
 import { LAYOUT_DEFAULT_VIEW_VARIANT } from "~/constants/layout";
 import { ROUTES } from "~/constants/routes";
+import useErrorHandler from "~/hooks/useErrorHandler";
 import useTriggerSSR from "~/hooks/useTriggerSSR";
 import { Program } from "~/interfaces/program";
 import { LayoutViewVariant } from "~/types/layout";
@@ -40,7 +40,7 @@ interface AccountsPageProviderProps {
 
 export const AccountsPageProvider = ({ program, children }: AccountsPageProviderProps) => {
   const router = useRouter();
-  const { enqueueSnackbar } = useSnackbar();
+  const { displayCaughtError } = useErrorHandler();
   const { triggerSSR } = useTriggerSSR();
   const [viewVariant, setViewVariant] = useState<LayoutViewVariant>(LAYOUT_DEFAULT_VIEW_VARIANT);
   const [isDeleteProgramDialogOpen, setIsDeleteProgramDialogOpen] = useState<boolean>(false);
@@ -57,7 +57,7 @@ export const AccountsPageProvider = ({ program, children }: AccountsPageProvider
       await createAccount({ name, programId: program.id });
       await triggerSSR();
     } catch (e) {
-      enqueueSnackbar((e as Error).message, { variant: "error" });
+      displayCaughtError(e);
     }
   };
 
@@ -69,7 +69,7 @@ export const AccountsPageProvider = ({ program, children }: AccountsPageProvider
       setIsDeleteProgramDialogOpen(false);
       await router.push(ROUTES.PROGRAMS());
     } catch (e) {
-      enqueueSnackbar((e as Error).message, { variant: "error" });
+      displayCaughtError(e);
     }
     setIsProgramDeleting(false);
   };
@@ -80,7 +80,7 @@ export const AccountsPageProvider = ({ program, children }: AccountsPageProvider
       await triggerSSR();
       setIsEditingProgramName(false);
     } catch (e) {
-      enqueueSnackbar((e as Error).message, { variant: "error" });
+      displayCaughtError(e);
     }
   };
 

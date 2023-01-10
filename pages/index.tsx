@@ -24,11 +24,11 @@ export const getServerSideProps: GetServerSideProps<HomeProps> = async () => {
   return { redirect: { permanent: false, destination: ROUTES.PROGRAMS() }, props: {} };
   // NOTE: commented for future use
   /*
-  const { origin } = absoluteUrl(req);
   // NOTE: healthy response from backend must be an empty array of accounts
   // if SSR fails due to backend failure it should be treated as 500 error
   // p.s. 401 error should be handled differently
-  const accounts = await getAccounts(origin);
+  const {programId} = params || {};
+  const accounts = await getAccounts(programId);
   // issue: https://github.com/vercel/next.js/discussions/11209
   // NOTE: json validation happens only in dev environment
   return { props: { accounts: JSON.parse(JSON.stringify(accounts)) } };

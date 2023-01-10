@@ -1,3 +1,4 @@
+import { API_ROUTES } from "~/constants/api_routes";
 import { Position } from "~/interfaces/position";
 
 interface UpdateAccountBody {
@@ -5,13 +6,11 @@ interface UpdateAccountBody {
   newPosition: Position;
 }
 
-// TODO: replace origin to nest_host env var when backend dev is ready
-// NOTE: this is done for demonstration purposes only
 export default async function updateAccount(origin: string, body: UpdateAccountBody): Promise<void> {
-  const res = await fetch(origin + "/api/accounts", {
+  const res = await fetch(API_ROUTES.ACCOUNTS(), {
     method: "PUT",
     body: JSON.stringify(body),
     headers: { "Content-Type": "application/json" },
   });
-  if (!res.ok) throw new Error(await res.text());
+  if (!res.ok) throw await res.json();
 }

@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import getMsg from "~/adapters/auth/getMsg";
 import validateMsg from "~/adapters/auth/validateMsg";
 import { ROUTES } from "~/constants/routes";
+import useErrorHandler from "~/hooks/useErrorHandler";
 import { PubKey } from "~/types/phantom";
 import { AuthContext } from "./context";
 import { AuthProviderProps, Provider } from "./types";
@@ -21,6 +22,7 @@ export default function AuthProvider({ children }: AuthProviderProps) {
   const [sid, setSid] = useState<string | undefined>();
   const [provider, setProvider] = useState<Provider | undefined>();
   const [pubKey, setPubKey] = useState<PubKey>();
+  const { displayCaughtError } = useErrorHandler();
   const { enqueueSnackbar } = useSnackbar();
 
   const connectToBE = async () => {
@@ -44,7 +46,7 @@ export default function AuthProvider({ children }: AuthProviderProps) {
       }
     } catch (e) {
       cookie.remove("connect.sid");
-      enqueueSnackbar((e as Error).message, { variant: "error" });
+      displayCaughtError(e);
     }
   };
 
@@ -54,7 +56,7 @@ export default function AuthProvider({ children }: AuthProviderProps) {
       const pubKey = resp?.publicKey;
       setPubKey(pubKey);
     } catch (e) {
-      enqueueSnackbar((e as Error).message, { variant: "error" });
+      displayCaughtError(e);
     }
   };
 
@@ -82,10 +84,14 @@ export default function AuthProvider({ children }: AuthProviderProps) {
 
   useEffect(() => {
     setSid(cookie.get("connect.sid"));
-    if (window.solana.isPhantom) {
+    if (window?.solana?.isPhantom) {
       setProvider(window.phantom.solana);
     } else {
-      enqueueSnackbar("Phantom wallet is required!!", { variant: "error" });
+      enqueueSnackbar("Phantom wallet is required!\nPlease install phantom wallet browser extension", {
+        style: { whiteSpace: "pre-line" },
+        variant: "warning",
+        persist: true,
+      });
     }
   }, []);
 

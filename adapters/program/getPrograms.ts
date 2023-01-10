@@ -6,7 +6,7 @@ type GetProgramsJsonResponse = { id: number; name: string; createdAt: string; up
 // SSR usage only
 export default async function getPrograms(sid: string): Promise<Program[]> {
   const res = await fetch(API_ROUTES.PROGRAMS(), { method: "GET", headers: { cookie: `connect.sid=${sid}` } });
-  if (!res.ok) throw new Error(await res.text());
+  if (!res.ok) throw await res.json();
   const data = (await res.json()) as GetProgramsJsonResponse;
   return (data || [])?.map((program) => ({ ...program }));
 }

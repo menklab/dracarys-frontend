@@ -12,5 +12,5 @@ export default async function updateProgram(programId: number, body: UpdateProgr
     headers: { "Content-Type": "application/json" },
     credentials: "include",
   });
-  if (!res.ok) throw new Error(await res.text());
+  if (!res.ok) throw await res.json();
 }

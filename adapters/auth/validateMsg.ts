@@ -13,6 +13,6 @@ export default async function validateMsg(body: validateMsgBody): Promise<boolea
     headers: { "Content-Type": "application/json" },
     credentials: "include",
   });
-  if (!res.ok) throw new Error(await res.text());
+  if (!res.ok) throw await res.json();
   return await res.json();
 }
