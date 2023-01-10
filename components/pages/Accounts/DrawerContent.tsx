@@ -20,12 +20,18 @@ import { Fragment, useState } from "react";
 import { SubmitHandler } from "react-hook-form";
 import { useAccountsPage } from "~/components/pages/Accounts/context";
 import { EditProgramNameSchemaType, useEditProgramNameForm } from "~/forms/editProgramName";
+import { Account } from "~/interfaces/account";
 
-export default function DrawerContent() {
-  const [open, setOpen] = useState(true);
+interface DrawerContentProps {
+  accounts: Account[];
+}
 
-  const handleClick = () => {
-    setOpen(!open);
+export default function DrawerContent({ accounts }: DrawerContentProps) {
+  const [openAccounts, setOpenAccounts] = useState<boolean>(false);
+  const { createAccountDialogOpen } = useAccountsPage();
+
+  const handleOpenAccounts = () => {
+    setOpenAccounts(!openAccounts);
   };
 
   const {
@@ -91,20 +97,24 @@ export default function DrawerContent() {
       <Divider />
       <ListItem
         secondaryAction={
-          <IconButton onClick={handleClick}>
+          <IconButton onClick={createAccountDialogOpen}>
             <AddIcon />
           </IconButton>
         }
       >
-        <IconButton onClick={handleClick}>{open ? <ExpandLess /> : <ExpandMore />}</IconButton>
+        <IconButton onClick={handleOpenAccounts}>{openAccounts ? <ExpandLess /> : <ExpandMore />}</IconButton>
         <ListItemText>Accounts</ListItemText>
       </ListItem>
-      <Collapse in={open} timeout="auto" unmountOnExit>
-        <List component="div" disablePadding>
-          <ListItemButton sx={{ pl: 7 }}>
-            <ListItemText primary="Starred" />
-          </ListItemButton>
-        </List>
+      <Collapse in={openAccounts} timeout="auto" unmountOnExit>
+        {accounts.map((account) => {
+          return (
+            <List component="div" disablePadding key={account.id}>
+              <ListItemButton sx={{ pl: 7 }}>
+                <ListItemText primary={account.name} />
+              </ListItemButton>
+            </List>
+          );
+        })}
       </Collapse>
     </List>
   );

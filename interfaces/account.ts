@@ -7,4 +7,6 @@ export interface Account {
   attributes?: Attribute[];
   accounts?: number[];
   position?: Position;
+  createdAt?: string;
+  updatedAt?: string;
 }
