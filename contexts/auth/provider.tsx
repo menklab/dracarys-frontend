@@ -84,10 +84,14 @@ export default function AuthProvider({ children }: AuthProviderProps) {
 
   useEffect(() => {
     setSid(cookie.get("connect.sid"));
-    if (window.solana.isPhantom) {
+    if (window?.solana?.isPhantom) {
       setProvider(window.phantom.solana);
     } else {
-      enqueueSnackbar("Phantom wallet is required!", { variant: "error" });
+      enqueueSnackbar("Phantom wallet is required!\nPlease install phantom wallet browser extension", {
+        style: { whiteSpace: "pre-line" },
+        variant: "warning",
+        persist: true,
+      });
     }
   }, []);
 
