@@ -1,14 +1,39 @@
+import AddIcon from "@mui/icons-material/Add";
 import CancelIcon from "@mui/icons-material/Cancel";
 import CheckIcon from "@mui/icons-material/Check";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import EditIcon from "@mui/icons-material/Edit";
-import { IconButton, List, ListItem, ListItemIcon, ListItemText, TextField } from "@mui/material";
-import { Fragment } from "react";
+import ExpandLess from "@mui/icons-material/ExpandLess";
+import ExpandMore from "@mui/icons-material/ExpandMore";
+import {
+  Collapse,
+  Divider,
+  IconButton,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  TextField,
+} from "@mui/material";
+import { Fragment, useState } from "react";
 import { SubmitHandler } from "react-hook-form";
 import { useAccountsPage } from "~/components/pages/Accounts/context";
 import { EditProgramNameSchemaType, useEditProgramNameForm } from "~/forms/editProgramName";
+import { Account } from "~/interfaces/account";
 
-export default function DrawerContent() {
+interface DrawerContentProps {
+  accounts: Account[];
+}
+
+export default function DrawerContent({ accounts }: DrawerContentProps) {
+  const [openAccounts, setOpenAccounts] = useState<boolean>(false);
+  const { createAccountDialogOpen } = useAccountsPage();
+
+  const handleOpenAccounts = () => {
+    setOpenAccounts(!openAccounts);
+  };
+
   const {
     program,
     editProgramName,
@@ -69,6 +94,28 @@ export default function DrawerContent() {
           )}
         </ListItemText>
       </ListItem>
+      <Divider />
+      <ListItem
+        secondaryAction={
+          <IconButton onClick={createAccountDialogOpen}>
+            <AddIcon />
+          </IconButton>
+        }
+      >
+        <IconButton onClick={handleOpenAccounts}>{openAccounts ? <ExpandLess /> : <ExpandMore />}</IconButton>
+        <ListItemText>Accounts</ListItemText>
+      </ListItem>
+      <Collapse in={openAccounts} timeout="auto" unmountOnExit>
+        {accounts.map((account) => {
+          return (
+            <List component="div" disablePadding key={account.id}>
+              <ListItemButton sx={{ pl: 7 }}>
+                <ListItemText primary={account.name} />
+              </ListItemButton>
+            </List>
+          );
+        })}
+      </Collapse>
     </List>
   );
 }

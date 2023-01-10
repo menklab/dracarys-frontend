@@ -1,5 +1,6 @@
 import { useRouter } from "next/router";
 import { createContext, ReactNode, useContext, useState } from "react";
+import createAccount from "~/adapters/account/createAccount";
 import deleteProgram from "~/adapters/program/deleteProgram";
 import updateProgram from "~/adapters/program/updateProgram";
 import { LAYOUT_DEFAULT_VIEW_VARIANT } from "~/constants/layout";
@@ -16,12 +17,16 @@ interface AccountsPageContextDefaultValue {
   isDeleteProgramDialogOpen: boolean;
   openDeleteProgramDialog: () => void;
   closeDeleteProgramDialog: () => void;
+  createAccountDialogOpen: () => void;
+  createAccountDialogClose: () => void;
   isProgramDeleting: boolean;
+  createAccountDialogIsOpened: boolean;
   deleteProgram: () => Promise<void>;
   changeProgramName: (name: string) => Promise<void>;
   isEditingProgramName: boolean;
   editProgramName: () => void;
   saveEditProgramName: (name: string) => Promise<void>;
+  createNewAccount: (name: string) => Promise<void>;
   cancelEditProgramName: () => void;
   goBackToProgramsList: () => Promise<boolean>;
 }
@@ -41,9 +46,19 @@ export const AccountsPageProvider = ({ program, children }: AccountsPageProvider
   const [isDeleteProgramDialogOpen, setIsDeleteProgramDialogOpen] = useState<boolean>(false);
   const [isProgramDeleting, setIsProgramDeleting] = useState<boolean>(false);
   const [isEditingProgramName, setIsEditingProgramName] = useState<boolean>(false);
+  const [createAccountDialogIsOpened, setCreateAccountDialogIsOpened] = useState<boolean>(false);
 
   const changeViewVariant = (variant?: LayoutViewVariant) => {
     if (variant) setViewVariant(variant);
+  };
+
+  const createNewAccount = async (name: string) => {
+    try {
+      await createAccount({ name, programId: program.id });
+      await triggerSSR();
+    } catch (e) {
+      displayCaughtError(e);
+    }
   };
 
   const _deleteProgram = async () => {
@@ -81,11 +96,15 @@ export const AccountsPageProvider = ({ program, children }: AccountsPageProvider
         isProgramDeleting,
         deleteProgram: _deleteProgram,
         changeProgramName,
+        createAccountDialogIsOpened,
+        createAccountDialogOpen: () => setCreateAccountDialogIsOpened(true),
+        createAccountDialogClose: () => setCreateAccountDialogIsOpened(false),
         isEditingProgramName,
         editProgramName: () => setIsEditingProgramName(true),
         saveEditProgramName: changeProgramName,
         cancelEditProgramName: () => setIsEditingProgramName(false),
         goBackToProgramsList: () => router.push(ROUTES.PROGRAMS()),
+        createNewAccount,
       }}
     >
       {children}
