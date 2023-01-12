@@ -10,7 +10,8 @@ export default async function createAccount(body: CreateAccountBody): Promise<vo
   const res = await fetch(API_ROUTES.ACCOUNTS(), {
     body: JSON.stringify(body),
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    mode: "cors",
+    headers: { "Access-Control-Allow-Origin": "*", "Content-Type": "application/json" },
     credentials: "include",
   });
   if (!res.ok) throw await res.json();
