@@ -19,7 +19,7 @@ import {
 import Link from "next/link";
 import { Fragment } from "react";
 import { SubmitHandler } from "react-hook-form";
-import { useAccountsPage } from "~/components/pages/Accounts/context";
+import { useAccountPage } from "~/components/pages/AccountPage/context";
 import { ROUTES } from "~/constants/routes";
 import { EditProgramNameSchemaType, useEditProgramNameForm } from "~/forms/editProgramName";
 import { Account } from "~/interfaces/account";
@@ -39,7 +39,7 @@ export default function DrawerContent({ accounts }: DrawerContentProps) {
     goBackToProgramsList,
     openAccounts,
     handleOpenAccounts,
-  } = useAccountsPage();
+  } = useAccountPage();
 
   const {
     register,

@@ -13,6 +13,8 @@ import { LayoutViewVariant } from "~/types/layout";
 interface AccountsPageContextDefaultValue {
   program: Program;
   viewVariant: LayoutViewVariant;
+  handleOpenAccounts: () => void;
+  openAccounts: boolean;
   changeViewVariant: (variant?: LayoutViewVariant) => void;
   isDeleteProgramDialogOpen: boolean;
   openDeleteProgramDialog: () => void;
@@ -47,6 +49,11 @@ export const AccountsPageProvider = ({ program, children }: AccountsPageProvider
   const [isProgramDeleting, setIsProgramDeleting] = useState<boolean>(false);
   const [isEditingProgramName, setIsEditingProgramName] = useState<boolean>(false);
   const [createAccountDialogIsOpened, setCreateAccountDialogIsOpened] = useState<boolean>(false);
+  const [openAccounts, setOpenAccounts] = useState<boolean>(false);
+
+  const handleOpenAccounts = () => {
+    setOpenAccounts(!openAccounts);
+  };
 
   const changeViewVariant = (variant?: LayoutViewVariant) => {
     if (variant) setViewVariant(variant);
@@ -91,6 +98,7 @@ export const AccountsPageProvider = ({ program, children }: AccountsPageProvider
         viewVariant,
         changeViewVariant,
         isDeleteProgramDialogOpen,
+        openAccounts,
         openDeleteProgramDialog: () => setIsDeleteProgramDialogOpen(true),
         closeDeleteProgramDialog: () => setIsDeleteProgramDialogOpen(false),
         isProgramDeleting,
@@ -105,6 +113,7 @@ export const AccountsPageProvider = ({ program, children }: AccountsPageProvider
         cancelEditProgramName: () => setIsEditingProgramName(false),
         goBackToProgramsList: () => router.push(ROUTES.PROGRAMS()),
         createNewAccount,
+        handleOpenAccounts,
       }}
     >
       {children}
