@@ -1,7 +1,5 @@
 import Konva from "konva";
-import absoluteUrl from "next-absolute-url";
 import { useRef } from "react";
-import updateAccount from "~/adapters/account/updateAccount";
 import useErrorHandler from "~/hooks/useErrorHandler";
 import { Connection } from "~/interfaces/connection";
 import { calculatePointsForConnection, getAccountGroupId, getConnectionId } from "~/utils/konva";
@@ -16,14 +14,15 @@ export default function KonvaProvider({ accounts, children }: KonvaProviderProps
     redraw: () => stageRef.current?.draw(),
     findNode: (nodeId) => stageRef.current?.findOne(`#${nodeId}`),
     saveAccountPosition: async (accountId, dragTo, cancelDragCb) => {
-      try {
-        const { origin } = absoluteUrl();
-        await updateAccount(origin, { accountId, newPosition: dragTo });
-      } catch (e) {
-        displayCaughtError(e);
-        cancelDragCb();
-        actions.repositionArrows(accountId);
-      }
+      console.log(accountId, dragTo, cancelDragCb, displayCaughtError);
+      // try {
+      //   const { origin } = absoluteUrl();
+      //   await updateAccount(origin, { accountId, newPosition: dragTo });
+      // } catch (e) {
+      //   displayCaughtError(e);
+      //   cancelDragCb();
+      //   actions.repositionArrows(accountId);
+      // }
     },
     repositionArrows: (movedAccountId: number) => {
       const account = accounts.find((account) => account.id === movedAccountId);
