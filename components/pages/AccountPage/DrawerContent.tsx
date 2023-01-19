@@ -1,4 +1,3 @@
-import AddIcon from "@mui/icons-material/Add";
 import CancelIcon from "@mui/icons-material/Cancel";
 import CheckIcon from "@mui/icons-material/Check";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
@@ -93,13 +92,7 @@ export default function DrawerContent({ accounts }: DrawerContentProps) {
         </ListItemText>
       </ListItem>
       <Divider />
-      <ListItem
-        secondaryAction={
-          <IconButton onClick={createAccountDialogOpen}>
-            <AddIcon />
-          </IconButton>
-        }
-      >
+      <ListItem>
         <IconButton onClick={handleOpenAccounts}>{openAccounts ? <ExpandLess /> : <ExpandMore />}</IconButton>
         <ListItemText>Accounts</ListItemText>
       </ListItem>

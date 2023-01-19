@@ -24,7 +24,7 @@ export default function AppBarContent({ account, program }: AppBarContentProps) 
 
   const {
     register,
-    formState: { errors, isSubmitting },
+    formState: { errors },
     handleSubmit,
   } = useEditAccountNameForm({ name: account.name });
 

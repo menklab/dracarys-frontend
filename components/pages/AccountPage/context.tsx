@@ -1,11 +1,15 @@
 import { useRouter } from "next/router";
 import { createContext, ReactNode, useContext, useState } from "react";
+import createAccountElement from "~/adapters/account/createAccountElement";
+import deleteAccountElement from "~/adapters/account/deleteAccountElement";
 import updateAccount from "~/adapters/account/updateAccount";
+import updateAccountElement from "~/adapters/account/updateAccountElement";
 import updateProgram from "~/adapters/program/updateProgram";
 import { ROUTES } from "~/constants/routes";
 import useErrorHandler from "~/hooks/useErrorHandler";
 import useTriggerSSR from "~/hooks/useTriggerSSR";
 import { Account } from "~/interfaces/account";
+import { ElementType } from "~/interfaces/accountElement";
 import { Program } from "~/interfaces/program";
 
 interface AccountPageContextDefaultValue {
@@ -13,6 +17,9 @@ interface AccountPageContextDefaultValue {
   changeProgramName: (name: string) => Promise<void>;
   saveEditAccountName: (name: string) => Promise<void>;
   saveEditProgramName: (name: string) => Promise<void>;
+  saveCreateAccountElement: (name: string, type: ElementType) => Promise<void>;
+  saveEditAccountElement: (id: number, name: string, type: ElementType) => Promise<void>;
+  removeAccountElement: (id: number) => Promise<void>;
   cancelEditProgramName: () => void;
   createAccountDialogOpen: () => void;
   handleOpenAccounts: () => void;
@@ -56,6 +63,33 @@ export const AccountPageProvider = ({ program, account, children }: AccountPageP
     }
   };
 
+  const removeAccountElement = async (id: number) => {
+    try {
+      await deleteAccountElement(id);
+      await triggerSSR();
+    } catch (e) {
+      displayCaughtError(e);
+    }
+  };
+
+  const saveEditAccountElement = async (id: number, name: string, type: ElementType) => {
+    try {
+      await updateAccountElement(id, { name, type });
+      await triggerSSR();
+    } catch (e) {
+      displayCaughtError(e);
+    }
+  };
+
+  const saveCreateAccountElement = async (name: string, type: ElementType) => {
+    try {
+      await createAccountElement({ accountId: account.id, name, type });
+      await triggerSSR();
+    } catch (e) {
+      displayCaughtError(e);
+    }
+  };
+
   const changeProgramName = async (name: string) => {
     try {
       await updateProgram(program.id, { name });
@@ -82,6 +116,9 @@ export const AccountPageProvider = ({ program, account, children }: AccountPageP
         cancelEditProgramName: () => setIsEditingProgramName(false),
         createAccountDialogOpen: () => setCreateAccountDialogIsOpened(true),
         saveEditAccountName,
+        saveCreateAccountElement,
+        saveEditAccountElement,
+        removeAccountElement,
         goBackToProgramsList: () => router.push(ROUTES.PROGRAMS()),
       }}
     >
