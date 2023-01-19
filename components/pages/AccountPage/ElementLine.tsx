@@ -29,7 +29,7 @@ export default function ElementLine({ accountElement }: ElementLineProps) {
   const onSubmit: SubmitHandler<EditAccountElementSchemaType> = async () => {
     const values = getValues();
     await saveEditAccountElement(accountElement.id, values.name, values.type as ElementType);
-    reset();
+    reset({});
   };
 
   return (

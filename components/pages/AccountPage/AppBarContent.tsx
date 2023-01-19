@@ -11,16 +11,9 @@ import { SubmitHandler } from "react-hook-form";
 import { useAccountPage } from "~/components/pages/AccountPage/context";
 import { ROUTES } from "~/constants/routes";
 import { EditAccountNameSchemaType, useEditAccountNameForm } from "~/forms/editAccountName";
-import { Account } from "~/interfaces/account";
-import { Program } from "~/interfaces/program";
 
-interface AppBarContentProps {
-  program: Program;
-  account: Account;
-}
-
-export default function AppBarContent({ account, program }: AppBarContentProps) {
-  const { saveEditAccountName, setIsEditingAccountName, isEditingAccountName } = useAccountPage();
+export default function AppBarContent() {
+  const { saveEditAccountName, setIsEditingAccountName, isEditingAccountName, account, program } = useAccountPage();
 
   const {
     register,

@@ -12,6 +12,12 @@ export default async function validateMsg(body: validateMsgBody): Promise<boolea
     body: JSON.stringify(body),
     mode: "cors",
     headers: { "Content-Type": "application/json" },
+    // headers: {
+    //   "Access-Control-Allow-Origin": "*",
+    //   "Access-Control-Allow-Methods": "DELETE, POST, GET, OPTIONS",
+    //   "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Requested-With",
+    //   "Content-Type": "application/json",
+    // },
     credentials: "include",
   });
   if (!res.ok) throw await res.json();

@@ -16,12 +16,9 @@ interface AccountProps {
 
 export default function AccountPage({ program, accounts, account, accountElements }: AccountProps) {
   return (
-    <AccountPageProvider account={account} program={program}>
-      <Layout
-        drawerContent={<DrawerContent accounts={accounts} />}
-        appBarContent={<AppBarContent account={account} program={program} />}
-      >
-        <View account={account} accountElements={accountElements} />
+    <AccountPageProvider account={account} program={program} accounts={accounts} accountElements={accountElements}>
+      <Layout drawerContent={<DrawerContent />} appBarContent={<AppBarContent />}>
+        <View />
       </Layout>
     </AccountPageProvider>
   );

@@ -5,17 +5,13 @@ import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
-import { Account } from "~/interfaces/account";
-import { AccountElement } from "~/interfaces/accountElement";
+import { useAccountPage } from "~/components/pages/AccountPage/context";
 import ElementLine from "./ElementLine";
 import ElementLineCreate from "./ElementLineCreate";
 
-interface AccountViewProps {
-  account: Account;
-  accountElements: AccountElement[];
-}
+export default function View() {
+  const { accountElements } = useAccountPage();
 
-export default function View({ account, accountElements }: AccountViewProps) {
   return (
     <div>
       <TableContainer component={Paper}>

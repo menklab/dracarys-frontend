@@ -21,20 +21,15 @@ import { SubmitHandler } from "react-hook-form";
 import { useAccountPage } from "~/components/pages/AccountPage/context";
 import { ROUTES } from "~/constants/routes";
 import { EditProgramNameSchemaType, useEditProgramNameForm } from "~/forms/editProgramName";
-import { Account } from "~/interfaces/account";
 
-interface DrawerContentProps {
-  accounts: Account[];
-}
-
-export default function DrawerContent({ accounts }: DrawerContentProps) {
+export default function DrawerContent() {
   const {
     program,
     editProgramName,
     saveEditProgramName,
+    accounts,
     cancelEditProgramName,
     isEditingProgramName,
-    createAccountDialogOpen,
     goBackToProgramsList,
     openAccounts,
     handleOpenAccounts,

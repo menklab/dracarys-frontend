@@ -9,11 +9,14 @@ import { ROUTES } from "~/constants/routes";
 import useErrorHandler from "~/hooks/useErrorHandler";
 import useTriggerSSR from "~/hooks/useTriggerSSR";
 import { Account } from "~/interfaces/account";
-import { ElementType } from "~/interfaces/accountElement";
+import { AccountElement, ElementType } from "~/interfaces/accountElement";
 import { Program } from "~/interfaces/program";
 
 interface AccountPageContextDefaultValue {
   program: Program;
+  accounts: Account[];
+  account: Account;
+  accountElements: AccountElement[];
   changeProgramName: (name: string) => Promise<void>;
   saveEditAccountName: (name: string) => Promise<void>;
   saveEditProgramName: (name: string) => Promise<void>;
@@ -37,10 +40,18 @@ const AccountPageContext = createContext<AccountPageContextDefaultValue | undefi
 interface AccountPageProviderProps {
   program: Program;
   account: Account;
+  accounts: Account[];
+  accountElements: AccountElement[];
   children: ReactNode;
 }
 
-export const AccountPageProvider = ({ program, account, children }: AccountPageProviderProps) => {
+export const AccountPageProvider = ({
+  program,
+  account,
+  accounts,
+  accountElements,
+  children,
+}: AccountPageProviderProps) => {
   const router = useRouter();
   const { displayCaughtError } = useErrorHandler();
   const { triggerSSR } = useTriggerSSR();
@@ -104,6 +115,9 @@ export const AccountPageProvider = ({ program, account, children }: AccountPageP
     <AccountPageContext.Provider
       value={{
         program,
+        accounts,
+        accountElements,
+        account,
         isEditingAccountName,
         handleOpenAccounts,
         setIsEditingAccountName,
