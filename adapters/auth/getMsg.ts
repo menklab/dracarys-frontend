@@ -8,7 +8,7 @@ export default async function getMsg() {
   const res = await fetch(API_ROUTES.REQUEST_MESSAGE(), {
     credentials: "include",
     method: "GET",
-    mode: "cors",
+    // mode: "cors",
   });
   if (!res.ok) throw await res.json();
   return (await res.json()) as secretMsgBody;

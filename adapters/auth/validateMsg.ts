@@ -10,7 +10,7 @@ export default async function validateMsg(body: validateMsgBody): Promise<boolea
   const res = await fetch(API_ROUTES.VALIDATE_MESSAGE(), {
     method: "POST",
     body: JSON.stringify(body),
-    mode: "cors",
+    // mode: "cors",
     headers: { "Content-Type": "application/json" },
     // headers: {
     //   "Access-Control-Allow-Origin": "*",
