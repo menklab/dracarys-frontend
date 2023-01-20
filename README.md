@@ -9,6 +9,7 @@ the backend repo can be found [here](https://github.com/menklab/dracarys-backend
 
 - [Features](#features)
 - [Contributing](#contributing)
+- [Helpful Resources](#helpful-resources)
 
 ## <a id="features"></a> Features
 - Create a program
@@ -25,3 +26,8 @@ Contributions are always welcome!
 See [contributing](https://github.com/menklab/dracarys-frontend/blob/dev/CONTRIBUTING.md) for ways to get started.
 
 Please adhere to this project's [code of conduct](https://github.com/menklab/dracarys-frontend/blob/dev/CODE_OF_CONDUCT.md).
+
+## <a id="helpful-resources"></a> Helpful Resources
+- [Solana Docs](https://docs.solana.com/)
+- [Solana Dev Learning Center](https://solana.com/developers)
+- [Anchor Docs](https://www.anchor-lang.com/)
