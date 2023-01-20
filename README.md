@@ -1,5 +1,7 @@
 ## Dracarys Frontend
-frontend repo for the dracarys application
+Dracarys is a visual development tool for Solana that aims to speed up and simlify the process of building Solana programs.
+
+> TODO: Add screenshots as demo
 
 the backend repo can be found [here](https://github.com/menklab/dracarys-backend)
 
