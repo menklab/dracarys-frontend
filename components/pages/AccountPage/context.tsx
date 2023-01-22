@@ -6,10 +6,11 @@ import updateAccount from "~/adapters/account/updateAccount";
 import updateAccountElement from "~/adapters/account/updateAccountElement";
 import updateProgram from "~/adapters/program/updateProgram";
 import { ROUTES } from "~/constants/routes";
+import { ElementType } from "~/enums/elementType";
 import useErrorHandler from "~/hooks/useErrorHandler";
 import useTriggerSSR from "~/hooks/useTriggerSSR";
 import { Account } from "~/interfaces/account";
-import { AccountElement, ElementType } from "~/interfaces/accountElement";
+import { AccountElement } from "~/interfaces/accountElement";
 import { Program } from "~/interfaces/program";
 
 interface AccountPageContextDefaultValue {

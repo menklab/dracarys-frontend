@@ -1,5 +1,6 @@
 import { API_ROUTES } from "~/constants/api_routes";
-import { AccountElement, ElementType } from "~/interfaces/accountElement";
+import { ElementType } from "~/enums/elementType";
+import { AccountElement } from "~/interfaces/accountElement";
 
 type GetAccountElementsJsonResponse = {
   id: number;
@@ -11,7 +12,7 @@ type GetAccountElementsJsonResponse = {
 
 // SSR usage only
 export default async function getAccountElements(sid: string, accountId: number): Promise<AccountElement[]> {
-  const res = await fetch(API_ROUTES.ACCOUNTS_ELEMENTS() + `/?accountId=${String(accountId)}`, {
+  const res = await fetch(API_ROUTES.ACCOUNTS_ELEMENTS() + `/?accountId=${accountId}`, {
     method: "GET",
     headers: { cookie: `connect.sid=${sid}` },
   });

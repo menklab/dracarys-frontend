@@ -8,8 +8,9 @@ import TableRow from "@mui/material/TableRow";
 import TextField from "@mui/material/TextField";
 import { SubmitHandler } from "react-hook-form";
 import { useAccountPage } from "~/components/pages/AccountPage/context";
+import { ElementType } from "~/enums/elementType";
 import { EditAccountElementSchemaType, useEditAccountElementForm } from "~/forms/editAccountElement";
-import { AccountElement, ElementType } from "~/interfaces/accountElement";
+import { AccountElement } from "~/interfaces/accountElement";
 
 interface ElementLineProps {
   accountElement: AccountElement;
@@ -23,26 +24,30 @@ export default function ElementLine({ accountElement }: ElementLineProps) {
     formState: { errors },
     reset,
     handleSubmit,
-    getValues,
   } = useEditAccountElementForm({ name: accountElement.name, type: accountElement.type });
 
-  const onSubmit: SubmitHandler<EditAccountElementSchemaType> = async () => {
-    const values = getValues();
+  const onSubmit: SubmitHandler<EditAccountElementSchemaType> = async (values) => {
     await saveEditAccountElement(accountElement.id, values.name, values.type as ElementType);
     reset({});
   };
 
+  const elementKey = `elementLine${accountElement.id}`;
+
   return (
     <TableRow key={accountElement.name} sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
       <TableCell component="th" scope="row" align="center">
+        <form id={elementKey} onSubmit={handleSubmit(onSubmit)} />
         <TextField
           fullWidth
           defaultValue={accountElement.name}
-          inputProps={{ style: { textAlign: "center" } }}
+          inputProps={{ style: { textAlign: "center" }, form: elementKey }}
           error={!!errors["name"]}
           helperText={errors["name"] ? errors["name"].message : ""}
           {...register("name")}
-          onBlur={handleSubmit(onSubmit)}
+          onBlur={(e) => {
+            e.preventDefault();
+            e.currentTarget.form?.requestSubmit();
+          }}
         />
       </TableCell>
       <TableCell align="center" sx={{ width: "40%" }}>
@@ -51,7 +56,11 @@ export default function ElementLine({ accountElement }: ElementLineProps) {
           error={!!errors["type"]}
           defaultValue={accountElement.type}
           {...register("type")}
-          onBlur={handleSubmit(onSubmit)}
+          inputProps={{ form: elementKey }}
+          onBlur={(e) => {
+            e.preventDefault();
+            e.currentTarget.form?.requestSubmit();
+          }}
         >
           {Object.keys(ElementType).map((keyObj) => (
             <MenuItem value={ElementType[keyObj as keyof typeof ElementType]} key={keyObj}>

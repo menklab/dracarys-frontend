@@ -1,5 +1,5 @@
 import { API_ROUTES } from "~/constants/api_routes";
-import { ElementType } from "~/interfaces/accountElement";
+import { ElementType } from "~/enums/elementType";
 
 interface UpdateAccountElementBody {
   name: string;
@@ -7,7 +7,7 @@ interface UpdateAccountElementBody {
 }
 
 export default async function updateAccountElement(elementId: number, body: UpdateAccountElementBody): Promise<void> {
-  const res = await fetch(API_ROUTES.ACCOUNTS_ELEMENTS() + `/${String(elementId)}`, {
+  const res = await fetch(API_ROUTES.ACCOUNTS_ELEMENTS() + `/${elementId}`, {
     method: "PATCH",
     body: JSON.stringify(body),
     credentials: "include",

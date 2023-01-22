@@ -19,7 +19,6 @@ declare global {
 
 export default function AuthProvider({ children }: AuthProviderProps) {
   const router = useRouter();
-  const [sid, setSid] = useState<string | undefined>();
   const [provider, setProvider] = useState<Provider | undefined>();
   const [pubKey, setPubKey] = useState<PubKey>();
   const { displayCaughtError } = useErrorHandler();
@@ -63,12 +62,11 @@ export default function AuthProvider({ children }: AuthProviderProps) {
   const disconnectFromPhantom = async () => {
     await provider?.disconnect();
     cookie.remove("connect.sid");
-    setSid(undefined);
     return await router.push(ROUTES.LOGIN());
   };
 
   useEffect(() => {
-    if (sid) return; // check if already has session id
+    if (cookie.get("connect.sid")) return; // check if already has session id
     if (!provider) return; // check if is available
     if (!provider?.isConnected) return;
     connectToBE();
@@ -78,12 +76,11 @@ export default function AuthProvider({ children }: AuthProviderProps) {
     if (!provider) return;
     if (pubKey) return;
     if (provider.isConnected) return;
-    if (!sid) return;
+    if (!cookie.get("connect.sid")) return;
     connectToPhantom();
   }, [provider]);
 
   useEffect(() => {
-    setSid(cookie.get("connect.sid"));
     if (window?.solana?.isPhantom) {
       setProvider(window.phantom.solana);
     } else {

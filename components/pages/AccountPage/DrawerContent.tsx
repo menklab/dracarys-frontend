@@ -99,7 +99,7 @@ export default function DrawerContent() {
               href={ROUTES.ACCOUNT(program.id, account.id)}
               style={{ textDecoration: "none", color: "unset" }}
             >
-              <List component="div" disablePadding key={account.id}>
+              <List component="div" disablePadding>
                 <ListItemButton sx={{ pl: 7 }}>
                   <ListItemText primary={account.name} />
                 </ListItemButton>

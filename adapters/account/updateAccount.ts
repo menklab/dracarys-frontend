@@ -7,7 +7,7 @@ interface UpdateAccountBody {
 }
 
 export default async function updateAccount(accountId: number, body: UpdateAccountBody): Promise<void> {
-  const res = await fetch(API_ROUTES.ACCOUNTS() + `/${String(accountId)}`, {
+  const res = await fetch(API_ROUTES.ACCOUNTS() + `/${accountId}`, {
     method: "PATCH",
     body: JSON.stringify(body),
     credentials: "include",

@@ -1,5 +1,5 @@
 import { API_ROUTES } from "~/constants/api_routes";
-import { ElementType } from "~/interfaces/accountElement";
+import { ElementType } from "~/enums/elementType";
 
 interface CreateAccountElementBody {
   accountId: number;
