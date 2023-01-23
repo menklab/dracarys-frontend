@@ -1,4 +1,3 @@
-import AddIcon from "@mui/icons-material/Add";
 import CancelIcon from "@mui/icons-material/Cancel";
 import CheckIcon from "@mui/icons-material/Check";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
@@ -19,27 +18,22 @@ import {
 import Link from "next/link";
 import { Fragment } from "react";
 import { SubmitHandler } from "react-hook-form";
-import { useAccountsPage } from "~/components/pages/Accounts/context";
+import { useAccountPage } from "~/components/pages/AccountPage/context";
 import { ROUTES } from "~/constants/routes";
 import { EditProgramNameSchemaType, useEditProgramNameForm } from "~/forms/editProgramName";
-import { Account } from "~/interfaces/account";
 
-interface DrawerContentProps {
-  accounts: Account[];
-}
-
-export default function DrawerContent({ accounts }: DrawerContentProps) {
+export default function DrawerContent() {
   const {
     program,
     editProgramName,
     saveEditProgramName,
+    accounts,
     cancelEditProgramName,
     isEditingProgramName,
-    createAccountDialogOpen,
     goBackToProgramsList,
     openAccounts,
     handleOpenAccounts,
-  } = useAccountsPage();
+  } = useAccountPage();
 
   const {
     register,
@@ -93,13 +87,7 @@ export default function DrawerContent({ accounts }: DrawerContentProps) {
         </ListItemText>
       </ListItem>
       <Divider />
-      <ListItem
-        secondaryAction={
-          <IconButton onClick={createAccountDialogOpen}>
-            <AddIcon />
-          </IconButton>
-        }
-      >
+      <ListItem>
         <IconButton onClick={handleOpenAccounts}>{openAccounts ? <ExpandLess /> : <ExpandMore />}</IconButton>
         <ListItemText>Accounts</ListItemText>
       </ListItem>
