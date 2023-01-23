@@ -13,7 +13,14 @@ import { ROUTES } from "~/constants/routes";
 import { EditAccountNameSchemaType, useEditAccountNameForm } from "~/forms/editAccountName";
 
 export default function AppBarContent() {
-  const { saveEditAccountName, setIsEditingAccountName, isEditingAccountName, account, program } = useAccountPage();
+  const {
+    saveEditAccountName,
+    setIsEditingAccountName,
+    isEditingAccountName,
+    account,
+    program,
+    openDeleteAccountDialog,
+  } = useAccountPage();
 
   const {
     register,
@@ -81,7 +88,7 @@ export default function AppBarContent() {
           </>
         )}
       </div>
-      <Button sx={{ ml: "auto" }} endIcon={<DeleteIcon />}>
+      <Button sx={{ ml: "auto" }} endIcon={<DeleteIcon />} onClick={openDeleteAccountDialog}>
         Delete account
       </Button>
     </>
