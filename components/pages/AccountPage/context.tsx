@@ -1,6 +1,7 @@
 import { useRouter } from "next/router";
 import { createContext, ReactNode, useContext, useState } from "react";
 import createAccountElement from "~/adapters/account/createAccountElement";
+import deleteAccount from "~/adapters/account/deleteAccount";
 import deleteAccountElement from "~/adapters/account/deleteAccountElement";
 import updateAccount from "~/adapters/account/updateAccount";
 import updateAccountElement from "~/adapters/account/updateAccountElement";
@@ -17,6 +18,8 @@ interface AccountPageContextDefaultValue {
   program: Program;
   accounts: Account[];
   account: Account;
+  isDeleteAccountDialogOpen: boolean;
+  isAccountDeleting: boolean;
   accountElements: AccountElement[];
   changeProgramName: (name: string) => Promise<void>;
   saveEditAccountName: (name: string) => Promise<void>;
@@ -24,8 +27,11 @@ interface AccountPageContextDefaultValue {
   saveCreateAccountElement: (name: string, type: ElementType) => Promise<void>;
   saveEditAccountElement: (id: number, name: string, type: ElementType) => Promise<void>;
   removeAccountElement: (id: number) => Promise<void>;
+  removeAccount: () => Promise<void>;
   cancelEditProgramName: () => void;
   createAccountDialogOpen: () => void;
+  openDeleteAccountDialog: () => void;
+  closeDeleteAccountDialog: () => void;
   handleOpenAccounts: () => void;
   editProgramName: () => void;
   setIsEditingAccountName: (state: boolean) => void;
@@ -57,6 +63,8 @@ export const AccountPageProvider = ({
   const { displayCaughtError } = useErrorHandler();
   const { triggerSSR } = useTriggerSSR();
   const [openAccounts, setOpenAccounts] = useState<boolean>(false);
+  const [isDeleteAccountDialogOpen, setIsDeleteAccountDialogOpen] = useState<boolean>(false);
+  const [isAccountDeleting, setIsAccountDeleting] = useState<boolean>(false);
   const [createAccountDialogIsOpened, setCreateAccountDialogIsOpened] = useState<boolean>(false);
   const [isEditingAccountName, setIsEditingAccountName] = useState<boolean>(false);
   const [isEditingProgramName, setIsEditingProgramName] = useState<boolean>(false);
@@ -82,6 +90,17 @@ export const AccountPageProvider = ({
     } catch (e) {
       displayCaughtError(e);
     }
+  };
+
+  const removeAccount = async () => {
+    setIsAccountDeleting(true);
+    try {
+      await deleteAccount(account.id);
+      await router.push(ROUTES.ACCOUNTS(program.id));
+    } catch (e) {
+      displayCaughtError(e);
+    }
+    setIsAccountDeleting(false);
   };
 
   const saveEditAccountElement = async (id: number, name: string, type: ElementType) => {
@@ -124,6 +143,8 @@ export const AccountPageProvider = ({
         setIsEditingAccountName,
         openAccounts,
         isEditingProgramName,
+        isDeleteAccountDialogOpen,
+        isAccountDeleting,
         changeProgramName,
         createAccountDialogIsOpened,
         editProgramName: () => setIsEditingProgramName(true),
@@ -133,7 +154,10 @@ export const AccountPageProvider = ({
         saveEditAccountName,
         saveCreateAccountElement,
         saveEditAccountElement,
+        openDeleteAccountDialog: () => setIsDeleteAccountDialogOpen(true),
+        closeDeleteAccountDialog: () => setIsDeleteAccountDialogOpen(false),
         removeAccountElement,
+        removeAccount,
         goBackToProgramsList: () => router.push(ROUTES.PROGRAMS()),
       }}
     >
