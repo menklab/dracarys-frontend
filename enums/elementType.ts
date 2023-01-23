@@ -1,4 +1,4 @@
-export let TypeArrayValidation = [
+export const TypeArrayValidation = [
   "Pubkey",
   "bool",
   "u8",
