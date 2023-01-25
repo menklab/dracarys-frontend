@@ -18,7 +18,7 @@ import {
 import Link from "next/link";
 import { Fragment } from "react";
 import { SubmitHandler } from "react-hook-form";
-import { useAccountPage } from "~/components/pages/AccountPage/context";
+import { useInstructionsPage } from "~/components/pages/Instructions/context";
 import { ROUTES } from "~/constants/routes";
 import { EditProgramNameSchemaType, useEditProgramNameForm } from "~/forms/editProgramName";
 
@@ -36,7 +36,7 @@ export default function DrawerContent() {
     goBackToProgramsList,
     openAccounts,
     handleOpenAccounts,
-  } = useAccountPage();
+  } = useInstructionsPage();
 
   const {
     register,
@@ -45,7 +45,6 @@ export default function DrawerContent() {
   } = useEditProgramNameForm({ name: program.name });
 
   const onSubmit: SubmitHandler<EditProgramNameSchemaType> = async (values) => {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
     await saveEditProgramName(values.name);
   };
 
