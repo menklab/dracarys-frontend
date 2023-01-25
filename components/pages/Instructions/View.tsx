@@ -24,7 +24,9 @@ export default function View() {
             {instructions.map((instruction) => (
               <TableRow key={`instructions-${instruction.id}`}>
                 <TableCell align="center">{instruction.name}</TableCell>
-                <TableCell align="center">{instruction.description}</TableCell>
+                <TableCell align="center" sx={{ width: "60%" }}>
+                  {instruction.description}
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
