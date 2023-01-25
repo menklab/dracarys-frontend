@@ -1,68 +1,55 @@
 import { useRouter } from "next/router";
 import { createContext, ReactNode, useContext, useState } from "react";
-import createAccount from "~/adapters/account/createAccount";
-import createInstruction from "~/adapters/instruction/createInstruction";
 import deleteProgram from "~/adapters/program/deleteProgram";
 import updateProgram from "~/adapters/program/updateProgram";
-import { LAYOUT_DEFAULT_VIEW_VARIANT } from "~/constants/layout";
 import { ROUTES } from "~/constants/routes";
 import useErrorHandler from "~/hooks/useErrorHandler";
 import useTriggerSSR from "~/hooks/useTriggerSSR";
 import { Account } from "~/interfaces/account";
 import { Instruction } from "~/interfaces/instruction";
 import { Program } from "~/interfaces/program";
-import { LayoutViewVariant } from "~/types/layout";
 
-interface AccountsPageContextDefaultValue {
+interface InstructionsPageContextDefaultValue {
   program: Program;
   instructions: Instruction[];
   accounts: Account[];
-  viewVariant: LayoutViewVariant;
   handleOpenAccounts: () => void;
   openAccounts: boolean;
   handleOpenInstructions: () => void;
   openInstructions: boolean;
-  changeViewVariant: (variant?: LayoutViewVariant) => void;
   isDeleteProgramDialogOpen: boolean;
   openDeleteProgramDialog: () => void;
   closeDeleteProgramDialog: () => void;
-  createAccountDialogOpen: () => void;
-  createAccountDialogClose: () => void;
-  createInstructionDialogOpen: () => void;
-  createInstructionDialogClose: () => void;
-  createInstructionDialogIsOpened: boolean;
-  createNewInstruction: (name: string, description?: string) => Promise<void>;
   isProgramDeleting: boolean;
-  createAccountDialogIsOpened: boolean;
   deleteProgram: () => Promise<void>;
-  changeProgramName: (name: string) => Promise<void>;
   isEditingProgramName: boolean;
   editProgramName: () => void;
   saveEditProgramName: (name: string) => Promise<void>;
-  createNewAccount: (name: string) => Promise<void>;
   cancelEditProgramName: () => void;
   goBackToProgramsList: () => Promise<boolean>;
 }
 
-const AccountsPageContext = createContext<AccountsPageContextDefaultValue | undefined>(undefined);
+const InstructionsPageContext = createContext<InstructionsPageContextDefaultValue | undefined>(undefined);
 
-interface AccountsPageProviderProps {
+interface InstructionsPageProviderProps {
   program: Program;
   instructions: Instruction[];
   accounts: Account[];
   children: ReactNode;
 }
 
-export const AccountsPageProvider = ({ program, instructions, accounts, children }: AccountsPageProviderProps) => {
+export const InstructionsPageProvider = ({
+  program,
+  instructions,
+  accounts,
+  children,
+}: InstructionsPageProviderProps) => {
+  const { triggerSSR } = useTriggerSSR();
   const router = useRouter();
   const { displayCaughtError } = useErrorHandler();
-  const { triggerSSR } = useTriggerSSR();
-  const [viewVariant, setViewVariant] = useState<LayoutViewVariant>(LAYOUT_DEFAULT_VIEW_VARIANT);
   const [isDeleteProgramDialogOpen, setIsDeleteProgramDialogOpen] = useState<boolean>(false);
   const [isProgramDeleting, setIsProgramDeleting] = useState<boolean>(false);
   const [isEditingProgramName, setIsEditingProgramName] = useState<boolean>(false);
-  const [createAccountDialogIsOpened, setCreateAccountDialogIsOpened] = useState<boolean>(false);
-  const [createInstructionDialogIsOpened, setCreateInstructionDialogIsOpened] = useState<boolean>(false);
   const [openAccounts, setOpenAccounts] = useState<boolean>(false);
   const [openInstructions, setOpenInstructions] = useState<boolean>(false);
 
@@ -74,32 +61,9 @@ export const AccountsPageProvider = ({ program, instructions, accounts, children
     setOpenInstructions(!openInstructions);
   };
 
-  const changeViewVariant = (variant?: LayoutViewVariant) => {
-    if (variant) setViewVariant(variant);
-  };
-
-  const createNewAccount = async (name: string) => {
-    try {
-      await createAccount({ name, programId: program.id });
-      await triggerSSR();
-    } catch (e) {
-      displayCaughtError(e);
-    }
-  };
-
-  const createNewInstruction = async (name: string, description?: string) => {
-    try {
-      await createInstruction({ name, description, programId: program.id });
-      await triggerSSR();
-    } catch (e) {
-      displayCaughtError(e);
-    }
-  };
-
   const _deleteProgram = async () => {
     setIsProgramDeleting(true);
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
       await deleteProgram(program.id);
       setIsDeleteProgramDialogOpen(false);
       await router.push(ROUTES.PROGRAMS());
@@ -120,11 +84,9 @@ export const AccountsPageProvider = ({ program, instructions, accounts, children
   };
 
   return (
-    <AccountsPageContext.Provider
+    <InstructionsPageContext.Provider
       value={{
         program,
-        viewVariant,
-        changeViewVariant,
         isDeleteProgramDialogOpen,
         openAccounts,
         openInstructions,
@@ -134,31 +96,22 @@ export const AccountsPageProvider = ({ program, instructions, accounts, children
         closeDeleteProgramDialog: () => setIsDeleteProgramDialogOpen(false),
         isProgramDeleting,
         deleteProgram: _deleteProgram,
-        changeProgramName,
-        createAccountDialogIsOpened,
-        createAccountDialogOpen: () => setCreateAccountDialogIsOpened(true),
-        createAccountDialogClose: () => setCreateAccountDialogIsOpened(false),
         isEditingProgramName,
         editProgramName: () => setIsEditingProgramName(true),
         saveEditProgramName: changeProgramName,
         cancelEditProgramName: () => setIsEditingProgramName(false),
         goBackToProgramsList: () => router.push(ROUTES.PROGRAMS()),
-        createNewAccount,
         handleOpenAccounts,
         handleOpenInstructions,
-        createInstructionDialogOpen: () => setCreateInstructionDialogIsOpened(true),
-        createInstructionDialogClose: () => setCreateInstructionDialogIsOpened(false),
-        createInstructionDialogIsOpened,
-        createNewInstruction,
       }}
     >
       {children}
-    </AccountsPageContext.Provider>
+    </InstructionsPageContext.Provider>
   );
 };
 
-export const useAccountsPage = () => {
-  const accountsPage = useContext(AccountsPageContext);
-  if (accountsPage === undefined) throw new Error("Cannot use accountsPage context");
-  return accountsPage;
+export const useInstructionsPage = () => {
+  const instructionsPage = useContext(InstructionsPageContext);
+  if (instructionsPage === undefined) throw new Error("Cannot use instructionsPage context");
+  return instructionsPage;
 };

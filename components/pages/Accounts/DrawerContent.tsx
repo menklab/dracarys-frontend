@@ -22,15 +22,12 @@ import { SubmitHandler } from "react-hook-form";
 import { useAccountsPage } from "~/components/pages/Accounts/context";
 import { ROUTES } from "~/constants/routes";
 import { EditProgramNameSchemaType, useEditProgramNameForm } from "~/forms/editProgramName";
-import { Account } from "~/interfaces/account";
 
-interface DrawerContentProps {
-  accounts: Account[];
-}
-
-export default function DrawerContent({ accounts }: DrawerContentProps) {
+export default function DrawerContent() {
   const {
     program,
+    accounts,
+    instructions,
     editProgramName,
     saveEditProgramName,
     cancelEditProgramName,
@@ -39,6 +36,9 @@ export default function DrawerContent({ accounts }: DrawerContentProps) {
     goBackToProgramsList,
     openAccounts,
     handleOpenAccounts,
+    openInstructions,
+    handleOpenInstructions,
+    createInstructionDialogOpen,
   } = useAccountsPage();
 
   const {
@@ -114,6 +114,42 @@ export default function DrawerContent({ accounts }: DrawerContentProps) {
               <List component="div" disablePadding>
                 <ListItemButton sx={{ pl: 7 }}>
                   <ListItemText primary={account.name} />
+                </ListItemButton>
+              </List>
+            </Link>
+          );
+        })}
+      </Collapse>
+      <ListItem
+        secondaryAction={
+          <IconButton onClick={createInstructionDialogOpen}>
+            <AddIcon />
+          </IconButton>
+        }
+        disablePadding
+      >
+        <ListItemButton>
+          <IconButton onClick={handleOpenInstructions}>{openInstructions ? <ExpandLess /> : <ExpandMore />}</IconButton>
+          <Link
+            key={`instructions-${program.id}`}
+            href={ROUTES.INSTRUCTIONS(program.id)}
+            style={{ textDecoration: "none", color: "unset" }}
+          >
+            <ListItemText>Instructions</ListItemText>
+          </Link>
+        </ListItemButton>
+      </ListItem>
+      <Collapse in={openInstructions} timeout="auto" unmountOnExit>
+        {instructions.map((instruction) => {
+          return (
+            <Link
+              key={`account-${instruction.id}`}
+              href={ROUTES.ACCOUNT(program.id, instruction.id)}
+              style={{ textDecoration: "none", color: "unset" }}
+            >
+              <List component="div" disablePadding>
+                <ListItemButton sx={{ pl: 7 }}>
+                  <ListItemText primary={instruction.name} />
                 </ListItemButton>
               </List>
             </Link>

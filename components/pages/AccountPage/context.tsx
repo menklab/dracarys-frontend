@@ -12,10 +12,14 @@ import useErrorHandler from "~/hooks/useErrorHandler";
 import useTriggerSSR from "~/hooks/useTriggerSSR";
 import { Account } from "~/interfaces/account";
 import { AccountElement } from "~/interfaces/accountElement";
+import { Instruction } from "~/interfaces/instruction";
 import { Program } from "~/interfaces/program";
 
 interface AccountPageContextDefaultValue {
   program: Program;
+  instructions: Instruction[];
+  handleOpenInstructions: () => void;
+  openInstructions: boolean;
   accounts: Account[];
   account: Account;
   isDeleteAccountDialogOpen: boolean;
@@ -29,6 +33,8 @@ interface AccountPageContextDefaultValue {
   removeAccountElement: (id: number) => Promise<void>;
   removeAccount: () => Promise<void>;
   cancelEditProgramName: () => void;
+  createInstructionDialogOpen: () => void;
+  createInstructionDialogClose: () => void;
   createAccountDialogOpen: () => void;
   openDeleteAccountDialog: () => void;
   closeDeleteAccountDialog: () => void;
@@ -46,6 +52,7 @@ const AccountPageContext = createContext<AccountPageContextDefaultValue | undefi
 
 interface AccountPageProviderProps {
   program: Program;
+  instructions: Instruction[];
   account: Account;
   accounts: Account[];
   accountElements: AccountElement[];
@@ -54,6 +61,7 @@ interface AccountPageProviderProps {
 
 export const AccountPageProvider = ({
   program,
+  instructions,
   account,
   accounts,
   accountElements,
@@ -66,8 +74,10 @@ export const AccountPageProvider = ({
   const [isDeleteAccountDialogOpen, setIsDeleteAccountDialogOpen] = useState<boolean>(false);
   const [isAccountDeleting, setIsAccountDeleting] = useState<boolean>(false);
   const [createAccountDialogIsOpened, setCreateAccountDialogIsOpened] = useState<boolean>(false);
+  const [createInstructionDialogIsOpened, setCreateInstructionDialogIsOpened] = useState<boolean>(false);
   const [isEditingAccountName, setIsEditingAccountName] = useState<boolean>(false);
   const [isEditingProgramName, setIsEditingProgramName] = useState<boolean>(false);
+  const [openInstructions, setOpenInstructions] = useState<boolean>(false);
 
   const handleOpenAccounts = () => {
     setOpenAccounts(!openAccounts);
@@ -81,6 +91,10 @@ export const AccountPageProvider = ({
     } catch (e) {
       displayCaughtError(e);
     }
+  };
+
+  const handleOpenInstructions = () => {
+    setOpenInstructions(!openInstructions);
   };
 
   const removeAccountElement = async (id: number) => {
@@ -135,9 +149,11 @@ export const AccountPageProvider = ({
     <AccountPageContext.Provider
       value={{
         program,
+        instructions,
         accounts,
         accountElements,
         account,
+        openInstructions,
         isEditingAccountName,
         handleOpenAccounts,
         setIsEditingAccountName,
@@ -154,8 +170,11 @@ export const AccountPageProvider = ({
         saveEditAccountName,
         saveCreateAccountElement,
         saveEditAccountElement,
+        handleOpenInstructions,
         openDeleteAccountDialog: () => setIsDeleteAccountDialogOpen(true),
         closeDeleteAccountDialog: () => setIsDeleteAccountDialogOpen(false),
+        createInstructionDialogOpen: () => setCreateInstructionDialogIsOpened(true),
+        createInstructionDialogClose: () => setCreateInstructionDialogIsOpened(false),
         removeAccountElement,
         removeAccount,
         goBackToProgramsList: () => router.push(ROUTES.PROGRAMS()),
