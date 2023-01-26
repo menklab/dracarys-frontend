@@ -144,7 +144,7 @@ export default function DrawerContent() {
           return (
             <Link
               key={`account-${instruction.id}`}
-              href={ROUTES.ACCOUNT(program.id, instruction.id)}
+              href={ROUTES.INSTRUCTION(program.id, instruction.id)}
               style={{ textDecoration: "none", color: "unset" }}
             >
               <List component="div" disablePadding>
