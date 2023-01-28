@@ -45,18 +45,11 @@ export default function DrawerContent() {
     register,
     formState: { errors, isSubmitting },
     handleSubmit,
-    reset,
   } = useEditProgramNameForm({ name: program.name });
-
-  const onEditCancel = () => {
-    cancelEditProgramName();
-    reset();
-  };
 
   const onSubmit: SubmitHandler<EditProgramNameSchemaType> = async (values) => {
     await new Promise((resolve) => setTimeout(resolve, 1000));
     await saveEditProgramName(values.name);
-    reset({ name: values.name });
   };
 
   return (
@@ -68,7 +61,7 @@ export default function DrawerContent() {
               <IconButton type="submit" disabled={isSubmitting}>
                 <CheckIcon />
               </IconButton>
-              <IconButton edge="end" onClick={onEditCancel} disabled={isSubmitting} sx={{ mr: 0 }}>
+              <IconButton edge="end" onClick={cancelEditProgramName} disabled={isSubmitting}>
                 <CancelIcon />
               </IconButton>
             </Fragment>
@@ -87,9 +80,7 @@ export default function DrawerContent() {
         <ListItemText>
           {isEditingProgramName ? (
             <TextField
-              disabled={isSubmitting}
-              sx={{ width: 140, mt: "2.5px" }}
-              inputProps={{ style: { paddingBottom: 3.5 } }}
+              sx={{ width: 140 }}
               size="small"
               variant="standard"
               error={!!errors["name"]}
