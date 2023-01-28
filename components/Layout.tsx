@@ -1,7 +1,6 @@
 import LogoutIcon from "@mui/icons-material/Logout";
 import { LoadingButton } from "@mui/lab";
-import { AppBar, Box, Drawer, List, ListItem, ListItemButton, ListItemText, Toolbar } from "@mui/material";
-import ListItemIcon from "@mui/material/ListItemIcon";
+import { AppBar, Box, Drawer, IconButton, List, ListItem, ListItemText, Toolbar } from "@mui/material";
 import { ReactNode } from "react";
 import { LAYOUT_DRAWER_WIDTH } from "~/constants/layout";
 import { useAuth } from "~/contexts/auth/hooks";
@@ -69,13 +68,15 @@ export default function Layout(props: LayoutProps) {
         {drawerContent}
 
         <List sx={{ mt: "auto" }}>
-          <ListItem>
-            <ListItemButton onClick={logOut}>
-              <ListItemText>Disconnect wallet</ListItemText>
-              <ListItemIcon sx={{ minWidth: "unset" }}>
+          <ListItem
+            sx={{ px: 4, py: 2 }}
+            secondaryAction={
+              <IconButton edge="start" onClick={logOut}>
                 <LogoutIcon />
-              </ListItemIcon>
-            </ListItemButton>
+              </IconButton>
+            }
+          >
+            <ListItemText primary="Disconnect wallet" />
           </ListItem>
         </List>
       </Drawer>
