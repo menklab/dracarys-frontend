@@ -37,6 +37,7 @@ export default function CreateProgramDialog() {
         <Typography variant="h4">Add program</Typography>
         <TextField
           fullWidth
+          label="Name"
           error={!!errors["name"]}
           helperText={errors["name"] ? errors["name"].message : ""}
           {...register("name")}
