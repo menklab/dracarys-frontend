@@ -1,6 +1,5 @@
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
-import { List, ListItem, ListItemButton, ListItemText } from "@mui/material";
-import ListItemIcon from "@mui/material/ListItemIcon";
+import { IconButton, List, ListItem, ListItemText } from "@mui/material";
 import { useProgramsPage } from "~/components/pages/Programs/context";
 
 export default function DrawerContent() {
@@ -8,13 +7,15 @@ export default function DrawerContent() {
 
   return (
     <List>
-      <ListItem>
-        <ListItemButton onClick={createProgramDialogOpen}>
-          <ListItemText>Programs</ListItemText>
-          <ListItemIcon sx={{ minWidth: "unset" }}>
+      <ListItem
+        sx={{ px: 4, py: 2 }}
+        secondaryAction={
+          <IconButton edge="start" onClick={createProgramDialogOpen}>
             <AddCircleOutlineIcon />
-          </ListItemIcon>
-        </ListItemButton>
+          </IconButton>
+        }
+      >
+        <ListItemText primary="Programs" />
       </ListItem>
     </List>
   );
