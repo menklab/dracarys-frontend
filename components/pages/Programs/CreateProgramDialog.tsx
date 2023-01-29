@@ -15,15 +15,19 @@ export default function CreateProgramDialog() {
     handleSubmit,
   } = useCreateProgramForm();
 
+  const onDialogClose = () => {
+    createProgramDialogClose();
+    setTimeout(reset, 100);
+  };
+
   const onSubmit: SubmitHandler<CreateProgramSchemaType> = async (values) => {
     await new Promise((resolve) => setTimeout(resolve, 1000));
     await createNewProgram(values.name);
-    createProgramDialogClose();
-    reset();
+    onDialogClose();
   };
 
   return (
-    <Dialog open={createProgramDialogIsOpened} fullWidth>
+    <Dialog open={createProgramDialogIsOpened} onClose={onDialogClose} fullWidth>
       <Box
         component="form"
         noValidate
@@ -31,7 +35,7 @@ export default function CreateProgramDialog() {
         onSubmit={handleSubmit(onSubmit)}
         sx={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4, p: 4 }}
       >
-        <IconButton sx={{ alignSelf: "self-end" }} onClick={createProgramDialogClose}>
+        <IconButton sx={{ alignSelf: "self-end" }} onClick={onDialogClose}>
           <CloseIcon />
         </IconButton>
         <Typography variant="h4">Add program</Typography>
