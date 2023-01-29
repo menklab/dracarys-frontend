@@ -59,7 +59,7 @@ export default function ElementLineCreate({ orderNumber }: CreateElementLineProp
         const intervalIdTemp = setTimeout(() => {
           const newLineForm = window.document.getElementById(elementKey) as HTMLFormElement;
           newLineForm.requestSubmit();
-        }, 2000);
+        }, 1000);
         setIntervalId(intervalIdTemp);
       }}
     >

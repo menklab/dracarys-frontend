@@ -61,7 +61,7 @@ export default function ElementLine({ instructionElement, orderNumber }: Element
         const intervalIdTemp = setTimeout(() => {
           const editLineForm = window.document.getElementById(elementKey) as HTMLFormElement;
           editLineForm.requestSubmit();
-        }, 2000);
+        }, 1000);
         setIntervalId(intervalIdTemp);
       }}
     >
