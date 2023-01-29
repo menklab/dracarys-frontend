@@ -1,15 +1,18 @@
 import { useRouter } from "next/router";
 import { createContext, ReactNode, useContext, useState } from "react";
-import updateAccountElement from "~/adapters/account/updateAccountElement";
+import createInstructionElement from "~/adapters/instruction/createInstructionElement";
 import deleteInstruction from "~/adapters/instruction/deleteInstruction";
+import deleteInstructionElement from "~/adapters/instruction/deleteInstructionElement";
 import updateInstruction from "~/adapters/instruction/updateInstruction";
+import updateInstructionElement from "~/adapters/instruction/updateInstructionElement";
 import updateProgram from "~/adapters/program/updateProgram";
 import { ROUTES } from "~/constants/routes";
-import { ElementType } from "~/enums/elementType";
+import { AccountType } from "~/enums/instructionElementTypes";
 import useErrorHandler from "~/hooks/useErrorHandler";
 import useTriggerSSR from "~/hooks/useTriggerSSR";
 import { Account } from "~/interfaces/account";
 import { Instruction } from "~/interfaces/instruction";
+import { InstructionElement } from "~/interfaces/instructionElement";
 import { Program } from "~/interfaces/program";
 
 interface InstructionPageContextDefaultValue {
@@ -17,22 +20,35 @@ interface InstructionPageContextDefaultValue {
   accounts: Account[];
   instructions: Instruction[];
   instruction: Instruction;
+  instructionElements: InstructionElement[];
   handleOpenInstructions: () => void;
   openInstructions: boolean;
   editInstructionDialogIsOpened: boolean;
   isDeleteInstructionDialogOpen: boolean;
   isInstructionDeleting: boolean;
   changeProgramName: (name: string) => Promise<void>;
-  saveEditInstructionName: (name: string) => Promise<void>;
+  saveEditInstructionName: (
+    elementId: number,
+    name: string,
+    order: number,
+    description: string,
+    mut: boolean,
+    accountType: AccountType,
+    genericType: string
+  ) => Promise<void>;
   saveEditProgramName: (name: string) => Promise<void>;
   editInstruction: (name: string, description: string) => Promise<void>;
-  saveCreateAccountElement: (name: string, type: ElementType) => Promise<void>;
-  saveEditAccountElement: (id: number, name: string, type: ElementType) => Promise<void>;
-  // removeAccountElement: (id: number) => Promise<void>;
+  saveCreateInstructionElement: (
+    name: string,
+    order: number,
+    description: string,
+    mut: boolean,
+    accountType: AccountType,
+    genericType: string
+  ) => Promise<void>;
   removeInstruction: () => Promise<void>;
+  removeInstructionElement: (id: number) => Promise<void>;
   cancelEditProgramName: () => void;
-  createInstructionDialogOpen: () => void;
-  createInstructionDialogClose: () => void;
   editInstructionDialogOpen: () => void;
   editInstructionDialogClose: () => void;
   createAccountDialogOpen: () => void;
@@ -53,6 +69,7 @@ const InstructionPageContext = createContext<InstructionPageContextDefaultValue 
 interface InstructionPageProviderProps {
   program: Program;
   instruction: Instruction;
+  instructionElements: InstructionElement[];
   instructions: Instruction[];
   accounts: Account[];
   children: ReactNode;
@@ -61,6 +78,7 @@ interface InstructionPageProviderProps {
 export const InstructionPageProvider = ({
   program,
   instruction,
+  instructionElements,
   instructions,
   accounts,
   children,
@@ -72,7 +90,6 @@ export const InstructionPageProvider = ({
   const [isDeleteInstructionDialogOpen, setIsDeleteInstructionDialogOpen] = useState<boolean>(false);
   const [isInstructionDeleting, setIsInstructionDeleting] = useState<boolean>(false);
   const [createAccountDialogIsOpened, setCreateAccountDialogIsOpened] = useState<boolean>(false);
-  const [createInstructionDialogIsOpened, setCreateInstructionDialogIsOpened] = useState<boolean>(false);
   const [editInstructionDialogIsOpened, setEditInstructionDialogIsOpened] = useState<boolean>(false);
   const [isEditingAccountName, setIsEditingAccountName] = useState<boolean>(false);
   const [isEditingProgramName, setIsEditingProgramName] = useState<boolean>(false);
@@ -82,14 +99,29 @@ export const InstructionPageProvider = ({
     setOpenAccounts(!openAccounts);
   };
 
-  const saveEditInstructionName = async (name: string) => {
-    // try {
-    //   await updateAccount(account.id, { name });
-    //   await triggerSSR();
-    //   setIsEditingAccountName(false);
-    // } catch (e) {
-    //   displayCaughtError(e);
-    // }
+  const saveEditInstructionName = async (
+    elementId: number,
+    name: string,
+    order: number,
+    description: string,
+    mut: boolean,
+    accountType: AccountType,
+    genericType: string
+  ) => {
+    try {
+      await updateInstructionElement(elementId, {
+        instructionId: instruction.id,
+        name,
+        order,
+        description,
+        mut,
+        accountType,
+        genericType,
+      });
+      await triggerSSR();
+    } catch (e) {
+      displayCaughtError(e);
+    }
   };
 
   const handleOpenInstructions = () => {
@@ -107,22 +139,37 @@ export const InstructionPageProvider = ({
     setIsInstructionDeleting(false);
   };
 
-  const saveEditAccountElement = async (id: number, name: string, type: ElementType) => {
+  const removeInstructionElement = async (id: number) => {
     try {
-      await updateAccountElement(id, { name, type });
+      await deleteInstructionElement(id);
       await triggerSSR();
     } catch (e) {
       displayCaughtError(e);
     }
   };
 
-  const saveCreateAccountElement = async (name: string, type: ElementType) => {
-    // try {
-    //   await createAccountElement({ accountId: account.id, name, type });
-    //   await triggerSSR();
-    // } catch (e) {
-    //   displayCaughtError(e);
-    // }
+  const saveCreateInstructionElement = async (
+    name: string,
+    order: number,
+    description: string,
+    mut: boolean,
+    accountType: AccountType,
+    genericType: string
+  ) => {
+    try {
+      await createInstructionElement({
+        instructionId: instruction.id,
+        name,
+        order,
+        description,
+        mut,
+        accountType,
+        genericType,
+      });
+      await triggerSSR();
+    } catch (e) {
+      displayCaughtError(e);
+    }
   };
 
   const editInstruction = async (name: string, description: string) => {
@@ -150,12 +197,14 @@ export const InstructionPageProvider = ({
         program,
         instructions,
         instruction,
+        instructionElements,
         accounts,
         openInstructions,
+        handleOpenInstructions,
         isEditingAccountName,
-        handleOpenAccounts,
         setIsEditingAccountName,
         openAccounts,
+        handleOpenAccounts,
         isEditingProgramName,
         isDeleteInstructionDialogOpen,
         isInstructionDeleting,
@@ -166,18 +215,15 @@ export const InstructionPageProvider = ({
         cancelEditProgramName: () => setIsEditingProgramName(false),
         createAccountDialogOpen: () => setCreateAccountDialogIsOpened(true),
         saveEditInstructionName,
-        saveCreateAccountElement,
-        saveEditAccountElement,
+        saveCreateInstructionElement,
         editInstruction,
-        handleOpenInstructions,
         editInstructionDialogIsOpened,
         openDeleteInstructionDialog: () => setIsDeleteInstructionDialogOpen(true),
         closeDeleteInstructionDialog: () => setIsDeleteInstructionDialogOpen(false),
-        createInstructionDialogOpen: () => setCreateInstructionDialogIsOpened(true),
-        createInstructionDialogClose: () => setCreateInstructionDialogIsOpened(false),
         editInstructionDialogOpen: () => setEditInstructionDialogIsOpened(true),
         editInstructionDialogClose: () => setEditInstructionDialogIsOpened(false),
         removeInstruction,
+        removeInstructionElement,
         goBackToProgramsList: () => router.push(ROUTES.PROGRAMS()),
       }}
     >

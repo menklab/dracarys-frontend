@@ -7,27 +7,7 @@ import { useInstructionPage } from "~/components/pages/InstructionPage/context";
 import { ROUTES } from "~/constants/routes";
 
 export default function AppBarContent() {
-  const {
-    saveEditInstructionName,
-    setIsEditingAccountName,
-    isEditingAccountName,
-    editInstructionDialogOpen,
-    instruction,
-    // ins
-    program,
-    openDeleteInstructionDialog,
-  } = useInstructionPage();
-
-  // const {
-  //   register,
-  //   formState: { errors },
-  //   handleSubmit,
-  // } = useEditInstructionForm({ name: "account.name", description: "asdas" });
-  //
-  // const onSubmit: SubmitHandler<EditInstructionSchemaType> = async (values) => {
-  //   await new Promise((resolve) => setTimeout(resolve, 1000));
-  //   await saveEditInstructionName(values.name);
-  // };
+  const { editInstructionDialogOpen, instruction, program, openDeleteInstructionDialog } = useInstructionPage();
 
   return (
     <>

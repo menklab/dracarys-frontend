@@ -9,7 +9,6 @@ export default function EditInstructionDialog() {
   const { editInstructionDialogIsOpened, editInstructionDialogClose, editInstruction, instruction } =
     useInstructionPage();
 
-  console.log(instruction);
   const {
     register,
     formState: { errors, isSubmitting },

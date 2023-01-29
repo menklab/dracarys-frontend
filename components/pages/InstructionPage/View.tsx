@@ -5,10 +5,12 @@ import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
-// import { useInstructionPage } from "~/components/pages/InstructionPage/context";
+import { useInstructionPage } from "~/components/pages/InstructionPage/context";
+import ElementLine from "~/components/pages/InstructionPage/ElementLine";
+import ElementLineCreate from "~/components/pages/InstructionPage/ElementLineCreate";
 
 export default function View() {
-  // const { accountElements } = useInstructionPage();
+  const { instructionElements } = useInstructionPage();
 
   return (
     <div>
@@ -17,15 +19,28 @@ export default function View() {
           <TableHead>
             <TableRow>
               <TableCell align="center">Name</TableCell>
-              <TableCell align="center">Type</TableCell>
+              <TableCell align="center">Account type</TableCell>
+              <TableCell align="center">Generic type</TableCell>
+              <TableCell align="center">Mut</TableCell>
+              <TableCell align="center">Description</TableCell>
               <TableCell align="center" />
             </TableRow>
           </TableHead>
           <TableBody>
-            {/*{accountElements.map((accountElement) => {*/}
-            {/*  return <ElementLine key={accountElement.id} accountElement={accountElement} />;*/}
-            {/*})}*/}
-            {/*<ElementLineCreate />*/}
+            {instructionElements
+              .sort(function (a, b) {
+                return a["order"] - b["order"];
+              })
+              .map((instructionElement, number) => {
+                return (
+                  <ElementLine
+                    key={instructionElement.id}
+                    instructionElement={instructionElement}
+                    orderNumber={number}
+                  />
+                );
+              })}
+            <ElementLineCreate orderNumber={instructionElements.length} />
           </TableBody>
         </Table>
       </TableContainer>
