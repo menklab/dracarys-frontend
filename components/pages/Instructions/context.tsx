@@ -1,15 +1,21 @@
 import { useRouter } from "next/router";
 import { createContext, ReactNode, useContext, useState } from "react";
+import generateInstructionCode from "~/adapters/code/generateInstructionCode";
 import deleteProgram from "~/adapters/program/deleteProgram";
 import updateProgram from "~/adapters/program/updateProgram";
+import { LAYOUT_DEFAULT_VIEW_VARIANT } from "~/constants/layout";
 import { ROUTES } from "~/constants/routes";
 import useErrorHandler from "~/hooks/useErrorHandler";
 import useTriggerSSR from "~/hooks/useTriggerSSR";
 import { Account } from "~/interfaces/account";
 import { Instruction } from "~/interfaces/instruction";
 import { Program } from "~/interfaces/program";
+import { LayoutViewVariant } from "~/types/layout";
 
 interface InstructionsPageContextDefaultValue {
+  viewVariant: LayoutViewVariant;
+  changeViewVariant: (variant?: LayoutViewVariant) => void;
+  getGeneratedInstructionCode: () => Promise<string[]>;
   program: Program;
   instructions: Instruction[];
   accounts: Account[];
@@ -47,11 +53,21 @@ export const InstructionsPageProvider = ({
   const { triggerSSR } = useTriggerSSR();
   const router = useRouter();
   const { displayCaughtError } = useErrorHandler();
+  const [viewVariant, setViewVariant] = useState<LayoutViewVariant>(LAYOUT_DEFAULT_VIEW_VARIANT);
   const [isDeleteProgramDialogOpen, setIsDeleteProgramDialogOpen] = useState<boolean>(false);
   const [isProgramDeleting, setIsProgramDeleting] = useState<boolean>(false);
   const [isEditingProgramName, setIsEditingProgramName] = useState<boolean>(false);
   const [openAccounts, setOpenAccounts] = useState<boolean>(false);
   const [openInstructions, setOpenInstructions] = useState<boolean>(false);
+
+  const changeViewVariant = (variant?: LayoutViewVariant) => {
+    if (variant) setViewVariant(variant);
+  };
+
+  const getGeneratedInstructionCode = async () => {
+    const generatedCode = await generateInstructionCode(Number(program.id));
+    return generatedCode;
+  };
 
   const handleOpenAccounts = () => {
     setOpenAccounts(!openAccounts);
@@ -86,6 +102,9 @@ export const InstructionsPageProvider = ({
   return (
     <InstructionsPageContext.Provider
       value={{
+        viewVariant,
+        changeViewVariant,
+        getGeneratedInstructionCode,
         program,
         isDeleteProgramDialogOpen,
         openAccounts,

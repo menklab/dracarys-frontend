@@ -1,7 +1,7 @@
 import { useRouter } from "next/router";
 import { createContext, ReactNode, useContext, useState } from "react";
 import createAccount from "~/adapters/account/createAccount";
-import generateAccountCode from "~/adapters/code/generateCode";
+import generateAccountCode from "~/adapters/code/generateAccountCode";
 import createInstruction from "~/adapters/instruction/createInstruction";
 import deleteProgram from "~/adapters/program/deleteProgram";
 import updateProgram from "~/adapters/program/updateProgram";

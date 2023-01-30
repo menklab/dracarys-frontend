@@ -1,8 +1,8 @@
 import { API_ROUTES } from "~/constants/api_routes";
 
 // FE usage only
-export default async function generateAccountCode(programId: number) {
-  const res = await fetch(API_ROUTES.GENERATE_CODE_ACCOUNT() + `/?programId=${programId}`, {
+export default async function generateInstructionCode(programId: number): Promise<string[]> {
+  const res = await fetch(API_ROUTES.GENERATE_CODE_INSTRUCTION() + `/?programId=${programId}`, {
     method: "GET",
     mode: "cors",
     headers: { "Content-Type": "application/json" },
