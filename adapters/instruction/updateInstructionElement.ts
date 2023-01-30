@@ -11,6 +11,7 @@ interface UpdateInstructionElementBody {
   genericType: string;
 }
 
+// FE usage only
 export default async function updateInstructionElement(
   elementId: number,
   body: UpdateInstructionElementBody

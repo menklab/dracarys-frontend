@@ -5,6 +5,7 @@ interface UpdateInstructionBody {
   description: string;
 }
 
+// FE usage only
 export default async function updateInstruction(instructionId: number, body: UpdateInstructionBody): Promise<void> {
   const res = await fetch(API_ROUTES.INSTRUCTION() + `/${instructionId}`, {
     method: "PATCH",

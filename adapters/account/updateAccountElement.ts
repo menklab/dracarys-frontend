@@ -6,6 +6,7 @@ interface UpdateAccountElementBody {
   type: ElementType;
 }
 
+// FE usage only
 export default async function updateAccountElement(elementId: number, body: UpdateAccountElementBody): Promise<void> {
   const res = await fetch(API_ROUTES.ACCOUNTS_ELEMENTS() + `/${elementId}`, {
     method: "PATCH",
