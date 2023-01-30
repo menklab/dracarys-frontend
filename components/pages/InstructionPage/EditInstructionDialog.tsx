@@ -23,8 +23,13 @@ export default function EditInstructionDialog() {
     reset({});
   };
 
+  const onDialogClose = () => {
+    editInstructionDialogClose();
+    setTimeout(reset, 100);
+  };
+
   return (
-    <Dialog open={editInstructionDialogIsOpened} fullWidth>
+    <Dialog open={editInstructionDialogIsOpened} onClose={onDialogClose} fullWidth>
       <Box
         component="form"
         noValidate
@@ -32,7 +37,7 @@ export default function EditInstructionDialog() {
         onSubmit={handleSubmit(onSubmit)}
         sx={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4, p: 4 }}
       >
-        <IconButton sx={{ alignSelf: "self-end" }} onClick={editInstructionDialogClose}>
+        <IconButton sx={{ alignSelf: "self-end" }} onClick={onDialogClose}>
           <CloseIcon />
         </IconButton>
         <Typography variant="h4">Edit instruction</Typography>

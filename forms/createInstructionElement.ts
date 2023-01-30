@@ -9,10 +9,12 @@ const errorMap: ZodErrorMap = () => {
 
 export const createInstructionElementSchema = object({
   name: string({ required_error: "Name is required", invalid_type_error: "Name must be a string" })
+    .trim()
     .min(1, "Name must be between 1 and 50 characters long")
     .max(50, "Name must be between 1 and 50 characters long")
     .regex(/^[a-z0-9_]+$/, "Field can only include lowercase letters, numbers and underscore"),
   description: string({ required_error: "description is required", invalid_type_error: "Name must be a string" })
+    .trim()
     .min(1, "Name must be between 1 and 50 characters long")
     .max(50, "Name must be between 1 and 50 characters long"),
   mut: boolean(),

@@ -9,15 +9,17 @@ const errorMap: ZodErrorMap = () => {
 
 export const editInstructionElementSchema = object({
   name: string({ required_error: "Name is required", invalid_type_error: "Name must be a string" })
+    .trim()
     .min(1, "Name must be between 1 and 50 characters long")
     .max(50, "Name must be between 1 and 50 characters long")
     .regex(/^[a-z0-9_]+$/, "Field can only include lowercase letters, numbers and underscore"),
   description: string({ required_error: "description is required", invalid_type_error: "Name must be a string" })
+    .trim()
     .min(1, "Name must be between 1 and 50 characters long")
     .max(50, "Name must be between 1 and 50 characters long"),
   mut: boolean(),
   accountType: nativeEnum(AccountType, { errorMap: errorMap }),
-  genericType: string({ required_error: "Generic Type is required" }).min(1, "Generic Type is required"),
+  genericType: string({ required_error: "Generic Type is required" }).trim().min(1, "Generic Type is required"),
 });
 
 export type EditInstructionElementSchemaType = TypeOf<typeof editInstructionElementSchema>;

@@ -22,8 +22,13 @@ export default function CreateInstructionDialog() {
     reset();
   };
 
+  const onDialogClose = () => {
+    createInstructionDialogClose();
+    setTimeout(reset, 100);
+  };
+
   return (
-    <Dialog open={createInstructionDialogIsOpened} fullWidth>
+    <Dialog open={createInstructionDialogIsOpened} onClose={onDialogClose} fullWidth>
       <Box
         component="form"
         noValidate
@@ -31,7 +36,7 @@ export default function CreateInstructionDialog() {
         onSubmit={handleSubmit(onSubmit)}
         sx={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4, p: 4 }}
       >
-        <IconButton sx={{ alignSelf: "self-end" }} onClick={createInstructionDialogClose}>
+        <IconButton sx={{ alignSelf: "self-end" }} onClick={onDialogClose}>
           <CloseIcon />
         </IconButton>
         <Typography variant="h4">Add instruction</Typography>
