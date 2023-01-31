@@ -5,10 +5,12 @@ import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
+import Link from "next/link";
 import { useInstructionsPage } from "~/components/pages/Instructions/context";
+import { ROUTES } from "~/constants/routes";
 
 export default function View() {
-  const { instructions } = useInstructionsPage();
+  const { instructions, program } = useInstructionsPage();
 
   return (
     <div>
@@ -23,7 +25,15 @@ export default function View() {
           <TableBody>
             {instructions.map((instruction) => (
               <TableRow key={`instructions-${instruction.id}`}>
-                <TableCell align="center">{instruction.name}</TableCell>
+                <TableCell align="center">
+                  <Link
+                    key={`account-${instruction.id}`}
+                    href={ROUTES.INSTRUCTION(program.id, instruction.id)}
+                    style={{ textDecoration: "none", color: "unset" }}
+                  >
+                    {instruction.name}
+                  </Link>
+                </TableCell>
                 <TableCell align="center" sx={{ width: "60%" }}>
                   {instruction.description}
                 </TableCell>
