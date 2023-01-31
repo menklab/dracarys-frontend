@@ -84,7 +84,7 @@ export default function DrawerContent() {
             <ChevronLeftIcon />
           </IconButton>
         </ListItemIcon>
-        <ListItemText>
+        <ListItemText primaryTypographyProps={{ style: { wordBreak: "break-all" } }}>
           {isEditingProgramName ? (
             <TextField
               disabled={isSubmitting}
