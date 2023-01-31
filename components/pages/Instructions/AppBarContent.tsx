@@ -1,12 +1,12 @@
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { Button, IconButton } from "@mui/material";
+import { Button, IconButton, ToggleButton, ToggleButtonGroup } from "@mui/material";
 import Link from "next/link";
 import { useInstructionsPage } from "~/components/pages/Instructions/context";
 import { ROUTES } from "~/constants/routes";
 
 export default function AppBarContent() {
-  const { program, openDeleteProgramDialog } = useInstructionsPage();
+  const { program, openDeleteProgramDialog, viewVariant, changeViewVariant } = useInstructionsPage();
 
   return (
     <>
@@ -28,6 +28,16 @@ export default function AppBarContent() {
         </Link>
         <p style={{ margin: "0 10px", fontSize: "24px" }}>All Instructions</p>
       </div>
+      <ToggleButtonGroup
+        size="small"
+        sx={{ ml: "auto" }}
+        value={viewVariant}
+        exclusive
+        onChange={(_, v) => changeViewVariant(v)}
+      >
+        <ToggleButton value="list">List view</ToggleButton>
+        <ToggleButton value="code">Code view</ToggleButton>
+      </ToggleButtonGroup>
       <Button sx={{ ml: "auto" }} endIcon={<DeleteIcon />} onClick={openDeleteProgramDialog}>
         Delete program
       </Button>
