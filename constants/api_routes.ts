@@ -8,4 +8,5 @@ export const API_ROUTES = {
   ACCOUNTS: () => `${process.env.NEST_HOST}/api/account`,
   ACCOUNTS_ELEMENTS: () => `${process.env.NEST_HOST}/api/account-element`,
   INSTRUCTION: () => `${process.env.NEST_HOST}/api/instruction`,
+  INSTRUCTION_ELEMENT: () => `${process.env.NEST_HOST}/api/instruction-element`,
 } as const;

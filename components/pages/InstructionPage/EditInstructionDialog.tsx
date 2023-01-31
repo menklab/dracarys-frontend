@@ -2,33 +2,34 @@ import CloseIcon from "@mui/icons-material/Close";
 import { LoadingButton } from "@mui/lab";
 import { Box, Dialog, IconButton, TextField, Typography } from "@mui/material";
 import { SubmitHandler } from "react-hook-form";
-import { useAccountsPage } from "~/components/pages/Accounts/context";
-import { CreateInstructionSchemaType, useCreateInstructionForm } from "~/forms/createInstruction";
+import { useInstructionPage } from "~/components/pages/InstructionPage/context";
+import { EditInstructionSchemaType, useEditInstructionForm } from "~/forms/editInstruction";
 
-export default function CreateInstructionDialog() {
-  const { createInstructionDialogIsOpened, createInstructionDialogClose, createNewInstruction } = useAccountsPage();
+export default function EditInstructionDialog() {
+  const { editInstructionDialogIsOpened, editInstructionDialogClose, editInstruction, instruction } =
+    useInstructionPage();
 
   const {
     register,
     formState: { errors, isSubmitting },
     reset,
     handleSubmit,
-  } = useCreateInstructionForm();
+  } = useEditInstructionForm({ name: instruction.name, description: instruction.description });
 
-  const onSubmit: SubmitHandler<CreateInstructionSchemaType> = async (values) => {
+  const onSubmit: SubmitHandler<EditInstructionSchemaType> = async (values) => {
     await new Promise((resolve) => setTimeout(resolve, 1000));
-    await createNewInstruction(values.name, values.description);
-    createInstructionDialogClose();
-    reset();
+    await editInstruction(values.name, values.description);
+    editInstructionDialogClose();
+    reset({});
   };
 
   const onDialogClose = () => {
-    createInstructionDialogClose();
+    editInstructionDialogClose();
     setTimeout(reset, 100);
   };
 
   return (
-    <Dialog open={createInstructionDialogIsOpened} onClose={onDialogClose} fullWidth>
+    <Dialog open={editInstructionDialogIsOpened} onClose={onDialogClose} fullWidth>
       <Box
         component="form"
         noValidate
@@ -39,7 +40,7 @@ export default function CreateInstructionDialog() {
         <IconButton sx={{ alignSelf: "self-end" }} onClick={onDialogClose}>
           <CloseIcon />
         </IconButton>
-        <Typography variant="h4">Add instruction</Typography>
+        <Typography variant="h4">Edit instruction</Typography>
         <TextField
           fullWidth
           placeholder="Name"
@@ -55,7 +56,7 @@ export default function CreateInstructionDialog() {
           {...register("description")}
         />
         <LoadingButton loading={isSubmitting} variant="contained" type="submit">
-          Create instruction
+          Save
         </LoadingButton>
       </Box>
     </Dialog>

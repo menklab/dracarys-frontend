@@ -84,7 +84,7 @@ export default function DrawerContent() {
             <ChevronLeftIcon />
           </IconButton>
         </ListItemIcon>
-        <ListItemText>
+        <ListItemText primaryTypographyProps={{ style: { wordBreak: "break-all" } }}>
           {isEditingProgramName ? (
             <TextField
               disabled={isSubmitting}
@@ -153,7 +153,7 @@ export default function DrawerContent() {
           return (
             <Link
               key={`account-${instruction.id}`}
-              href={ROUTES.ACCOUNT(program.id, instruction.id)}
+              href={ROUTES.INSTRUCTION(program.id, instruction.id)}
               style={{ textDecoration: "none", color: "unset" }}
             >
               <List component="div" disablePadding>
