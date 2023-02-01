@@ -7,7 +7,7 @@ the backend repo can be found [here](https://github.com/menklab/dracarys-backend
 
 ## Content
 
-- [Features](#features)
+- [Features](#features )
 - [Contributing](#contributing)
 - [Helpful Resources](#helpful-resources)
 
