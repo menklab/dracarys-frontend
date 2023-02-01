@@ -16,5 +16,9 @@ export const editInstructionSchema = object({
 export type EditInstructionSchemaType = TypeOf<typeof editInstructionSchema>;
 
 export const useEditInstructionForm = (defaultValues: DefaultValues<EditInstructionSchemaType>) => {
-  return useForm<EditInstructionSchemaType>({ resolver: zodResolver(editInstructionSchema), defaultValues });
+  return useForm<EditInstructionSchemaType>({
+    mode: "all",
+    resolver: zodResolver(editInstructionSchema),
+    defaultValues,
+  });
 };
