@@ -1,12 +1,17 @@
 import Konva from "konva";
+import { useRouter } from "next/navigation";
 import { Ref, useEffect, useRef, useState } from "react";
+import { KONVA_ACCOUNT_HEADER_HEIGHT, KONVA_ACCOUNT_STROKE_WIDTH, KONVA_ACCOUNT_WIDTH } from "~/constants/konva";
+import { ROUTES } from "~/constants/routes";
 import { useKonva } from "~/contexts/konva/hooks";
+import { Cursor } from "~/enums/cursor";
 import { Account } from "~/interfaces/account";
 import { Position } from "~/interfaces/position";
 import {
   calculateAccountRectHeight,
   calculateCenteredAccountNamePosition,
   calculateCenteredAttributeNamePosition,
+  setCursorOnStage,
 } from "~/utils/konva";
 
 interface UseAccountHookReturn {
@@ -15,9 +20,13 @@ interface UseAccountHookReturn {
   nameRef: Ref<Konva.Text>;
   attributesGroupRef: Ref<Konva.Group>;
   canMove: boolean;
+  isHovered: boolean;
   onDragMove: () => void;
   onDragStart: (pos: Position) => void;
   onDragEnd: (pos: Position) => Promise<void>;
+  onClick: () => void;
+  onMouseEnter: () => void;
+  onMouseLeave: () => void;
 }
 
 export default function useAccount(account: Account): UseAccountHookReturn {
@@ -27,11 +36,33 @@ export default function useAccount(account: Account): UseAccountHookReturn {
   const attributesGroupRef = useRef<Konva.Group>(null);
   const [lastPos, setLastPos] = useState<Position>(account.position || { x: 0, y: 0 });
   const [canMove, setCanMove] = useState<boolean>(false);
+  const [isHovered, setIsHovered] = useState<boolean>(false);
   const konva = useKonva();
+  const router = useRouter();
 
-  const onDragMove = () => konva.actions.repositionArrows(account.id);
-  const onDragStart = (pos: Position) => setLastPos(pos);
+  const onDragMove = () => {
+    if (!groupRef.current || !konva.data.stageRef.current) return;
+    const stage = konva.data.stageRef.current;
+    const group = groupRef.current;
+    const pos = group.position();
+
+    if (pos.x + KONVA_ACCOUNT_STROKE_WIDTH < 0) group.x(KONVA_ACCOUNT_STROKE_WIDTH);
+    if (pos.x + KONVA_ACCOUNT_WIDTH + KONVA_ACCOUNT_STROKE_WIDTH > stage.width())
+      group.x(stage.width() - KONVA_ACCOUNT_WIDTH - KONVA_ACCOUNT_STROKE_WIDTH);
+    if (pos.y + KONVA_ACCOUNT_STROKE_WIDTH < 0) group.y(KONVA_ACCOUNT_STROKE_WIDTH);
+    if (pos.y + KONVA_ACCOUNT_HEADER_HEIGHT + KONVA_ACCOUNT_STROKE_WIDTH > stage.height())
+      group.y(stage.height() - KONVA_ACCOUNT_HEADER_HEIGHT - KONVA_ACCOUNT_STROKE_WIDTH);
+
+    konva.actions.repositionArrows(account.id);
+  };
+
+  const onDragStart = (pos: Position) => {
+    setLastPos(pos);
+    setCursorOnStage(konva.data.stageRef?.current!, Cursor.MOVE);
+  };
+
   const onDragEnd = async (pos: Position) => {
+    setCursorOnStage(konva.data.stageRef?.current!, Cursor.POINTER);
     setCanMove(false);
     const cancelDragCb = () => {
       groupRef.current?.position(lastPos);
@@ -40,6 +71,18 @@ export default function useAccount(account: Account): UseAccountHookReturn {
 
     await konva.actions.saveAccountPosition(account.id, pos, cancelDragCb);
     setCanMove(true);
+  };
+
+  const onClick = () => router.push(ROUTES.ACCOUNT(konva.data.program.id, account.id));
+
+  const onMouseEnter = () => {
+    setIsHovered(true);
+    setCursorOnStage(konva.data.stageRef?.current!, Cursor.POINTER);
+  };
+
+  const onMouseLeave = () => {
+    setIsHovered(false);
+    setCursorOnStage(konva.data.stageRef?.current!, Cursor.DEFAULT);
   };
 
   useEffect(() => {
@@ -66,8 +109,12 @@ export default function useAccount(account: Account): UseAccountHookReturn {
     nameRef,
     attributesGroupRef,
     canMove,
+    isHovered,
     onDragMove,
     onDragStart,
     onDragEnd,
+    onClick,
+    onMouseEnter,
+    onMouseLeave,
   };
 }

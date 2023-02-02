@@ -3,6 +3,7 @@ import useAccount from "~/components/konva/Account/useAccount";
 import {
   KONVA_ACCOUNT_ATTRIBUTE_FONT_SIZE,
   KONVA_ACCOUNT_CORNER_RADIUS,
+  KONVA_ACCOUNT_FILL,
   KONVA_ACCOUNT_NAME_FONT_SIZE,
   KONVA_ACCOUNT_STROKE_COLOR,
   KONVA_ACCOUNT_STROKE_WIDTH,
@@ -12,8 +13,19 @@ import { Account } from "~/interfaces/account";
 import { getAccountAttributesId, getAccountGroupId, getAccountRectId } from "~/utils/konva";
 
 export default function KonvaAccount(account: Account) {
-  const { groupRef, rectRef, nameRef, attributesGroupRef, canMove, onDragMove, onDragStart, onDragEnd } =
-    useAccount(account);
+  const {
+    groupRef,
+    rectRef,
+    nameRef,
+    attributesGroupRef,
+    canMove,
+    onDragMove,
+    onDragStart,
+    onDragEnd,
+    onClick,
+    onMouseEnter,
+    onMouseLeave,
+  } = useAccount(account);
   const { id, attributes, name } = account;
 
   return (
@@ -21,19 +33,31 @@ export default function KonvaAccount(account: Account) {
       id={getAccountGroupId(id)}
       ref={groupRef}
       draggable={canMove}
+      onClick={onClick}
       onDragMove={onDragMove}
       onDragStart={(e) => onDragStart(e.target.position())}
       onDragEnd={(e) => onDragEnd(e.target.position())}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
     >
       <Rect
         id={getAccountRectId(id)}
         ref={rectRef}
+        fill={KONVA_ACCOUNT_FILL}
         width={KONVA_ACCOUNT_WIDTH}
         stroke={KONVA_ACCOUNT_STROKE_COLOR}
         strokeWidth={KONVA_ACCOUNT_STROKE_WIDTH}
         cornerRadius={KONVA_ACCOUNT_CORNER_RADIUS}
       />
-      <Text ref={nameRef} text={name} fontSize={KONVA_ACCOUNT_NAME_FONT_SIZE} />
+      <Text
+        ref={nameRef}
+        text={name}
+        fontSize={KONVA_ACCOUNT_NAME_FONT_SIZE}
+        width={KONVA_ACCOUNT_WIDTH}
+        align="center"
+        wrap="none"
+        ellipsis
+      />
       <Group id={getAccountAttributesId(id)} ref={attributesGroupRef}>
         {attributes?.map((attribute) => (
           <Text

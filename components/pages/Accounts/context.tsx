@@ -69,8 +69,7 @@ export const AccountsPageProvider = ({ program, instructions, accounts, children
   const [openInstructions, setOpenInstructions] = useState<boolean>(false);
 
   const getGeneratedAccountCode = async () => {
-    const generatedCode = await generateAccountCode(Number(program.id));
-    return generatedCode;
+    return await generateAccountCode(Number(program.id));
   };
 
   const handleOpenAccounts = () => {

@@ -7,6 +7,7 @@ import {
   KONVA_ACCOUNT_NAME_FONT_SIZE,
   KONVA_CONNECTION_OFFSET,
 } from "~/constants/konva";
+import { Cursor } from "~/enums/cursor";
 import { Position } from "~/interfaces/position";
 import { Line } from "~/types/konva";
 
@@ -118,4 +119,8 @@ const calculatePointsForConnection_SHAPE_BASED = (from: IRect, to: IRect): Line 
 
 export const calculatePointsForConnection = (from: IRect, to: IRect): Line => {
   return calculatePointsForConnection_SHAPE_BASED(from, to);
+};
+
+export const setCursorOnStage = (stage: Konva.Stage, cursor: Cursor) => {
+  stage.container().style.cursor = cursor;
 };
