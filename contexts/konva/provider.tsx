@@ -1,12 +1,13 @@
 import Konva from "konva";
 import { useRef } from "react";
+import updateAccount from "~/adapters/account/updateAccount";
 import useErrorHandler from "~/hooks/useErrorHandler";
 import { Connection } from "~/interfaces/connection";
 import { calculatePointsForConnection, getAccountGroupId, getConnectionId } from "~/utils/konva";
 import { KonvaContext } from "./context";
 import { KonvaContextActions, KonvaProviderProps } from "./types";
 
-export default function KonvaProvider({ accounts, children }: KonvaProviderProps) {
+export default function KonvaProvider({ program, accounts, children }: KonvaProviderProps) {
   const { displayCaughtError } = useErrorHandler();
   const stageRef = useRef<Konva.Stage>(null);
 
@@ -14,15 +15,13 @@ export default function KonvaProvider({ accounts, children }: KonvaProviderProps
     redraw: () => stageRef.current?.draw(),
     findNode: (nodeId) => stageRef.current?.findOne(`#${nodeId}`),
     saveAccountPosition: async (accountId, dragTo, cancelDragCb) => {
-      console.log(accountId, dragTo, cancelDragCb, displayCaughtError);
-      // try {
-      //   const { origin } = absoluteUrl();
-      //   await updateAccount(origin, { accountId, newPosition: dragTo });
-      // } catch (e) {
-      //   displayCaughtError(e);
-      //   cancelDragCb();
-      //   actions.repositionArrows(accountId);
-      // }
+      try {
+        await updateAccount(accountId, { coordinates: dragTo });
+      } catch (e) {
+        displayCaughtError(e);
+        cancelDragCb();
+        actions.repositionArrows(accountId);
+      }
     },
     repositionArrows: (movedAccountId: number) => {
       const account = accounts.find((account) => account.id === movedAccountId);
@@ -53,5 +52,7 @@ export default function KonvaProvider({ accounts, children }: KonvaProviderProps
     },
   };
 
-  return <KonvaContext.Provider value={{ actions, data: { accounts, stageRef } }}>{children}</KonvaContext.Provider>;
+  return (
+    <KonvaContext.Provider value={{ actions, data: { program, accounts, stageRef } }}>{children}</KonvaContext.Provider>
+  );
 }
