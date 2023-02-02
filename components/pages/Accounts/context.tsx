@@ -1,6 +1,7 @@
 import { useRouter } from "next/router";
 import { createContext, ReactNode, useContext, useState } from "react";
 import createAccount from "~/adapters/account/createAccount";
+import generateAccountCode from "~/adapters/code/generateAccountCode";
 import createInstruction from "~/adapters/instruction/createInstruction";
 import deleteProgram from "~/adapters/program/deleteProgram";
 import updateProgram from "~/adapters/program/updateProgram";
@@ -25,6 +26,7 @@ interface AccountsPageContextDefaultValue {
   changeViewVariant: (variant?: LayoutViewVariant) => void;
   isDeleteProgramDialogOpen: boolean;
   openDeleteProgramDialog: () => void;
+  getGeneratedAccountCode: () => Promise<string[]>;
   closeDeleteProgramDialog: () => void;
   createAccountDialogOpen: () => void;
   createAccountDialogClose: () => void;
@@ -65,6 +67,10 @@ export const AccountsPageProvider = ({ program, instructions, accounts, children
   const [createInstructionDialogIsOpened, setCreateInstructionDialogIsOpened] = useState<boolean>(false);
   const [openAccounts, setOpenAccounts] = useState<boolean>(false);
   const [openInstructions, setOpenInstructions] = useState<boolean>(false);
+
+  const getGeneratedAccountCode = async () => {
+    return await generateAccountCode(Number(program.id));
+  };
 
   const handleOpenAccounts = () => {
     setOpenAccounts(!openAccounts);
@@ -145,6 +151,7 @@ export const AccountsPageProvider = ({ program, instructions, accounts, children
         goBackToProgramsList: () => router.push(ROUTES.PROGRAMS()),
         createNewAccount,
         handleOpenAccounts,
+        getGeneratedAccountCode,
         handleOpenInstructions,
         createInstructionDialogOpen: () => setCreateInstructionDialogIsOpened(true),
         createInstructionDialogClose: () => setCreateInstructionDialogIsOpened(false),

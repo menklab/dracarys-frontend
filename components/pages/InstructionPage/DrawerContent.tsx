@@ -18,7 +18,7 @@ import {
 import Link from "next/link";
 import { Fragment } from "react";
 import { SubmitHandler } from "react-hook-form";
-import { useAccountPage } from "~/components/pages/AccountPage/context";
+import { useInstructionPage } from "~/components/pages/InstructionPage/context";
 import { ROUTES } from "~/constants/routes";
 import { EditProgramNameSchemaType, useEditProgramNameForm } from "~/forms/editProgramName";
 
@@ -36,7 +36,7 @@ export default function DrawerContent() {
     goBackToProgramsList,
     openAccounts,
     handleOpenAccounts,
-  } = useAccountPage();
+  } = useInstructionPage();
 
   const {
     register,
@@ -128,7 +128,7 @@ export default function DrawerContent() {
           return (
             <Link
               key={`account-${instruction.id}`}
-              href={ROUTES.INSTRUCTION(program.id, instruction.id)}
+              href={ROUTES.ACCOUNT(program.id, instruction.id)}
               style={{ textDecoration: "none", color: "unset" }}
             >
               <List component="div" disablePadding>

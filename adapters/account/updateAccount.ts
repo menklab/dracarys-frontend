@@ -6,6 +6,7 @@ interface UpdateAccountBody {
   coordinates?: Position;
 }
 
+// FE usage only
 export default async function updateAccount(accountId: number, body: UpdateAccountBody): Promise<void> {
   const { name, coordinates } = body;
   const res = await fetch(API_ROUTES.ACCOUNTS() + `/${accountId}`, {
