@@ -5,13 +5,14 @@ import Select from "@mui/material/Select";
 import TableCell from "@mui/material/TableCell";
 import TableRow from "@mui/material/TableRow";
 import TextField from "@mui/material/TextField";
+import { useEffect } from "react";
 import { Controller, SubmitHandler } from "react-hook-form";
 import { useAccountPage } from "~/components/pages/AccountPage/context";
 import { ElementType } from "~/enums/elementType";
 import { CreateAccountElementSchemaType, useCreateAccountElementForm } from "~/forms/createAccountElement";
 
 export default function ElementLineCreate() {
-  const { saveCreateAccountElement } = useAccountPage();
+  const { saveCreateAccountElement, account } = useAccountPage();
 
   const {
     register,
@@ -25,6 +26,11 @@ export default function ElementLineCreate() {
     name: "",
     type: "",
   };
+
+  useEffect(() => {
+    // @ts-ignore
+    reset(defaultValues);
+  }, [account]);
 
   const onSubmit: SubmitHandler<CreateAccountElementSchemaType> = async (values) => {
     await saveCreateAccountElement(values.name, values.type as ElementType);
