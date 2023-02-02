@@ -1,1 +1,1 @@
-export type LayoutViewVariant = "list" | "code";
+export type LayoutViewVariant = "visual" | "code";

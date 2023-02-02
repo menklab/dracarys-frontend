@@ -1,7 +1,8 @@
 import Konva from "konva";
-import { ReactNode, Ref } from "react";
+import { ReactNode, RefObject } from "react";
 import { Account } from "~/interfaces/account";
 import { Position } from "~/interfaces/position";
+import { Program } from "~/interfaces/program";
 
 export interface KonvaContextActions {
   redraw: () => void;
@@ -11,8 +12,9 @@ export interface KonvaContextActions {
 }
 
 export interface KonvaContextData {
+  program: Program;
   accounts: Account[];
-  stageRef: Ref<Konva.Stage>;
+  stageRef: RefObject<Konva.Stage>;
 }
 
 export interface KonvaContextDefaultValue {
@@ -21,6 +23,7 @@ export interface KonvaContextDefaultValue {
 }
 
 export interface KonvaProviderProps {
+  program: Program;
   accounts: Account[];
   children: ReactNode;
 }
