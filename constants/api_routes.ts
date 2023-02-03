@@ -6,6 +6,7 @@ export const API_ROUTES = {
   GENERATE_CODE_INSTRUCTION: () => `${process.env.NEST_HOST}/api/instruction/generate-code`,
   PROGRAMS: () => `${process.env.NEST_HOST}/api/program`,
   ACCOUNTS: () => `${process.env.NEST_HOST}/api/account`,
+  ACCOUNTS_LINKS: () => `${process.env.NEST_HOST}/api/account/links`,
   ACCOUNTS_ELEMENTS: () => `${process.env.NEST_HOST}/api/account-element`,
   INSTRUCTION: () => `${process.env.NEST_HOST}/api/instruction`,
   INSTRUCTION_ELEMENT: () => `${process.env.NEST_HOST}/api/instruction-element`,

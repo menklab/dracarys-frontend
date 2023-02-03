@@ -8,6 +8,7 @@ export interface KonvaContextActions {
   redraw: () => void;
   findNode: <S extends Konva.Node>(nodeId: string) => S | undefined;
   saveAccountPosition: (accountId: number, dragTo: Position, cancelDragCb: () => void) => Promise<void>;
+  createConnection: (fromAccountId: number, toAccountId: number) => Promise<void>;
   repositionArrows: (movedAccountId: number) => void;
 }
 

@@ -1,7 +1,9 @@
 import Konva from "konva";
 import { useRef } from "react";
 import updateAccount from "~/adapters/account/updateAccount";
+import updateAccountLinks from "~/adapters/account/updateAccountLinks";
 import useErrorHandler from "~/hooks/useErrorHandler";
+import useTriggerSSR from "~/hooks/useTriggerSSR";
 import { Connection } from "~/interfaces/connection";
 import { calculatePointsForConnection, getAccountGroupId, getConnectionId } from "~/utils/konva";
 import { KonvaContext } from "./context";
@@ -9,6 +11,7 @@ import { KonvaContextActions, KonvaProviderProps } from "./types";
 
 export default function KonvaProvider({ program, accounts, children }: KonvaProviderProps) {
   const { displayCaughtError } = useErrorHandler();
+  const { triggerSSR } = useTriggerSSR();
   const stageRef = useRef<Konva.Stage>(null);
 
   const actions: KonvaContextActions = {
@@ -21,6 +24,18 @@ export default function KonvaProvider({ program, accounts, children }: KonvaProv
         displayCaughtError(e);
         cancelDragCb();
         actions.repositionArrows(accountId);
+      }
+    },
+    createConnection: async (fromAccountId, toAccountId) => {
+      try {
+        const newLinks = [{ accountId: fromAccountId, linkedAccounts: [toAccountId] }];
+        const oldLinks = accounts
+          .filter((account) => account.accounts?.length! > 0)
+          .map((account) => ({ accountId: account.id, linkedAccounts: account?.accounts! }));
+        await updateAccountLinks({ links: [...oldLinks, ...newLinks] });
+        await triggerSSR();
+      } catch (e) {
+        displayCaughtError(e);
       }
     },
     repositionArrows: (movedAccountId: number) => {
