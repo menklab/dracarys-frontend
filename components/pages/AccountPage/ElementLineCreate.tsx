@@ -1,11 +1,10 @@
 import FormControl from "@mui/material/FormControl";
 import FormHelperText from "@mui/material/FormHelperText";
-import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 import TableCell from "@mui/material/TableCell";
 import TableRow from "@mui/material/TableRow";
 import TextField from "@mui/material/TextField";
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Controller, SubmitHandler } from "react-hook-form";
 import { useAccountPage } from "~/components/pages/AccountPage/context";
 import { ElementType } from "~/enums/elementType";
@@ -13,6 +12,7 @@ import { CreateAccountElementSchemaType, useCreateAccountElementForm } from "~/f
 
 export default function ElementLineCreate() {
   const { saveCreateAccountElement, account } = useAccountPage();
+  const [intervalId, setIntervalId] = useState<any>(undefined);
 
   const {
     register,
@@ -41,7 +41,16 @@ export default function ElementLineCreate() {
   const elementKey = "elementLineNew";
 
   return (
-    <TableRow sx={{ backgroundColor: "#ededed", "&:last-child td, &:last-child th": { border: 0 } }}>
+    <TableRow
+      sx={{ backgroundColor: "#ededed", "&:last-child td, &:last-child th": { border: 0 } }}
+      onBlur={() => {
+        const intervalIdTemp = setTimeout(() => {
+          const newLineForm = window.document.getElementById(elementKey) as HTMLFormElement;
+          newLineForm.requestSubmit();
+        }, 1000);
+        setIntervalId(intervalIdTemp);
+      }}
+    >
       <TableCell scope="row" align="center" sx={{ verticalAlign: "top" }}>
         <form id={elementKey} onSubmit={handleSubmit(onSubmit)} />
         <TextField
@@ -50,9 +59,8 @@ export default function ElementLineCreate() {
           error={!!errors["name"]}
           helperText={errors["name"] ? errors["name"].message : ""}
           {...register("name")}
-          onBlur={(e) => {
-            e.preventDefault();
-            e.currentTarget.form?.requestSubmit();
+          onFocus={() => {
+            clearTimeout(intervalId);
           }}
         />
       </TableCell>
@@ -65,25 +73,20 @@ export default function ElementLineCreate() {
             defaultValue=""
             render={({ field, field: { value } }) => (
               <Select
+                native
                 fullWidth
                 defaultValue=""
-                {...field}
-                value={value}
+                {...register("type")}
                 inputProps={{ form: elementKey }}
-                onBlur={(e) => {
-                  e.preventDefault();
-                  // can't find a better way because e.currentTarget doesn't work
-                  const newLineForm = window.document.getElementById(elementKey) as HTMLFormElement;
-                  newLineForm.requestSubmit();
+                onFocus={() => {
+                  clearTimeout(intervalId);
                 }}
               >
-                <MenuItem value="">
-                  <em>None</em>
-                </MenuItem>
+                <option aria-label="None" value="" />
                 {Object.keys(ElementType).map((keyObj) => (
-                  <MenuItem value={ElementType[keyObj as keyof typeof ElementType]} key={keyObj}>
+                  <option key={`create-type-${keyObj}`} value={ElementType[keyObj as keyof typeof ElementType]}>
                     {ElementType[keyObj as keyof typeof ElementType]}
-                  </MenuItem>
+                  </option>
                 ))}
               </Select>
             )}
