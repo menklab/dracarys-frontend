@@ -1,6 +1,7 @@
 export const KONVA_ACCOUNT_WIDTH = 200;
 export const KONVA_ACCOUNT_STROKE_WIDTH = 2;
 export const KONVA_ACCOUNT_STROKE_COLOR = "black";
+export const KONVA_ACCOUNT_FILL = "white";
 export const KONVA_ACCOUNT_CORNER_RADIUS = 4;
 export const KONVA_ACCOUNT_HEADER_HEIGHT = 40;
 export const KONVA_ACCOUNT_NAME_FONT_SIZE = 16;

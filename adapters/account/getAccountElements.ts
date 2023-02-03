@@ -12,10 +12,13 @@ type GetAccountElementsJsonResponse = {
 
 // SSR usage only
 export default async function getAccountElements(sid: string, accountId: number): Promise<AccountElement[]> {
-  const res = await fetch(API_ROUTES.ACCOUNTS_ELEMENTS() + `/?accountId=${accountId}`, {
-    method: "GET",
-    headers: { cookie: `connect.sid=${sid}` },
-  });
+  const res = await fetch(
+    API_ROUTES.ACCOUNTS_ELEMENTS() + "?" + new URLSearchParams({ accountId: String(accountId) }),
+    {
+      method: "GET",
+      headers: { cookie: `connect.sid=${sid}` },
+    }
+  );
 
   if (!res.ok) throw await res.json();
   const data = (await res.json()) as GetAccountElementsJsonResponse;

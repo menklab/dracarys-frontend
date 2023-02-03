@@ -14,7 +14,7 @@ export default function AppBarContent() {
         exclusive
         onChange={(_, v) => changeViewVariant(v)}
       >
-        <ToggleButton value="list">List view</ToggleButton>
+        <ToggleButton value="visual">Diagram view</ToggleButton>
         <ToggleButton value="code">Code view</ToggleButton>
       </ToggleButtonGroup>
       <Button sx={{ ml: "auto" }} endIcon={<DeleteIcon />} onClick={openDeleteProgramDialog}>

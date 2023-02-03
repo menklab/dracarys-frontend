@@ -65,8 +65,7 @@ export const InstructionsPageProvider = ({
   };
 
   const getGeneratedInstructionCode = async () => {
-    const generatedCode = await generateInstructionCode(Number(program.id));
-    return generatedCode;
+    return await generateInstructionCode(Number(program.id));
   };
 
   const handleOpenAccounts = () => {
