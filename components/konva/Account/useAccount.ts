@@ -17,6 +17,7 @@ import {
 interface UseAccountHookReturn {
   groupRef: Ref<Konva.Group>;
   rectRef: Ref<Konva.Rect>;
+  crownRef: Ref<Konva.Rect>;
   nameRef: Ref<Konva.Text>;
   attributesGroupRef: Ref<Konva.Group>;
   canMove: boolean;
@@ -27,11 +28,14 @@ interface UseAccountHookReturn {
   onClick: () => void;
   onMouseEnter: () => void;
   onMouseLeave: () => void;
+  onCrownMouseEnter: () => void;
+  onCrownMouseLeave: () => void;
 }
 
 export default function useAccount(account: Account): UseAccountHookReturn {
   const groupRef = useRef<Konva.Group>(null);
   const rectRef = useRef<Konva.Rect>(null);
+  const crownRef = useRef<Konva.Rect>(null);
   const nameRef = useRef<Konva.Text>(null);
   const attributesGroupRef = useRef<Konva.Group>(null);
   const [lastPos, setLastPos] = useState<Position>(account.position || { x: 0, y: 0 });
@@ -41,11 +45,11 @@ export default function useAccount(account: Account): UseAccountHookReturn {
   const router = useRouter();
 
   const onDragMove = () => {
-    if (!groupRef.current || !konva.data.stageRef.current) return;
     const stage = konva.data.stageRef.current;
     const group = groupRef.current;
-    const pos = group.position();
+    if (!group || !stage) return;
 
+    const pos = group.position();
     if (pos.x + KONVA_ACCOUNT_STROKE_WIDTH < 0) group.x(KONVA_ACCOUNT_STROKE_WIDTH);
     if (pos.x + KONVA_ACCOUNT_WIDTH + KONVA_ACCOUNT_STROKE_WIDTH > stage.width())
       group.x(stage.width() - KONVA_ACCOUNT_WIDTH - KONVA_ACCOUNT_STROKE_WIDTH);
@@ -57,15 +61,22 @@ export default function useAccount(account: Account): UseAccountHookReturn {
   };
 
   const onDragStart = (pos: Position) => {
+    const stage = konva.data.stageRef.current;
+    if (!stage) return;
+
     setLastPos(pos);
-    setCursorOnStage(konva.data.stageRef?.current!, Cursor.MOVE);
+    setCursorOnStage(stage, Cursor.MOVE);
   };
 
   const onDragEnd = async (pos: Position) => {
-    setCursorOnStage(konva.data.stageRef?.current!, Cursor.POINTER);
+    const stage = konva.data.stageRef.current;
+    const group = groupRef.current;
+    if (!stage || !group) return;
+
+    setCursorOnStage(stage, Cursor.POINTER);
     setCanMove(false);
     const cancelDragCb = () => {
-      groupRef.current?.position(lastPos);
+      group.position(lastPos);
       konva.actions.redraw();
     };
 
@@ -76,23 +87,52 @@ export default function useAccount(account: Account): UseAccountHookReturn {
   const onClick = () => router.push(ROUTES.ACCOUNT(konva.data.program.id, account.id));
 
   const onMouseEnter = () => {
+    const crown = crownRef.current;
+    const stage = konva.data.stageRef.current;
+    if (!crown || !stage) return;
+
+    crown.to({ opacity: 1, duration: 0.4 });
     setIsHovered(true);
-    setCursorOnStage(konva.data.stageRef?.current!, Cursor.POINTER);
+    setCursorOnStage(stage, Cursor.POINTER);
   };
 
   const onMouseLeave = () => {
+    const crown = crownRef.current;
+    const stage = konva.data.stageRef.current;
+    if (!crown || !stage) return;
+
+    crown.to({ opacity: 0, duration: 0.4 });
     setIsHovered(false);
-    setCursorOnStage(konva.data.stageRef?.current!, Cursor.DEFAULT);
+    setCursorOnStage(stage, Cursor.DEFAULT);
+  };
+
+  const onCrownMouseEnter = () => {
+    const stage = konva.data.stageRef.current;
+    if (!stage) return;
+
+    stage.draggable(false);
+    setCanMove(false);
+  };
+
+  const onCrownMouseLeave = () => {
+    const stage = konva.data.stageRef.current;
+    if (!stage) return;
+
+    stage.draggable(true);
+    setCanMove(true);
   };
 
   useEffect(() => {
-    const group = groupRef.current as Konva.Group;
-    const rect = rectRef.current as Konva.Rect;
-    const name = nameRef.current as Konva.Text;
-    const attributesGroup = attributesGroupRef.current as Konva.Group;
+    const group = groupRef.current;
+    const rect = rectRef.current;
+    const crown = crownRef.current;
+    const name = nameRef.current;
+    const attributesGroup = attributesGroupRef.current;
+    if (!group || !rect || !crown || !name || !attributesGroup) return;
 
     // TODO: calculate position to avoid accounts overlapping
     group.position(account.position || { x: 0, y: 0 });
+    crown.opacity(0);
     rect.height(calculateAccountRectHeight(account.attributes?.length || 0));
     name.position(calculateCenteredAccountNamePosition(rect, name));
 
@@ -106,6 +146,7 @@ export default function useAccount(account: Account): UseAccountHookReturn {
   return {
     groupRef,
     rectRef,
+    crownRef,
     nameRef,
     attributesGroupRef,
     canMove,
@@ -116,5 +157,7 @@ export default function useAccount(account: Account): UseAccountHookReturn {
     onClick,
     onMouseEnter,
     onMouseLeave,
+    onCrownMouseEnter,
+    onCrownMouseLeave,
   };
 }

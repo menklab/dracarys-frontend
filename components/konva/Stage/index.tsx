@@ -4,12 +4,32 @@ import KonvaConnection from "~/components/konva/Connection";
 import useStage from "~/components/konva/Stage/useStage";
 
 export default function KonvaStage() {
-  const { stageRef, containerRef, size, onWheel, accounts, connections } = useStage();
+  const {
+    stageRef,
+    layerRef,
+    containerRef,
+    size,
+    onWheel,
+    accounts,
+    connections,
+    onMouseUp,
+    onMouseDown,
+    onMouseMove,
+  } = useStage();
 
   return (
     <div style={{ width: "100%", minHeight: "calc(100vh - 64px)" }} ref={containerRef}>
-      <Stage width={size.width} height={size.height} ref={stageRef} onWheel={onWheel} draggable>
-        <Layer>
+      <Stage
+        width={size.width}
+        height={size.height}
+        ref={stageRef}
+        draggable
+        onWheel={onWheel}
+        onMouseUp={onMouseUp}
+        onMouseDown={onMouseDown}
+        onMouseMove={onMouseMove}
+      >
+        <Layer ref={layerRef}>
           {accounts
             // zIndex is ignored while using react version of konva
             // overlaying is controlled by components render order
