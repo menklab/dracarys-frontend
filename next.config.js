@@ -13,6 +13,11 @@ const nextConfig = {
         destination: "/login",
         permanent: true,
       },
+      {
+        source: "/programs/:programId",
+        destination: "/programs/:programId/accounts",
+        permanent: true,
+      },
     ];
   },
 };
