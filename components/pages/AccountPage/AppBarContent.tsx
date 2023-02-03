@@ -25,6 +25,7 @@ export default function AppBarContent() {
   const {
     register,
     formState: { errors },
+    reset,
     handleSubmit,
   } = useEditAccountNameForm({ name: account.name });
 
@@ -67,6 +68,7 @@ export default function AppBarContent() {
               <IconButton
                 edge="end"
                 onClick={() => {
+                  reset();
                   setIsEditingAccountName(false);
                 }}
               >
