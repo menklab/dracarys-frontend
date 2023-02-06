@@ -9,6 +9,8 @@ import { Account } from "~/interfaces/account";
 import { AccountElement } from "~/interfaces/accountElement";
 import { Instruction } from "~/interfaces/instruction";
 import { Program } from "~/interfaces/program";
+import getSidCookie from "~/utils/getSidCookie";
+import serverLogout from "~/utils/serverLogout";
 
 interface AccountPageProps {
   program: Program;
@@ -36,21 +38,26 @@ export default function AccountIndexPage({
   );
 }
 
-export const getServerSideProps: GetServerSideProps<AccountPageProps> = async ({ req, params }) => {
-  const { programId, accountId } = params || {};
-  const sid = req?.cookies["connect.sid"]!;
-  const program = await getProgram(sid, Number(programId));
-  const accounts = await getAccounts(sid, Number(programId));
-  const account = await getAccount(sid, Number(accountId));
-  const instructions = await getInstructions(sid, Number(programId));
-  const accountElements = await getAccountElements(sid, Number(accountId));
-  return {
-    props: {
-      program: JSON.parse(JSON.stringify(program)),
-      instructions: JSON.parse(JSON.stringify(instructions)),
-      accounts: JSON.parse(JSON.stringify(accounts)),
-      account: JSON.parse(JSON.stringify(account)),
-      accountElements: JSON.parse(JSON.stringify(accountElements)),
-    },
-  };
+export const getServerSideProps: GetServerSideProps<AccountPageProps> = async ({ req, res, params }) => {
+  try {
+    const { programId, accountId } = params || {};
+    const sid = getSidCookie(req);
+    const program = await getProgram(sid, Number(programId));
+    const accounts = await getAccounts(sid, Number(programId));
+    const account = await getAccount(sid, Number(accountId));
+    const instructions = await getInstructions(sid, Number(programId));
+    const accountElements = await getAccountElements(sid, Number(accountId));
+    return {
+      props: {
+        program: JSON.parse(JSON.stringify(program)),
+        instructions: JSON.parse(JSON.stringify(instructions)),
+        accounts: JSON.parse(JSON.stringify(accounts)),
+        account: JSON.parse(JSON.stringify(account)),
+        accountElements: JSON.parse(JSON.stringify(accountElements)),
+      },
+    };
+  } catch (e) {
+    if ((e as { statusCode: number }).statusCode === 403) serverLogout(res);
+    return { props: { program: {}, instructions: [], accounts: [], account: {}, accountElements: [] } };
+  }
 };

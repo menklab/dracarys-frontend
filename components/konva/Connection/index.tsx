@@ -1,7 +1,9 @@
+import Konva from "konva";
 import { Arrow } from "react-konva";
 import useConnection from "~/components/konva/Connection/useConnection";
 import { KONVA_CONNECTION_FILL_COLOR, KONVA_CONNECTION_STROKE_COLOR } from "~/constants/konva";
-import { getConnectionId } from "~/utils/konva";
+import { useKonva } from "~/contexts/konva/hooks";
+import { calculatePointsForConnection, getAccountGroupId, getConnectionId } from "~/utils/konva";
 
 interface ConnectionProps {
   from: number;
@@ -10,14 +12,21 @@ interface ConnectionProps {
 
 export default function KonvaConnection({ from, to }: ConnectionProps) {
   const { arrowRef } = useConnection(from, to);
+  const konva = useKonva();
+
+  const accountGroupFrom = konva.actions.findNode<Konva.Group>(getAccountGroupId(from))?.getClientRect();
+  const accountGroupTo = konva.actions.findNode<Konva.Group>(getAccountGroupId(to))?.getClientRect();
+  if (!accountGroupFrom || !accountGroupTo) return null;
+
+  const points = calculatePointsForConnection(accountGroupFrom, accountGroupTo);
+
   return (
     <Arrow
-      id={getConnectionId(from, to)}
       ref={arrowRef}
+      id={getConnectionId(from, to)}
       stroke={KONVA_CONNECTION_STROKE_COLOR}
       fill={KONVA_CONNECTION_FILL_COLOR}
-      // points is not constant, there is no need to set it
-      points={[]}
+      points={points}
     />
   );
 }

@@ -1,20 +1,26 @@
 import Konva from "konva";
 import { IRect } from "konva/lib/types";
 import {
+  KONVA_ACCOUNT_ATTRIBUTES_MAKER_ID,
   KONVA_ACCOUNT_ATTRIBUTE_FONT_SIZE,
   KONVA_ACCOUNT_ATTRIBUTE_HEIGHT,
+  KONVA_ACCOUNT_CROWN_MAKER_ID,
+  KONVA_ACCOUNT_GROUP_MAKER_ID,
   KONVA_ACCOUNT_HEADER_HEIGHT,
   KONVA_ACCOUNT_NAME_FONT_SIZE,
+  KONVA_ACCOUNT_RECT_MAKER_ID,
+  KONVA_CONNECTION_MAKER_ID,
   KONVA_CONNECTION_OFFSET,
 } from "~/constants/konva";
 import { Cursor } from "~/enums/cursor";
 import { Position } from "~/interfaces/position";
 import { Line } from "~/types/konva";
 
-export const getAccountGroupId = (accountId: number) => `account-group-${accountId}`;
-export const getAccountRectId = (accountId: number) => `account-rect-${accountId}`;
-export const getAccountAttributesId = (accountId: number) => `account-attributes-${accountId}`;
-export const getConnectionId = (from: number, to: number) => `connection-${from}-${to}`;
+export const getAccountGroupId = (accountId: number) => `${KONVA_ACCOUNT_GROUP_MAKER_ID}-${accountId}`;
+export const getAccountRectId = (accountId: number) => `${KONVA_ACCOUNT_RECT_MAKER_ID}-${accountId}`;
+export const getAccountCrownId = (accountId: number) => `${KONVA_ACCOUNT_CROWN_MAKER_ID}-${accountId}`;
+export const getAccountAttributesId = (accountId: number) => `${KONVA_ACCOUNT_ATTRIBUTES_MAKER_ID}-${accountId}`;
+export const getConnectionId = (from: number, to: number) => `${KONVA_CONNECTION_MAKER_ID}-${from}-${to}`;
 
 export const calculateAccountRectHeight = (attributesCount: number): number => {
   if (attributesCount <= 0) return KONVA_ACCOUNT_HEADER_HEIGHT;
