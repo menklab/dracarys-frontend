@@ -29,10 +29,61 @@ export default function KonvaProvider({ program, accounts, children }: KonvaProv
     createConnection: async (fromAccountId, toAccountId) => {
       try {
         const newLinks = [{ accountId: fromAccountId, linkedAccounts: [toAccountId] }];
-        const oldLinks = accounts
-          .filter((account) => account.accounts?.length! > 0)
-          .map((account) => ({ accountId: account.id, linkedAccounts: account?.accounts! }));
+        const oldLinks = accounts.reduce(
+          (prev: any[], curr) =>
+            curr.linkedAccounts.length > 0
+              ? [...prev, { accountId: curr.id, linkedAccounts: curr.linkedAccounts }]
+              : prev,
+          []
+        );
         await updateAccountLinks({ links: [...oldLinks, ...newLinks] });
+        await triggerSSR();
+      } catch (e) {
+        displayCaughtError(e);
+      }
+    },
+    reverseConnection: async (fromAccountId, toAccountId) => {
+      try {
+        const newLinks = [
+          { accountId: fromAccountId, linkedAccounts: [] },
+          { accountId: toAccountId, linkedAccounts: [fromAccountId] },
+        ];
+
+        const oldLinks: any[] = [];
+        for (const account of accounts) {
+          if (
+            !(
+              [fromAccountId, toAccountId].includes(account.id) ||
+              account.linkedAccounts.includes(fromAccountId) ||
+              account.linkedAccounts.includes(toAccountId)
+            )
+          )
+            oldLinks.push({ accountId: account.id, linkedAccounts: account.linkedAccounts });
+        }
+
+        await updateAccountLinks({ links: [...oldLinks, ...newLinks] });
+        await triggerSSR();
+      } catch (e) {
+        displayCaughtError(e);
+      }
+    },
+    deleteConnection: async (fromAccountId, toAccountId) => {
+      try {
+        const links = accounts.reduce(
+          (prev: any[], curr) =>
+            curr.linkedAccounts.length > 0
+              ? [...prev, { accountId: curr.id, linkedAccounts: [...curr.linkedAccounts] }]
+              : prev,
+          []
+        );
+
+        const idx = links.findIndex(
+          (link) => link.accountId === fromAccountId && link.linkedAccounts.includes(toAccountId)
+        );
+
+        links[idx].linkedAccounts = [];
+
+        await updateAccountLinks({ links });
         await triggerSSR();
       } catch (e) {
         displayCaughtError(e);
@@ -42,10 +93,10 @@ export default function KonvaProvider({ program, accounts, children }: KonvaProv
       const account = accounts.find((account) => account.id === movedAccountId);
       if (!account) return;
 
-      const connectionsFromAccount: Connection[] = account.accounts?.map((to) => ({ from: account.id, to })) || [];
+      const connectionsFromAccount: Connection[] = account.linkedAccounts.map((to) => ({ from: account.id, to })) || [];
       const connectionsToAccount: Connection[] = accounts.reduce(
         (prev: { from: number; to: number }[], curr) =>
-          curr.accounts?.includes(account.id) ? [...prev, { from: curr.id, to: account.id }] : prev,
+          curr.linkedAccounts.includes(account.id) ? [...prev, { from: curr.id, to: account.id }] : prev,
         []
       );
 
