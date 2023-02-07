@@ -5,7 +5,7 @@ export interface Account {
   id: number;
   name: string;
   attributes?: Attribute[];
-  accounts?: number[];
+  linkedAccounts: number[];
   position?: Position;
   createdAt?: string;
   updatedAt?: string;

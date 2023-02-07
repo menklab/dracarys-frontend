@@ -23,7 +23,7 @@ export default async function getAccount(sid: string, accountId: number): Promis
     id: data.id,
     name: data.name,
     position: { x: data.coordinates[0], y: data.coordinates[1] },
-    accounts: data.linkedAccounts,
+    linkedAccounts: data.linkedAccounts,
     createdAt: data.createdAt,
     updatedAt: data.updatedAt,
   };

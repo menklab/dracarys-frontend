@@ -5,6 +5,7 @@ import {
   KONVA_CONNECTION_FILL_COLOR,
   KONVA_CONNECTION_MAKER_ID,
   KONVA_CONNECTION_STROKE_COLOR,
+  KONVA_CONNECTION_STROKE_WIDTH,
 } from "~/constants/konva";
 import { useKonva } from "~/contexts/konva/hooks";
 import { Cursor } from "~/enums/cursor";
@@ -39,7 +40,7 @@ export default function useStage(): UseStageHookReturn {
       accounts.reduce(
         (prev: Connection[], curr) => [
           ...prev,
-          ...(curr.accounts?.map((connection) => ({ from: curr.id, to: connection })) || []),
+          ...(curr.linkedAccounts.map((connection) => ({ from: curr.id, to: connection })) || []),
         ],
         []
       ),
@@ -84,6 +85,7 @@ export default function useStage(): UseStageHookReturn {
       id: KONVA_CONNECTION_MAKER_ID,
       points: [mousePointTo.x, mousePointTo.y],
       stroke: KONVA_CONNECTION_STROKE_COLOR,
+      strokeWidth: KONVA_CONNECTION_STROKE_WIDTH,
       fill: KONVA_CONNECTION_FILL_COLOR,
     });
     layer.add(arrow);
