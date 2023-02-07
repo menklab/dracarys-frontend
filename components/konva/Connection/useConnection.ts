@@ -23,6 +23,8 @@ interface UseAccountHookReturn {
   handleToClose: (event: Event) => void;
   deleteConnection: () => Promise<void>;
   accounts: Account[];
+  fromOptionIsDisabled: (account: Account) => boolean;
+  toOptionIsDisabled: (account: Account) => boolean;
   handleFromMenuItemClick: (fromAccountId: number) => Promise<void>;
   handleToMenuItemClick: (toAccountId: number) => Promise<void>;
   arrowRef: RefObject<Konva.Arrow>;
@@ -30,14 +32,18 @@ interface UseAccountHookReturn {
 
 export default function useConnection(from: number, to: number): UseAccountHookReturn {
   const konva = useKonva();
+  const { accounts, stageRef } = konva.data;
   const arrowRef = useRef<Konva.Arrow>(null);
   const buttonGroupRef = useRef<HTMLDivElement>(null);
   const [isOpened, setIsOpened] = useState<boolean>(false);
   const [fromOpen, setFromOpen] = useState<boolean>(false);
   const [toOpen, setToOpen] = useState<boolean>(false);
 
+  const accountFrom = accounts.find((account) => account.id === from)!;
+  const accountTo = accounts.find((account) => account.id === to)!;
+
   useEffect(() => {
-    const stage = konva.data.stageRef.current;
+    const stage = stageRef.current;
     if (!stage) return;
 
     stage.on("mousedown", () => {
@@ -45,22 +51,22 @@ export default function useConnection(from: number, to: number): UseAccountHookR
       setToOpen(false);
       setIsOpened(false);
     });
-  }, [konva.data.stageRef]);
+  }, [stageRef]);
 
   const onArrowMouseEnter = () => {
-    const stage = konva.data.stageRef.current;
+    const stage = stageRef.current;
     if (!stage) return;
     stage.container().style.cursor = Cursor.POINTER;
   };
 
   const onArrowMouseLeave = () => {
-    const stage = konva.data.stageRef.current;
+    const stage = stageRef.current;
     if (!stage) return;
     stage.container().style.cursor = Cursor.DEFAULT;
   };
 
   const htmlTransformFunc = (attrs: HtmlTransformAttrs) => {
-    const stage = konva.data.stageRef.current;
+    const stage = stageRef.current;
     if (!stage) return attrs;
     const pointer = stage.getPointerPosition();
     // NOTE: mouse offsets
@@ -75,14 +81,32 @@ export default function useConnection(from: number, to: number): UseAccountHookR
 
   const deleteConnection = async () => await konva.actions.deleteConnection(from, to);
 
+  const fromOptionIsDisabled = (account: Account) =>
+    accounts
+      .filter((a) => a.id === account.id)
+      .map((account) => account.linkedAccounts)
+      .flat()
+      .includes(to) ||
+    accountTo.linkedAccounts.includes(account.id) ||
+    account.id === to;
+
+  const toOptionIsDisabled = (account: Account) =>
+    accounts
+      .filter((a) => a.id === account.id)
+      .map((account) => account.linkedAccounts)
+      .flat()
+      .includes(from) ||
+    accountFrom.linkedAccounts.includes(account.id) ||
+    account.id === from;
+
   const handleFromMenuItemClick = async (fromAccountId: number) => {
     setFromOpen(false);
-    await konva.actions.createConnection(fromAccountId, to);
+    await konva.actions.changeConnectionFrom(from, fromAccountId, to);
   };
 
   const handleToMenuItemClick = async (toAccountId: number) => {
     setToOpen(false);
-    await konva.actions.createConnection(from, toAccountId);
+    await konva.actions.changeConnectionTo(from, to, toAccountId);
   };
 
   const handleFromToggle = () => {
@@ -126,7 +150,9 @@ export default function useConnection(from: number, to: number): UseAccountHookR
     handleToToggle,
     deleteConnection,
     handleFromClose,
-    accounts: konva.data.accounts,
+    accounts,
+    fromOptionIsDisabled,
+    toOptionIsDisabled,
     handleFromMenuItemClick,
     handleToClose,
     handleToMenuItemClick,

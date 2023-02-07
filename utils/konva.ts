@@ -13,6 +13,8 @@ import {
   KONVA_CONNECTION_OFFSET,
 } from "~/constants/konva";
 import { Cursor } from "~/enums/cursor";
+import { Account } from "~/interfaces/account";
+import { Connection } from "~/interfaces/connection";
 import { Position } from "~/interfaces/position";
 import { Line } from "~/types/konva";
 
@@ -130,3 +132,14 @@ export const calculatePointsForConnection = (from: IRect, to: IRect): Line => {
 export const setCursorOnStage = (stage: Konva.Stage, cursor: Cursor) => {
   stage.container().style.cursor = cursor;
 };
+
+export const getUnrelatedConnections = (accounts: Account[], fromAccountId: number, toAccountId: number) =>
+  accounts.reduce(
+    (prev: Connection[], curr) =>
+      [fromAccountId, toAccountId].includes(curr.id) ||
+      curr.linkedAccounts.includes(fromAccountId) ||
+      curr.linkedAccounts.includes(toAccountId)
+        ? prev
+        : [...prev, ...curr.linkedAccounts.map((to) => ({ from: curr.id, to }))],
+    []
+  );

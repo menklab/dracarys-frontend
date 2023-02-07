@@ -44,6 +44,8 @@ export default function KonvaConnection({ from, to }: ConnectionProps) {
     deleteConnection,
     handleFromClose,
     accounts,
+    fromOptionIsDisabled,
+    toOptionIsDisabled,
     handleFromMenuItemClick,
     handleToClose,
     handleToMenuItemClick,
@@ -64,13 +66,7 @@ export default function KonvaConnection({ from, to }: ConnectionProps) {
       />
       {isOpened && (
         <Html transformFunc={htmlTransformFunc}>
-          <ButtonGroup
-            size="small"
-            ref={buttonGroupRef}
-            variant="outlined"
-            sx={{ bgcolor: "white" }}
-            aria-label="contained button group"
-          >
+          <ButtonGroup size="small" ref={buttonGroupRef} variant="contained" aria-label="contained button group">
             <Button onClick={reverseConnection}>
               <Loop fontSize="small" />
             </Button>
@@ -119,7 +115,7 @@ export default function KonvaConnection({ from, to }: ConnectionProps) {
                       {accounts.map((account) => (
                         <MenuItem
                           key={account.id}
-                          disabled={account.id === from || account.id === to}
+                          disabled={fromOptionIsDisabled(account)}
                           selected={account.id === from}
                           onClick={() => handleFromMenuItemClick(account.id)}
                         >
@@ -162,7 +158,7 @@ export default function KonvaConnection({ from, to }: ConnectionProps) {
                       {accounts.map((account) => (
                         <MenuItem
                           key={account.id}
-                          disabled={account.id === to || account.id === from}
+                          disabled={toOptionIsDisabled(account)}
                           selected={account.id === to}
                           onClick={() => handleToMenuItemClick(account.id)}
                         >
