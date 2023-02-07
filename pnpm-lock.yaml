@@ -29,6 +29,7 @@ specifiers:
   react-dom: 18.2.0
   react-hook-form: ^7.41.2
   react-konva: ^18.2.3
+  react-konva-utils: ^0.3.2
   react-syntax-highlighter: ^15.5.0
   typescript: ^4.9.4
   zod: ^3.20.2
@@ -53,6 +54,7 @@ dependencies:
   react-dom: 18.2.0_react@18.2.0
   react-hook-form: 7.41.2_react@18.2.0
   react-konva: 18.2.3_b37p36zhls44rqmxgh4mahumjq
+  react-konva-utils: 0.3.2_b37p36zhls44rqmxgh4mahumjq
   react-syntax-highlighter: 15.5.0_react@18.2.0
   zod: 3.20.2
 
@@ -2845,6 +2847,20 @@ packages:
     resolution: {integrity: sha512-xWGDIW6x921xtzPkhiULtthJHoJvBbF3q26fzloPCK0hsvxtPVelvftw3zjbHWSkR2km9Z+4uxbDDK/6Zw9B8w==}
     dev: false
 
+  /react-konva-utils/0.3.2_b37p36zhls44rqmxgh4mahumjq:
+    resolution: {integrity: sha512-BocSYCPd58rCumFAL9sUs5aum+eRD53Amknd78Mm2BQln/XMZZS8zHq35HPbiZkSMcj5Q6fZ4foHa9aMLcPRIQ==}
+    peerDependencies:
+      konva: ^8.3.5
+      react: ^18.2.0
+      react-dom: ^18.2.0
+    dependencies:
+      konva: 8.3.14
+      react: 18.2.0
+      react-dom: 18.2.0_react@18.2.0
+      react-konva: 18.2.3_b37p36zhls44rqmxgh4mahumjq
+      use-image: 1.1.0_biqbaboplfbrettd7655fr4n2y
+    dev: false
+
   /react-konva/18.2.3_b37p36zhls44rqmxgh4mahumjq:
     resolution: {integrity: sha512-OPxjBTgaEGU9pt/VJSVM7QNXYHEZ5CkulX+4fTTvbaH+Wh+vMLbXmH3yjWw4kT/5Qi6t0UQKHPPmirCv8/9sdg==}
     peerDependencies:
@@ -3276,6 +3292,16 @@ packages:
     dependencies:
       punycode: 2.1.1
     dev: true
+
+  /use-image/1.1.0_biqbaboplfbrettd7655fr4n2y:
+    resolution: {integrity: sha512-+cBHRR/44ZyMUS873O0vbVylgMM0AbdTunEplAWXvIQ2p69h2sIo2Qq74zeUsq6AMo+27e5lERQvXzd1crGiMg==}
+    peerDependencies:
+      react: '>=16.8.0'
+      react-dom: '>=16.8.0'
+    dependencies:
+      react: 18.2.0
+      react-dom: 18.2.0_react@18.2.0
+    dev: false
 
   /util-deprecate/1.0.2:
     resolution: {integrity: sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==}

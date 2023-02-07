@@ -14,6 +14,7 @@ export const KONVA_ACCOUNT_NAME_FONT_SIZE = 16;
 export const KONVA_ACCOUNT_ATTRIBUTE_HEIGHT = 20;
 export const KONVA_ACCOUNT_ATTRIBUTE_FONT_SIZE = 12;
 export const KONVA_CONNECTION_STROKE_COLOR = "black";
+export const KONVA_CONNECTION_STROKE_WIDTH = 4;
 export const KONVA_CONNECTION_FILL_COLOR = "black";
 export const KONVA_CONNECTION_OFFSET = 10;
 export const KONVA_ACCOUNT_GROUP_MAKER_ID = "account-group";

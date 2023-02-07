@@ -39,7 +39,7 @@ export default function useStage(): UseStageHookReturn {
       accounts.reduce(
         (prev: Connection[], curr) => [
           ...prev,
-          ...(curr.accounts?.map((connection) => ({ from: curr.id, to: connection })) || []),
+          ...(curr.linkedAccounts.map((connection) => ({ from: curr.id, to: connection })) || []),
         ],
         []
       ),

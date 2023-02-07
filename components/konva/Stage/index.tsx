@@ -39,7 +39,7 @@ export default function KonvaStage() {
                 key={account.id}
                 id={account.id}
                 name={account.name}
-                accounts={account.accounts}
+                linkedAccounts={account.linkedAccounts}
                 attributes={account.attributes}
                 position={account.position}
               />
