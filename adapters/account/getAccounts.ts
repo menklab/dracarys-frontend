@@ -22,7 +22,7 @@ export default async function getAccounts(sid: string, programId: number): Promi
     id: account.id,
     name: account.name,
     position: { x: account.coordinates[0], y: account.coordinates[1] },
-    accounts: account.linkedAccounts,
+    linkedAccounts: account.linkedAccounts,
     createdAt: account.createdAt,
     updatedAt: account.updatedAt,
   }));
