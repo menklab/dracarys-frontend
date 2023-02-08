@@ -33,7 +33,7 @@ export default function KonvaStage() {
           {accounts
             // zIndex is ignored while using react version of konva
             // overlaying is controlled by components render order
-            .sort((a, b) => b.id - a.id)
+            .sort((a, b) => a.id - b.id)
             .map((account) => (
               <KonvaAccount
                 key={account.id}
