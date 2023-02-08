@@ -19,14 +19,15 @@ interface AccountsPageContextDefaultValue {
   instructions: Instruction[];
   accounts: Account[];
   viewVariant: LayoutViewVariant;
+  forceCodeUpdate: () => Promise<void>;
+  generatedCodeString: string;
   handleOpenAccounts: () => void;
   openAccounts: boolean;
   handleOpenInstructions: () => void;
   openInstructions: boolean;
-  changeViewVariant: (variant?: LayoutViewVariant) => void;
+  changeViewVariant: (variant?: LayoutViewVariant) => Promise<void>;
   isDeleteProgramDialogOpen: boolean;
   openDeleteProgramDialog: () => void;
-  getGeneratedAccountCode: () => Promise<string[]>;
   closeDeleteProgramDialog: () => void;
   createAccountDialogOpen: () => void;
   createAccountDialogClose: () => void;
@@ -60,6 +61,7 @@ export const AccountsPageProvider = ({ program, instructions, accounts, children
   const { displayCaughtError } = useErrorHandler();
   const { triggerSSR } = useTriggerSSR();
   const [viewVariant, setViewVariant] = useState<LayoutViewVariant>(LAYOUT_DEFAULT_VIEW_VARIANT);
+  const [generatedCodeString, setGeneratedCodeString] = useState<string>("");
   const [isDeleteProgramDialogOpen, setIsDeleteProgramDialogOpen] = useState<boolean>(false);
   const [isProgramDeleting, setIsProgramDeleting] = useState<boolean>(false);
   const [isEditingProgramName, setIsEditingProgramName] = useState<boolean>(false);
@@ -68,8 +70,10 @@ export const AccountsPageProvider = ({ program, instructions, accounts, children
   const [openAccounts, setOpenAccounts] = useState<boolean>(false);
   const [openInstructions, setOpenInstructions] = useState<boolean>(false);
 
-  const getGeneratedAccountCode = async () => {
-    return await generateAccountCode(Number(program.id));
+  const updateGeneratedAccountCode = async () => {
+    const code = await generateAccountCode(Number(program.id));
+    if (!code) return;
+    setGeneratedCodeString(code.join("\n"));
   };
 
   const handleOpenAccounts = () => {
@@ -80,8 +84,10 @@ export const AccountsPageProvider = ({ program, instructions, accounts, children
     setOpenInstructions(!openInstructions);
   };
 
-  const changeViewVariant = (variant?: LayoutViewVariant) => {
-    if (variant) setViewVariant(variant);
+  const changeViewVariant = async (variant?: LayoutViewVariant) => {
+    if (!variant) return;
+    if (variant === "code") await updateGeneratedAccountCode();
+    setViewVariant(variant);
   };
 
   const createNewAccount = async (name: string) => {
@@ -131,6 +137,8 @@ export const AccountsPageProvider = ({ program, instructions, accounts, children
         program,
         viewVariant,
         changeViewVariant,
+        forceCodeUpdate: updateGeneratedAccountCode,
+        generatedCodeString,
         isDeleteProgramDialogOpen,
         openAccounts,
         openInstructions,
@@ -151,7 +159,6 @@ export const AccountsPageProvider = ({ program, instructions, accounts, children
         goBackToProgramsList: () => router.push(ROUTES.PROGRAMS()),
         createNewAccount,
         handleOpenAccounts,
-        getGeneratedAccountCode,
         handleOpenInstructions,
         createInstructionDialogOpen: () => setCreateInstructionDialogIsOpened(true),
         createInstructionDialogClose: () => setCreateInstructionDialogIsOpened(false),

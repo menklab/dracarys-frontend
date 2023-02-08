@@ -1,32 +1,17 @@
 import Refresh from "@mui/icons-material/Refresh";
 import { Box, IconButton, Paper } from "@mui/material";
-import { useEffect, useState } from "react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { xonokai } from "react-syntax-highlighter/dist/cjs/styles/prism";
 
 interface CodeBlockProps {
-  getGeneratedCode: () => Promise<string[]>;
+  forceCodeUpdate: () => Promise<void>;
+  generatedCodeString: string;
 }
 
-export default function CodeBlock({ getGeneratedCode }: CodeBlockProps) {
-  const [generatedCodeString, setGeneratedCodeString] = useState<string>("");
-
-  const updateCode = async () => {
-    const codeArray = await getGeneratedCode();
-    let codeString = "";
-    codeArray.forEach((str) => {
-      codeString += str + "\n";
-    });
-    setGeneratedCodeString(codeString);
-  };
-
-  useEffect(() => {
-    updateCode();
-  }, []);
-
+export default function CodeBlock({ forceCodeUpdate, generatedCodeString }: CodeBlockProps) {
   return (
     <Box sx={{ width: "70%", margin: "30px auto", overflow: "hidden" }}>
-      <IconButton sx={{ margin: "auto calc(100% - 40px)" }} onClick={updateCode}>
+      <IconButton sx={{ margin: "auto calc(100% - 40px)" }} onClick={forceCodeUpdate}>
         <Refresh />
       </IconButton>
       <Paper elevation={3}>

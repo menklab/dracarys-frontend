@@ -3,10 +3,14 @@ import { useInstructionsPage } from "~/components/pages/Instructions/context";
 import InstructionsList from "~/components/pages/Instructions/InstructionsList";
 
 export default function View() {
-  const { viewVariant, getGeneratedInstructionCode } = useInstructionsPage();
+  const { viewVariant, forceCodeUpdate, generatedCodeString } = useInstructionsPage();
 
   const innerBlock =
-    viewVariant === "code" ? <CodeBlock getGeneratedCode={getGeneratedInstructionCode} /> : <InstructionsList />;
+    viewVariant === "code" ? (
+      <CodeBlock forceCodeUpdate={forceCodeUpdate} generatedCodeString={generatedCodeString} />
+    ) : (
+      <InstructionsList />
+    );
 
   return <div>{innerBlock}</div>;
 }
