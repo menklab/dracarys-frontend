@@ -7,7 +7,7 @@ const KonvaProvider = dynamic(() => import("~/contexts/konva/provider"), { ssr: 
 const KonvaStage = dynamic(() => import("~/components/konva/Stage"), { ssr: false });
 
 export default function View() {
-  const { program, accounts, viewVariant, getGeneratedAccountCode } = useAccountsPage();
+  const { program, accounts, viewVariant, forceCodeUpdate, generatedCodeString } = useAccountsPage();
 
   return (
     <div>
@@ -18,7 +18,7 @@ export default function View() {
         </KonvaProvider>
       </div>
       <div style={{ display: viewVariant === "code" ? "block" : "none" }}>
-        <CodeBlock getGeneratedCode={getGeneratedAccountCode} />
+        <CodeBlock forceCodeUpdate={forceCodeUpdate} generatedCodeString={generatedCodeString} />
       </div>
       <CreateAccountDialog />
       <CreateInstructionDialog />

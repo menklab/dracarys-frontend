@@ -14,8 +14,9 @@ import { LayoutViewVariant } from "~/types/layout";
 
 interface InstructionsPageContextDefaultValue {
   viewVariant: LayoutViewVariant;
-  changeViewVariant: (variant?: LayoutViewVariant) => void;
-  getGeneratedInstructionCode: () => Promise<string[]>;
+  changeViewVariant: (variant?: LayoutViewVariant) => Promise<void>;
+  forceCodeUpdate: () => Promise<void>;
+  generatedCodeString: string;
   program: Program;
   instructions: Instruction[];
   accounts: Account[];
@@ -54,18 +55,23 @@ export const InstructionsPageProvider = ({
   const router = useRouter();
   const { displayCaughtError } = useErrorHandler();
   const [viewVariant, setViewVariant] = useState<LayoutViewVariant>(LAYOUT_DEFAULT_VIEW_VARIANT);
+  const [generatedCodeString, setGeneratedCodeString] = useState<string>("");
   const [isDeleteProgramDialogOpen, setIsDeleteProgramDialogOpen] = useState<boolean>(false);
   const [isProgramDeleting, setIsProgramDeleting] = useState<boolean>(false);
   const [isEditingProgramName, setIsEditingProgramName] = useState<boolean>(false);
   const [openAccounts, setOpenAccounts] = useState<boolean>(false);
   const [openInstructions, setOpenInstructions] = useState<boolean>(false);
 
-  const changeViewVariant = (variant?: LayoutViewVariant) => {
-    if (variant) setViewVariant(variant);
+  const updateGeneratedInstructionCode = async () => {
+    const code = await generateInstructionCode(Number(program.id));
+    if (!code) return;
+    setGeneratedCodeString(code.join("\n"));
   };
 
-  const getGeneratedInstructionCode = async () => {
-    return await generateInstructionCode(Number(program.id));
+  const changeViewVariant = async (variant?: LayoutViewVariant) => {
+    if (!variant) return;
+    if (variant === "code") await updateGeneratedInstructionCode();
+    setViewVariant(variant);
   };
 
   const handleOpenAccounts = () => {
@@ -103,7 +109,8 @@ export const InstructionsPageProvider = ({
       value={{
         viewVariant,
         changeViewVariant,
-        getGeneratedInstructionCode,
+        forceCodeUpdate: updateGeneratedInstructionCode,
+        generatedCodeString,
         program,
         isDeleteProgramDialogOpen,
         openAccounts,
