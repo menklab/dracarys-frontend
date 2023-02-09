@@ -92,8 +92,8 @@ export const AccountsPageProvider = ({ program, instructions, accounts, children
 
   const createNewAccount = async (name: string) => {
     try {
-      await createAccount({ name, programId: program.id });
-      await triggerSSR();
+      const newAccount = await createAccount({ name, programId: program.id });
+      await router.push(ROUTES.ACCOUNT(program.id, newAccount.id));
     } catch (e) {
       displayCaughtError(e);
     }
