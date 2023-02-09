@@ -4,7 +4,8 @@ import { HtmlTransformAttrs } from "react-konva-utils";
 import { useKonva } from "~/contexts/konva/hooks";
 import { Cursor } from "~/enums/cursor";
 import { Account } from "~/interfaces/account";
-import { calculatePointsForConnection, getAccountGroupId } from "~/utils/konva";
+import { Line } from "~/types/konva";
+import { calculatePointsForConnection, getAccountGroupId, moveConnectionRelativeToStage } from "~/utils/konva";
 
 interface UseAccountHookReturn {
   onArrowMouseEnter: () => void;
@@ -31,13 +32,14 @@ interface UseAccountHookReturn {
 }
 
 export default function useConnection(from: number, to: number): UseAccountHookReturn {
-  const konva = useKonva();
-  const { accounts, stageRef } = konva.data;
   const arrowRef = useRef<Konva.Arrow>(null);
   const buttonGroupRef = useRef<HTMLDivElement>(null);
   const [isOpened, setIsOpened] = useState<boolean>(false);
   const [fromOpen, setFromOpen] = useState<boolean>(false);
   const [toOpen, setToOpen] = useState<boolean>(false);
+  const [points, setPoints] = useState<Line | []>([]);
+  const konva = useKonva();
+  const { accounts, stageRef } = konva.data;
 
   const accountFrom = accounts.find((account) => account.id === from)!;
   const accountTo = accounts.find((account) => account.id === to)!;
@@ -52,6 +54,16 @@ export default function useConnection(from: number, to: number): UseAccountHookR
       setIsOpened(false);
     });
   }, [stageRef]);
+
+  useEffect(() => {
+    const stage = stageRef.current;
+    const accountGroupFrom = konva.actions.findNode<Konva.Group>(getAccountGroupId(from))?.getClientRect();
+    const accountGroupTo = konva.actions.findNode<Konva.Group>(getAccountGroupId(to))?.getClientRect();
+    if (!stage || !accountGroupFrom || !accountGroupTo) return;
+
+    const points = calculatePointsForConnection(accountGroupFrom, accountGroupTo);
+    setPoints(moveConnectionRelativeToStage(points, stage));
+  }, [from, konva.actions, stageRef, to]);
 
   const onArrowMouseEnter = () => {
     const stage = stageRef.current;
@@ -69,7 +81,7 @@ export default function useConnection(from: number, to: number): UseAccountHookR
     const stage = stageRef.current;
     if (!stage) return attrs;
     const pointer = stage.getPointerPosition();
-    // NOTE: mouse offsets
+    // NOTE: popup offsets
     attrs.x = pointer?.x! - 115;
     attrs.y = pointer?.y! + 15;
     return attrs;
@@ -83,18 +95,14 @@ export default function useConnection(from: number, to: number): UseAccountHookR
 
   const fromOptionIsDisabled = (account: Account) =>
     accounts
-      .filter((a) => a.id === account.id)
-      .map((account) => account.linkedAccounts)
-      .flat()
+      .reduce((prev: number[], curr) => (curr.id === account.id ? [...prev, ...curr.linkedAccounts] : prev), [])
       .includes(to) ||
     accountTo.linkedAccounts.includes(account.id) ||
     account.id === to;
 
   const toOptionIsDisabled = (account: Account) =>
     accounts
-      .filter((a) => a.id === account.id)
-      .map((account) => account.linkedAccounts)
-      .flat()
+      .reduce((prev: number[], curr) => (curr.id === account.id ? [...prev, ...curr.linkedAccounts] : prev), [])
       .includes(from) ||
     accountFrom.linkedAccounts.includes(account.id) ||
     account.id === from;
@@ -128,11 +136,6 @@ export default function useConnection(from: number, to: number): UseAccountHookR
     if (buttonGroupRef.current?.contains(event.target as HTMLElement)) return;
     setToOpen(false);
   };
-
-  const accountGroupFrom = konva.actions.findNode<Konva.Group>(getAccountGroupId(from))?.getClientRect();
-  const accountGroupTo = konva.actions.findNode<Konva.Group>(getAccountGroupId(to))?.getClientRect();
-  const points =
-    accountGroupFrom && accountGroupTo ? calculatePointsForConnection(accountGroupFrom, accountGroupTo) : [];
 
   return {
     arrowRef,

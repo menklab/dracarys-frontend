@@ -12,6 +12,8 @@ export default function KonvaStage() {
     onWheel,
     accounts,
     connections,
+    onDoubleClick,
+    onDragEnd,
     onMouseUp,
     onMouseDown,
     onMouseMove,
@@ -24,6 +26,8 @@ export default function KonvaStage() {
         height={size.height}
         ref={stageRef}
         draggable
+        onDblClick={onDoubleClick}
+        onDragEnd={onDragEnd}
         onWheel={onWheel}
         onMouseUp={onMouseUp}
         onMouseDown={onMouseDown}
@@ -40,7 +44,6 @@ export default function KonvaStage() {
                 id={account.id}
                 name={account.name}
                 linkedAccounts={account.linkedAccounts}
-                attributes={account.attributes}
                 position={account.position}
               />
             ))}
