@@ -104,7 +104,7 @@ export default function useStage(): UseStageHookReturn {
             center,
             zoom,
           }),
-        500
+        100
       ),
     [program.id, program.name]
   );
