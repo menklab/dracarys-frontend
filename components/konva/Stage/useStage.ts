@@ -1,16 +1,22 @@
 import Konva from "konva";
+import { debounce } from "lodash";
 import { Ref, RefObject, useEffect, useMemo, useRef, useState } from "react";
+import updateProgram from "~/adapters/program/updateProgram";
 import {
   KONVA_ACCOUNT_CROWN_MAKER_ID,
   KONVA_CONNECTION_FILL_COLOR,
   KONVA_CONNECTION_MAKER_ID,
   KONVA_CONNECTION_STROKE_COLOR,
   KONVA_CONNECTION_STROKE_WIDTH,
+  KONVA_DEFAULT_STAGE_POSITION,
+  KONVA_DEFAULT_STAGE_SCALE,
 } from "~/constants/konva";
 import { useKonva } from "~/contexts/konva/hooks";
 import { Cursor } from "~/enums/cursor";
+import useErrorHandler from "~/hooks/useErrorHandler";
 import { Account } from "~/interfaces/account";
 import { Connection } from "~/interfaces/connection";
+import { Position } from "~/interfaces/position";
 import { Size } from "~/types/konva";
 
 interface UseStageHookReturn {
@@ -18,7 +24,9 @@ interface UseStageHookReturn {
   layerRef: Ref<Konva.Layer>;
   containerRef: RefObject<HTMLDivElement>;
   size: Size;
-  onWheel: (e: Konva.KonvaEventObject<WheelEvent>) => void;
+  onDoubleClick: (e: Konva.KonvaEventObject<MouseEvent>) => Promise<void>;
+  onDragEnd: (e: Konva.KonvaEventObject<DragEvent>) => Promise<void>;
+  onWheel: (e: Konva.KonvaEventObject<WheelEvent>) => Promise<void>;
   accounts: Account[];
   connections: Connection[];
   onMouseDown: () => void;
@@ -27,12 +35,13 @@ interface UseStageHookReturn {
 }
 
 export default function useStage(): UseStageHookReturn {
-  const layerRef = useRef<Konva.Layer>(null);
   const [size, setSize] = useState<Size>({ width: 0, height: 0 });
+  const layerRef = useRef<Konva.Layer>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const { displayCaughtError } = useErrorHandler();
   const konva = useKonva();
   const {
-    data: { accounts, stageRef },
+    data: { program, accounts, stageRef },
   } = konva;
 
   const connections = useMemo(
@@ -52,56 +61,111 @@ export default function useStage(): UseStageHookReturn {
       setSize({ width: containerRef.current.offsetWidth, height: containerRef.current.offsetHeight });
   }, [containerRef]);
 
-  const onWheel = (e: Konva.KonvaEventObject<WheelEvent>) => {
-    e.evt.preventDefault();
+  useEffect(() => {
     const stage = stageRef.current;
     if (!stage) return;
 
-    const oldScale = stage.scaleX();
-    const pointer = stage.getPointerPosition()!;
-    const mousePointTo = { x: (pointer.x - stage.x()) / oldScale, y: (pointer.y - stage.y()) / oldScale };
-    let direction = e.evt.deltaY > 0 ? 1 : -1;
-    // when we zoom on trackpad, e.evt.ctrlKey is true
-    // in that case lets revert direction
-    if (e.evt.ctrlKey) direction = -direction;
-    const newScale = direction > 0 ? oldScale * 1.05 : oldScale / 1.05;
-    stage.scale({ x: newScale, y: newScale });
-    const newPos = { x: pointer.x - mousePointTo.x * newScale, y: pointer.y - mousePointTo.y * newScale };
-    stage.position(newPos);
+    if (program.zoom) stage.scale({ x: program.zoom, y: program.zoom });
+    if (program.center) stage.position(program.center);
+  }, [program.center, program.zoom, stageRef]);
+
+  const onDoubleClick = async () => {
+    try {
+      const stage = stageRef.current;
+      if (!stage) return;
+
+      await updateProgram(program.id, {
+        name: program.name,
+        center: KONVA_DEFAULT_STAGE_POSITION,
+        zoom: KONVA_DEFAULT_STAGE_SCALE,
+      });
+
+      stage.position(KONVA_DEFAULT_STAGE_POSITION);
+      stage.scale({ x: KONVA_DEFAULT_STAGE_SCALE, y: KONVA_DEFAULT_STAGE_SCALE });
+    } catch (e) {
+      displayCaughtError(e);
+    }
+  };
+
+  const onDragEnd = async (e: Konva.KonvaEventObject<DragEvent>) => {
+    try {
+      await updateProgram(program.id, { name: program.name, center: e.target.position(), zoom: program.zoom });
+    } catch (e) {
+      displayCaughtError(e);
+    }
+  };
+
+  const debouncedChangeHandler = useMemo(
+    () =>
+      debounce(
+        (center: Position, zoom: number) =>
+          updateProgram(program.id, {
+            name: program.name,
+            center,
+            zoom,
+          }),
+        100
+      ),
+    [program.id, program.name]
+  );
+
+  useEffect(() => () => debouncedChangeHandler.cancel(), [debouncedChangeHandler]);
+
+  const onWheel = async (e: Konva.KonvaEventObject<WheelEvent>) => {
+    try {
+      e.evt.preventDefault();
+      const stage = stageRef.current;
+      if (!stage) return;
+
+      const oldScale = stage.scaleX();
+      const pointer = stage.getPointerPosition()!;
+      const mousePointTo = { x: (pointer.x - stage.x()) / oldScale, y: (pointer.y - stage.y()) / oldScale };
+      let direction = e.evt.deltaY > 0 ? 1 : -1;
+      // NOTE: when we zoom on trackpad, e.evt.ctrlKey is true in that case lets revert direction
+      if (e.evt.ctrlKey) direction = -direction;
+      const newScale = direction > 0 ? oldScale * 1.025 : oldScale / 1.025;
+      const newPos = { x: pointer.x - mousePointTo.x * newScale, y: pointer.y - mousePointTo.y * newScale };
+
+      await debouncedChangeHandler(newPos, newScale);
+      stage.scale({ x: newScale, y: newScale });
+      stage.position(newPos);
+    } catch (e) {
+      displayCaughtError(e);
+    }
   };
 
   const onMouseDown = () => {
     const stage = stageRef.current;
     const layer = layerRef.current;
-    if (!stage || !layer) return;
+    const pointer = stage?.getPointerPosition();
+    if (!stage || !layer || !pointer) return;
 
-    const pointer = stage.getPointerPosition();
-    const shape = stage.getIntersection({ x: pointer?.x!, y: pointer?.y! });
+    const shape = stage.getIntersection({ x: pointer.x, y: pointer.y });
     if (!shape?.attrs?.id?.startsWith(KONVA_ACCOUNT_CROWN_MAKER_ID)) return;
 
     const scale = stage.scaleX();
-    const mousePointTo = { x: (pointer?.x! - stage.x()) / scale, y: (pointer?.y! - stage.y()) / scale };
-    const arrow = new Konva.Arrow({
-      id: KONVA_CONNECTION_MAKER_ID,
-      points: [mousePointTo.x, mousePointTo.y],
-      stroke: KONVA_CONNECTION_STROKE_COLOR,
-      strokeWidth: KONVA_CONNECTION_STROKE_WIDTH,
-      fill: KONVA_CONNECTION_FILL_COLOR,
-    });
-    layer.add(arrow);
+    const mousePointTo = { x: (pointer.x - stage.x()) / scale, y: (pointer.y - stage.y()) / scale };
+
+    layer.add(
+      new Konva.Arrow({
+        id: KONVA_CONNECTION_MAKER_ID,
+        points: [mousePointTo.x, mousePointTo.y],
+        stroke: KONVA_CONNECTION_STROKE_COLOR,
+        strokeWidth: KONVA_CONNECTION_STROKE_WIDTH,
+        fill: KONVA_CONNECTION_FILL_COLOR,
+      })
+    );
   };
 
   const onMouseMove = () => {
     const stage = stageRef.current;
-    if (!stage) return;
-
     const arrow = konva.actions.findNode<Konva.Arrow>(KONVA_CONNECTION_MAKER_ID);
-    if (!arrow) return;
+    const pointer = stage?.getPointerPosition();
+    if (!stage || !arrow || !pointer) return;
 
     stage.container().style.cursor = Cursor.POINTER;
     const scale = stage.scaleX();
-    const pointer = stage.getPointerPosition();
-    const mousePointTo = { x: (pointer?.x! - stage.x()) / scale, y: (pointer?.y! - stage.y()) / scale };
+    const mousePointTo = { x: (pointer.x - stage.x()) / scale, y: (pointer.y - stage.y()) / scale };
     const points = [arrow.points()[0], arrow.points()[1], mousePointTo.x, mousePointTo.y];
     arrow.points(points);
     stage.draw();
@@ -109,38 +173,48 @@ export default function useStage(): UseStageHookReturn {
 
   const onMouseUp = async () => {
     const stage = stageRef.current;
-    if (!stage) return;
-
     const arrow = konva.actions.findNode<Konva.Arrow>(KONVA_CONNECTION_MAKER_ID);
-    if (!arrow) return;
+    if (!stage || !arrow) return;
 
     arrow.destroy();
     stage.container().style.cursor = Cursor.DEFAULT;
-    let fromAccountId: number = -1;
-    let toAccountId: number = -1;
-    const fromIntersections: Konva.Shape[] = stage.getAllIntersections({ x: arrow.points()[0], y: arrow.points()[1] });
-    const toIntersections: Konva.Shape[] = stage.getAllIntersections({ x: arrow.points()[2], y: arrow.points()[3] });
 
-    for (const fromIntersection of fromIntersections) {
-      const id = fromIntersection.attrs.id.replace(/^\D+/g, "");
+    const positionFrom: Position = {
+      x: arrow.points()[0] * stage.scaleX() + stage.x(),
+      y: arrow.points()[1] * stage.scaleX() + stage.y(),
+    };
+
+    const positionTo: Position = {
+      x: arrow.points()[2] * stage.scaleX() + stage.x(),
+      y: arrow.points()[3] * stage.scaleX() + stage.y(),
+    };
+
+    const intersectionsFrom: Konva.Shape[] = stage.getAllIntersections(positionFrom);
+    const intersectionsTo: Konva.Shape[] = stage.getAllIntersections(positionTo);
+
+    let accountIdFrom: number = -1;
+    let accountIdTo: number = -1;
+
+    for (const shape of intersectionsFrom) {
+      const id = shape.attrs.id.replace(/^\D+/g, "");
       if (!isNaN(id)) {
-        fromAccountId = +id;
+        accountIdFrom = +id;
         break;
       }
     }
 
-    for (const toIntersection of toIntersections) {
-      const id = toIntersection.attrs.id.replace(/^\D+/g, "");
+    for (const shape of intersectionsTo) {
+      const id = shape.attrs.id.replace(/^\D+/g, "");
       if (!isNaN(id)) {
-        toAccountId = +id;
+        accountIdTo = +id;
         break;
       }
     }
 
-    if (fromAccountId < 0 || toAccountId < 0) return;
-    if (fromAccountId === toAccountId) return;
+    if (accountIdFrom < 0 || accountIdTo < 0) return;
+    if (accountIdFrom === accountIdTo) return;
 
-    await konva.actions.createConnection(fromAccountId, toAccountId);
+    await konva.actions.createConnection(accountIdFrom, accountIdTo);
   };
 
   return {
@@ -151,6 +225,8 @@ export default function useStage(): UseStageHookReturn {
     onWheel,
     accounts,
     connections,
+    onDoubleClick,
+    onDragEnd,
     onMouseDown,
     onMouseUp,
     onMouseMove,

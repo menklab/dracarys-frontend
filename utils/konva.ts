@@ -129,6 +129,13 @@ export const calculatePointsForConnection = (from: IRect, to: IRect): Line => {
   return calculatePointsForConnection_SHAPE_BASED(from, to);
 };
 
+export const moveConnectionRelativeToStage = (line: Line, stage: Konva.Stage): Line => [
+  (line[0] - stage!.x()) / stage.scaleX(),
+  (line[1] - stage!.y()) / stage.scaleX(),
+  (line[2] - stage!.x()) / stage.scaleX(),
+  (line[3] - stage!.y()) / stage.scaleX(),
+];
+
 export const setCursorOnStage = (stage: Konva.Stage, cursor: Cursor) => {
   stage.container().style.cursor = cursor;
 };

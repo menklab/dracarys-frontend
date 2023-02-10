@@ -1,7 +1,6 @@
 import { Group, Rect, Text } from "react-konva";
 import useAccount from "~/components/konva/Account/useAccount";
 import {
-  KONVA_ACCOUNT_ATTRIBUTE_FONT_SIZE,
   KONVA_ACCOUNT_CORNER_RADIUS,
   KONVA_ACCOUNT_CROWN_HEIGHT,
   KONVA_ACCOUNT_CROWN_OFFSET_X,
@@ -10,13 +9,14 @@ import {
   KONVA_ACCOUNT_CROWN_STROKE,
   KONVA_ACCOUNT_CROWN_WIDTH,
   KONVA_ACCOUNT_FILL,
+  KONVA_ACCOUNT_HEADER_HEIGHT,
   KONVA_ACCOUNT_NAME_FONT_SIZE,
   KONVA_ACCOUNT_STROKE_COLOR,
   KONVA_ACCOUNT_STROKE_WIDTH,
   KONVA_ACCOUNT_WIDTH,
 } from "~/constants/konva";
 import { Account } from "~/interfaces/account";
-import { getAccountAttributesId, getAccountCrownId, getAccountGroupId, getAccountRectId } from "~/utils/konva";
+import { getAccountCrownId, getAccountGroupId, getAccountRectId } from "~/utils/konva";
 
 export default function KonvaAccount(account: Account) {
   const {
@@ -24,7 +24,6 @@ export default function KonvaAccount(account: Account) {
     rectRef,
     crownRef,
     nameRef,
-    attributesGroupRef,
     canMove,
     onDragMove,
     onDragStart,
@@ -35,7 +34,7 @@ export default function KonvaAccount(account: Account) {
     onCrownMouseEnter,
     onCrownMouseLeave,
   } = useAccount(account);
-  const { id, attributes, name } = account;
+  const { id, name } = account;
 
   return (
     <Group
@@ -67,6 +66,7 @@ export default function KonvaAccount(account: Account) {
         ref={rectRef}
         onClick={onClick}
         fill={KONVA_ACCOUNT_FILL}
+        height={KONVA_ACCOUNT_HEADER_HEIGHT}
         width={KONVA_ACCOUNT_WIDTH}
         stroke={KONVA_ACCOUNT_STROKE_COLOR}
         strokeWidth={KONVA_ACCOUNT_STROKE_WIDTH}
@@ -82,15 +82,16 @@ export default function KonvaAccount(account: Account) {
         wrap="none"
         ellipsis
       />
-      <Group id={getAccountAttributesId(id)} ref={attributesGroupRef}>
-        {attributes?.map((attribute) => (
-          <Text
-            key={`${id}-${attribute.name}`}
-            text={`${attribute.name}: ${attribute.type}`}
-            fontSize={KONVA_ACCOUNT_ATTRIBUTE_FONT_SIZE}
-          />
-        ))}
-      </Group>
+      {/* NOTE: for future use */}
+      {/*<Group id={getAccountAttributesId(id)} ref={attributesGroupRef}>*/}
+      {/*  {attributes?.map((attribute) => (*/}
+      {/*    <Text*/}
+      {/*      key={`${id}-${attribute.name}`}*/}
+      {/*      text={`${attribute.name}: ${attribute.type}`}*/}
+      {/*      fontSize={KONVA_ACCOUNT_ATTRIBUTE_FONT_SIZE}*/}
+      {/*    />*/}
+      {/*  ))}*/}
+      {/*</Group>*/}
     </Group>
   );
 }

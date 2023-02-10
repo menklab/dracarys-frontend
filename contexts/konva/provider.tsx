@@ -10,6 +10,7 @@ import {
   getAccountGroupId,
   getConnectionId,
   getUnrelatedConnections,
+  moveConnectionRelativeToStage,
 } from "~/utils/konva";
 import { KonvaContext } from "./context";
 import { KonvaContextActions, KonvaProviderProps } from "./types";
@@ -136,8 +137,9 @@ export default function KonvaProvider({ program, accounts, children }: KonvaProv
       }
     },
     repositionArrows: (movedAccountId: number) => {
+      const stage = stageRef.current;
       const account = accounts.find((account) => account.id === movedAccountId);
-      if (!account) return;
+      if (!account || !stage) return;
 
       const connectionsFromAccount: Connection[] = account.linkedAccounts.map((to) => ({ from: account.id, to })) || [];
       const connectionsToAccount: Connection[] = accounts.reduce(
@@ -157,7 +159,7 @@ export default function KonvaProvider({ program, accounts, children }: KonvaProv
         if (!accountGroupFrom || !accountGroupTo) return;
 
         const points = calculatePointsForConnection(accountGroupFrom, accountGroupTo);
-        connection.points(points);
+        connection.points(moveConnectionRelativeToStage(points, stage));
       }
 
       actions.redraw();
