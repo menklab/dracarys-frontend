@@ -2,8 +2,10 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import { LoadingButton } from "@mui/lab";
 import { AppBar, Box, Drawer, IconButton, List, ListItem, ListItemText, Toolbar } from "@mui/material";
 import { ReactNode } from "react";
+import logout from "~/adapters/auth/logout";
 import { LAYOUT_DRAWER_WIDTH } from "~/constants/layout";
 import { useAuth } from "~/contexts/auth/hooks";
+import useErrorHandler from "~/hooks/useErrorHandler";
 
 interface LayoutProps {
   appBarContent?: ReactNode;
@@ -13,6 +15,7 @@ interface LayoutProps {
 
 export default function Layout(props: LayoutProps) {
   const { appBarContent, drawerContent, children } = props;
+  const { displayCaughtError } = useErrorHandler();
 
   const {
     data: { pubKey },
@@ -20,7 +23,12 @@ export default function Layout(props: LayoutProps) {
   } = useAuth();
   const pubKeyString = pubKey ? pubKey.toBase58() : "";
   const logOut = provider
-    ? () => {
+    ? async () => {
+        try {
+          await logout();
+        } catch (e) {
+          displayCaughtError(e);
+        }
         disconnectFromPhantom();
       }
     : undefined;

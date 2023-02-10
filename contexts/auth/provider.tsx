@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import { useSnackbar } from "notistack";
 import { useEffect, useState } from "react";
 import getMsg from "~/adapters/auth/getMsg";
+import logout from "~/adapters/auth/logout";
 import validateMsg from "~/adapters/auth/validateMsg";
 import { ROUTES } from "~/constants/routes";
 import useErrorHandler from "~/hooks/useErrorHandler";
@@ -52,6 +53,7 @@ export default function AuthProvider({ children }: AuthProviderProps) {
       }
     } catch (e) {
       console.log("cookie.remove");
+      await logoutFN();
       cookie.remove("connect.sid");
       displayCaughtError(e);
     }
@@ -76,6 +78,14 @@ export default function AuthProvider({ children }: AuthProviderProps) {
     await provider?.disconnect();
     cookie.remove("connect.sid");
     return await router.push(ROUTES.LOGIN());
+  };
+
+  const logoutFN = async () => {
+    try {
+      await logout();
+    } catch (e) {
+      displayCaughtError(e);
+    }
   };
 
   useEffect(() => {
