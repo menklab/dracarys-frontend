@@ -52,7 +52,7 @@ export default function AuthProvider({ children }: AuthProviderProps) {
         return await router.push(ROUTES.HOME());
       }
     } catch (e) {
-      console.log("cookie.remove");
+      console.log("cookie.remove", cookie, cookie.remove("connect.sid"));
       await logoutFN();
       cookie.remove("connect.sid");
       displayCaughtError(e);
