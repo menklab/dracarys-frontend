@@ -27,18 +27,14 @@ export default function AuthProvider({ children }: AuthProviderProps) {
   const { enqueueSnackbar } = useSnackbar();
 
   const connectToBE = async () => {
-    console.log("connectToBE", pubKey);
     if (!pubKey) return;
     const { message } = await getMsg();
     const encodedMessage = new TextEncoder().encode(message);
     try {
-      console.log("encodedMessage", encodedMessage);
       const signedMessage = await provider?.signMessage(encodedMessage, "utf8");
-      console.log("signedMessage", signedMessage);
       const signature = signedMessage?.signature;
       const signatureString = btoa(String.fromCharCode.apply(null, signature as number[]));
       const pubKeyString = pubKey.toBase58();
-      console.log("pubKeyString", pubKeyString);
 
       const response = await validateMsg({
         pubKey: pubKeyString,
@@ -46,13 +42,10 @@ export default function AuthProvider({ children }: AuthProviderProps) {
         signature: signatureString,
       });
 
-      console.log("connectToBE", response);
-
       if (response) {
         return await router.push(ROUTES.HOME());
       }
     } catch (e) {
-      console.log("cookie.remove", cookie, cookie.remove("connect.sid"));
       await logoutFN();
       cookie.remove("connect.sid");
       displayCaughtError(e);
@@ -62,9 +55,7 @@ export default function AuthProvider({ children }: AuthProviderProps) {
   const connectToPhantom = async () => {
     setLoginProgress(true);
     try {
-      console.log("connectToPhantom", provider);
       const resp = await provider?.connect();
-      console.log(resp);
       const pubKey = resp?.publicKey;
       setPubKey(pubKey);
     } catch (e) {
@@ -74,7 +65,6 @@ export default function AuthProvider({ children }: AuthProviderProps) {
   };
 
   const disconnectFromPhantom = async () => {
-    console.log("disconnectFromPhantom", provider);
     await provider?.disconnect();
     cookie.remove("connect.sid");
     return await router.push(ROUTES.LOGIN());
@@ -89,21 +79,17 @@ export default function AuthProvider({ children }: AuthProviderProps) {
   };
 
   useEffect(() => {
-    console.log("useEffect1", provider);
     if (cookie.get("connect.sid")) return; // check if already has session id
     if (!provider) return; // check if is available
     if (!provider?.isConnected) return;
-    console.log("useEffect1.0", provider);
     connectToBE();
   }, [pubKey]);
 
   useEffect(() => {
-    console.log("useEffect2", provider);
     if (!provider) return;
     if (pubKey) return;
     if (provider.isConnected) return;
     if (!cookie.get("connect.sid")) return;
-    console.log("useEffect2.0", provider, pubKey);
     connectToPhantom();
   }, [provider]);
 

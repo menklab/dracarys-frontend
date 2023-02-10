@@ -10,8 +10,6 @@ export default function Login() {
     data: { loginProgress },
   } = useAuth();
 
-  console.log(process.env.NODE_ENV);
-
   return (
     <Container maxWidth="lg">
       <Stack direction="column" justifyContent="center" alignItems="center" spacing={2} sx={{ height: "100vh" }}>
