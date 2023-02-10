@@ -7,7 +7,10 @@ import { useAuth } from "~/contexts/auth/hooks";
 export default function Login() {
   const {
     actions: { connectToPhantom },
+    data: { loginProgress },
   } = useAuth();
+
+  console.log(process.env.NODE_ENV);
 
   return (
     <Container maxWidth="lg">
@@ -16,7 +19,7 @@ export default function Login() {
         <Typography variant="body1" sx={{ maxWidth: 380, textAlign: "center" }}>
           By logging in you are agreeing to the manufacterers <br /> Privacy Policy and Terms of use.
         </Typography>
-        <Button variant="contained" onClick={connectToPhantom}>
+        <Button variant="contained" onClick={connectToPhantom} disabled={loginProgress}>
           Login
         </Button>
       </Stack>

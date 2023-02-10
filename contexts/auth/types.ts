@@ -24,6 +24,7 @@ export interface AuthContextActions {
 
 export interface AuthContextData {
   pubKey: PubKey | undefined;
+  loginProgress: boolean;
 }
 
 export interface AuthContextDefaultValue {
