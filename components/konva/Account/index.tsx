@@ -6,15 +6,13 @@ import {
   KONVA_ACCOUNT_CROWN_OFFSET_X,
   KONVA_ACCOUNT_CROWN_OFFSET_Y,
   KONVA_ACCOUNT_CROWN_SHADOW_BLUR,
-  KONVA_ACCOUNT_CROWN_STROKE,
   KONVA_ACCOUNT_CROWN_WIDTH,
-  KONVA_ACCOUNT_FILL,
   KONVA_ACCOUNT_HEADER_HEIGHT,
   KONVA_ACCOUNT_NAME_FONT_SIZE,
-  KONVA_ACCOUNT_STROKE_COLOR,
   KONVA_ACCOUNT_STROKE_WIDTH,
   KONVA_ACCOUNT_WIDTH,
 } from "~/constants/konva";
+import { useTheme } from "~/contexts/theme/hooks";
 import { Account } from "~/interfaces/account";
 import { getAccountCrownId, getAccountGroupId, getAccountRectId } from "~/utils/konva";
 
@@ -35,6 +33,9 @@ export default function KonvaAccount(account: Account) {
     onCrownMouseLeave,
   } = useAccount(account);
   const { id, name } = account;
+  const {
+    data: { theme },
+  } = useTheme();
 
   return (
     <Group
@@ -57,7 +58,7 @@ export default function KonvaAccount(account: Account) {
         cornerRadius={KONVA_ACCOUNT_CORNER_RADIUS}
         strokeWidth={KONVA_ACCOUNT_STROKE_WIDTH}
         shadowBlur={KONVA_ACCOUNT_CROWN_SHADOW_BLUR}
-        stroke={KONVA_ACCOUNT_CROWN_STROKE}
+        stroke={theme.palette.text.primary}
         onMouseEnter={onCrownMouseEnter}
         onMouseLeave={onCrownMouseLeave}
       />
@@ -65,10 +66,10 @@ export default function KonvaAccount(account: Account) {
         id={getAccountRectId(id)}
         ref={rectRef}
         onClick={onClick}
-        fill={KONVA_ACCOUNT_FILL}
+        fill={theme.palette.background.default}
         height={KONVA_ACCOUNT_HEADER_HEIGHT}
         width={KONVA_ACCOUNT_WIDTH}
-        stroke={KONVA_ACCOUNT_STROKE_COLOR}
+        stroke={theme.palette.text.primary}
         strokeWidth={KONVA_ACCOUNT_STROKE_WIDTH}
         cornerRadius={KONVA_ACCOUNT_CORNER_RADIUS}
       />
@@ -76,6 +77,7 @@ export default function KonvaAccount(account: Account) {
         ref={nameRef}
         text={name}
         onClick={onClick}
+        fill={theme.palette.text.primary}
         fontSize={KONVA_ACCOUNT_NAME_FONT_SIZE}
         width={KONVA_ACCOUNT_WIDTH}
         align="center"

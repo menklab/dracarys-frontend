@@ -4,14 +4,13 @@ import { Ref, RefObject, useEffect, useMemo, useRef, useState } from "react";
 import updateProgram from "~/adapters/program/updateProgram";
 import {
   KONVA_ACCOUNT_CROWN_MAKER_ID,
-  KONVA_CONNECTION_FILL_COLOR,
   KONVA_CONNECTION_MAKER_ID,
-  KONVA_CONNECTION_STROKE_COLOR,
   KONVA_CONNECTION_STROKE_WIDTH,
   KONVA_DEFAULT_STAGE_POSITION,
   KONVA_DEFAULT_STAGE_SCALE,
 } from "~/constants/konva";
 import { useKonva } from "~/contexts/konva/hooks";
+import { useTheme } from "~/contexts/theme/hooks";
 import { Cursor } from "~/enums/cursor";
 import useErrorHandler from "~/hooks/useErrorHandler";
 import { Account } from "~/interfaces/account";
@@ -43,6 +42,9 @@ export default function useStage(): UseStageHookReturn {
   const {
     data: { program, accounts, stageRef },
   } = konva;
+  const {
+    data: { theme },
+  } = useTheme();
 
   const connections = useMemo(
     () =>
@@ -89,6 +91,10 @@ export default function useStage(): UseStageHookReturn {
 
   const onDragEnd = async (e: Konva.KonvaEventObject<DragEvent>) => {
     try {
+      const stage = stageRef.current;
+      if (!stage) return;
+      if (e.target !== stage) return; // NOTE: drag on stage only
+
       await updateProgram(program.id, { name: program.name, center: e.target.position(), zoom: program.zoom });
     } catch (e) {
       displayCaughtError(e);
@@ -150,9 +156,9 @@ export default function useStage(): UseStageHookReturn {
       new Konva.Arrow({
         id: KONVA_CONNECTION_MAKER_ID,
         points: [mousePointTo.x, mousePointTo.y],
-        stroke: KONVA_CONNECTION_STROKE_COLOR,
+        fill: theme.palette.text.primary,
+        stroke: theme.palette.text.primary,
         strokeWidth: KONVA_CONNECTION_STROKE_WIDTH,
-        fill: KONVA_CONNECTION_FILL_COLOR,
       })
     );
   };

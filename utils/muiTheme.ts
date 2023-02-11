@@ -1,5 +1,6 @@
-import { createTheme } from "@mui/material/styles";
+import { ThemeOptions } from "@mui/material/styles";
 import { Roboto } from "@next/font/google";
+import { LayoutColorMode } from "~/types/layout";
 
 export const roboto = Roboto({
   weight: ["300", "400", "500", "700"],
@@ -8,11 +9,7 @@ export const roboto = Roboto({
   fallback: ["Helvetica", "Arial", "sans-serif"],
 });
 
-const theme = createTheme({
-  palette: {
-    // mode: "dark"
-  },
+export const getDesignTokens = (mode: LayoutColorMode): ThemeOptions => ({
+  palette: { mode },
   typography: { fontFamily: roboto.style.fontFamily },
 });
-
-export default theme;

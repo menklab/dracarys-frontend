@@ -9,6 +9,7 @@ import TextField from "@mui/material/TextField";
 import { useState } from "react";
 import { Controller, SubmitHandler } from "react-hook-form";
 import { useInstructionPage } from "~/components/pages/InstructionPage/context";
+import { useTheme } from "~/contexts/theme/hooks";
 import { AccountType, GenericType } from "~/enums/instructionElementTypes";
 import { CreateInstructionElementSchemaType, useCreateInstructionElementForm } from "~/forms/createInstructionElement";
 import { Account } from "~/interfaces/account";
@@ -20,6 +21,9 @@ interface CreateElementLineProps {
 export default function ElementLineCreate({ orderNumber }: CreateElementLineProps) {
   const { saveCreateInstructionElement, accounts } = useInstructionPage();
   const [intervalId, setIntervalId] = useState<any>(undefined);
+  const {
+    data: { theme },
+  } = useTheme();
 
   const {
     register,
@@ -54,7 +58,7 @@ export default function ElementLineCreate({ orderNumber }: CreateElementLineProp
 
   return (
     <TableRow
-      sx={{ backgroundColor: "#ededed", "&:last-child td, &:last-child th": { border: 0 } }}
+      sx={{ backgroundColor: theme.palette.divider, "&:last-child td, &:last-child th": { border: 0 } }}
       onBlur={() => {
         const intervalIdTemp = setTimeout(() => {
           const newLineForm = window.document.getElementById(elementKey) as HTMLFormElement;

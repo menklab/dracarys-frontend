@@ -1,10 +1,12 @@
-import LogoutIcon from "@mui/icons-material/Logout";
+import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 import { LoadingButton } from "@mui/lab";
 import { AppBar, Box, Drawer, IconButton, List, ListItem, ListItemText, Toolbar } from "@mui/material";
 import { ReactNode } from "react";
 import logout from "~/adapters/auth/logout";
+import ThemeChanger from "~/components/ThemeChanger";
 import { LAYOUT_DRAWER_WIDTH } from "~/constants/layout";
 import { useAuth } from "~/contexts/auth/hooks";
+import { useTheme } from "~/contexts/theme/hooks";
 import useErrorHandler from "~/hooks/useErrorHandler";
 
 interface LayoutProps {
@@ -18,9 +20,14 @@ export default function Layout(props: LayoutProps) {
   const { displayCaughtError } = useErrorHandler();
 
   const {
+    data: { theme },
+  } = useTheme();
+
+  const {
     data: { pubKey },
     actions: { provider, disconnectFromPhantom },
   } = useAuth();
+
   const pubKeyString = pubKey ? pubKey.toBase58() : "";
   const logOut = provider
     ? async () => {
@@ -38,7 +45,11 @@ export default function Layout(props: LayoutProps) {
       <AppBar
         position="fixed"
         color="inherit"
-        sx={{ width: `calc(100% - ${LAYOUT_DRAWER_WIDTH}px)`, ml: `${LAYOUT_DRAWER_WIDTH}px` }}
+        sx={{
+          width: `calc(100% - ${LAYOUT_DRAWER_WIDTH}px)`,
+          ml: `${LAYOUT_DRAWER_WIDTH}px`,
+          background: theme.palette.background.default,
+        }}
       >
         <Toolbar>{appBarContent}</Toolbar>
       </AppBar>
@@ -76,11 +87,14 @@ export default function Layout(props: LayoutProps) {
         {drawerContent}
 
         <List sx={{ mt: "auto" }}>
+          <ListItem sx={{ px: 4, py: 2 }} secondaryAction={<ThemeChanger />}>
+            <ListItemText primary="Change theme" />
+          </ListItem>
           <ListItem
             sx={{ px: 4, py: 2 }}
             secondaryAction={
               <IconButton edge="start" onClick={logOut}>
-                <LogoutIcon />
+                <ExitToAppIcon />
               </IconButton>
             }
           >

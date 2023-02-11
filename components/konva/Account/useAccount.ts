@@ -43,8 +43,8 @@ export default function useAccount(account: Account): UseAccountHookReturn {
     const stage = konva.data.stageRef.current;
     if (!stage) return;
 
-    setLastPos(pos);
     setCursorOnStage(stage, Cursor.MOVE);
+    setLastPos(pos);
   };
 
   const onDragEnd = async (pos: Position) => {
