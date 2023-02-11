@@ -36,8 +36,8 @@ export default function AppBarContent() {
 
   return (
     <>
-      <div
-        style={{
+      <Box
+        sx={{
           display: "flex",
           justifyContent: "space-around",
           alignItems: "center",
@@ -67,6 +67,7 @@ export default function AppBarContent() {
               </IconButton>
               <IconButton
                 edge="end"
+                sx={{ mr: 0 }}
                 onClick={() => {
                   reset();
                   setIsEditingAccountName(false);
@@ -89,7 +90,7 @@ export default function AppBarContent() {
             </IconButton>
           </>
         )}
-      </div>
+      </Box>
       <Button sx={{ ml: "auto" }} endIcon={<DeleteIcon />} onClick={openDeleteAccountDialog}>
         Delete account
       </Button>

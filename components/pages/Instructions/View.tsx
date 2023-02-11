@@ -1,3 +1,4 @@
+import { Box } from "@mui/material";
 import CodeBlock from "~/components/Code/CodeBlock";
 import { useInstructionsPage } from "~/components/pages/Instructions/context";
 import InstructionsList from "~/components/pages/Instructions/InstructionsList";
@@ -12,5 +13,5 @@ export default function View() {
       <InstructionsList />
     );
 
-  return <div>{innerBlock}</div>;
+  return <Box>{innerBlock}</Box>;
 }
