@@ -1,27 +1,30 @@
+import { Box } from "@mui/material";
 import dynamic from "next/dynamic";
 import CodeBlock from "~/components/Code/CodeBlock";
+import KonvaLoading from "~/components/konva/KonvaLoading";
 import { useAccountsPage } from "~/components/pages/Accounts/context";
 import CreateAccountDialog from "~/components/pages/Accounts/CreateAccountDialog";
 import CreateInstructionDialog from "~/components/pages/Accounts/CreateInstructionDialog";
-const KonvaProvider = dynamic(() => import("~/contexts/konva/provider"), { ssr: false });
-const KonvaStage = dynamic(() => import("~/components/konva/Stage"), { ssr: false });
+import KonvaProvider from "~/contexts/konva/provider";
+
+const KonvaStage = dynamic(() => import("~/components/konva/Stage"), { ssr: false, loading: () => <KonvaLoading /> });
 
 export default function View() {
   const { program, accounts, viewVariant, forceCodeUpdate, generatedCodeString } = useAccountsPage();
 
   return (
-    <div>
+    <Box>
       {/* NOTE: this is done to prevent unnecessary conditional rendering */}
-      <div style={{ display: viewVariant === "visual" ? "block" : "none" }}>
+      <Box sx={{ display: viewVariant === "visual" ? "block" : "none" }}>
         <KonvaProvider program={program} accounts={accounts}>
           <KonvaStage />
         </KonvaProvider>
-      </div>
-      <div style={{ display: viewVariant === "code" ? "block" : "none" }}>
+      </Box>
+      <Box sx={{ display: viewVariant === "code" ? "block" : "none" }}>
         <CodeBlock forceCodeUpdate={forceCodeUpdate} generatedCodeString={generatedCodeString} />
-      </div>
+      </Box>
       <CreateAccountDialog />
       <CreateInstructionDialog />
-    </div>
+    </Box>
   );
 }

@@ -1,3 +1,4 @@
+import { Box } from "@mui/material";
 import Paper from "@mui/material/Paper";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -13,7 +14,7 @@ export default function View() {
   const { accountElements } = useAccountPage();
 
   return (
-    <div>
+    <Box>
       <TableContainer component={Paper}>
         <Table sx={{ minWidth: 650 }} aria-label="simple table">
           <TableHead>
@@ -31,6 +32,6 @@ export default function View() {
           </TableBody>
         </Table>
       </TableContainer>
-    </div>
+    </Box>
   );
 }

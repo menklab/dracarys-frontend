@@ -1,7 +1,7 @@
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
-import { Button, IconButton } from "@mui/material";
+import { Box, Button, IconButton } from "@mui/material";
 import Link from "next/link";
 import { useInstructionPage } from "~/components/pages/InstructionPage/context";
 import { ROUTES } from "~/constants/routes";
@@ -11,8 +11,8 @@ export default function AppBarContent() {
 
   return (
     <>
-      <div
-        style={{
+      <Box
+        sx={{
           display: "flex",
           justifyContent: "space-around",
           alignItems: "center",
@@ -33,7 +33,7 @@ export default function AppBarContent() {
             <EditIcon />
           </IconButton>
         </>
-      </div>
+      </Box>
       <Button sx={{ ml: "auto" }} endIcon={<DeleteIcon />} onClick={openDeleteInstructionDialog}>
         Delete instruction
       </Button>

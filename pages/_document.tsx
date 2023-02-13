@@ -1,15 +1,15 @@
 import createEmotionServer from "@emotion/server/create-instance";
 import Document, { Head, Html, Main, NextScript } from "next/document";
+import { LAYOUT_DEFAULT_COLOR_MODE } from "~/constants/layout";
 import createEmotionCache from "~/utils/createEmotionCache";
-import theme, { roboto } from "~/utils/muiTheme";
+import getValueFromCookie from "~/utils/getValueFromCookie";
+import { roboto } from "~/utils/muiTheme";
 
 export default class MyDocument extends Document {
   render() {
     return (
       <Html lang="en" className={roboto.className}>
         <Head>
-          {/* PWA primary color */}
-          <meta name="theme-color" content={theme.palette.primary.main} />
           <link rel="shortcut icon" href="/favicon.ico" />
           <meta name="emotion-insertion-point" content="" />
           {(this.props as any).emotionStyleTags}
@@ -26,6 +26,7 @@ export default class MyDocument extends Document {
 // `getInitialProps` belongs to `_document` (instead of `_app`),
 // it's compatible with static-site generation (SSG).
 MyDocument.getInitialProps = async (ctx) => {
+  const colorMode = getValueFromCookie(ctx.req?.headers.cookie || "", "colorMode");
   const originalRenderPage = ctx.renderPage;
 
   const cache = createEmotionCache();
@@ -35,7 +36,7 @@ MyDocument.getInitialProps = async (ctx) => {
     originalRenderPage({
       enhanceApp: (App: any) =>
         function EnhanceApp(props) {
-          return <App emotionCache={cache} {...props} />;
+          return <App emotionCache={cache} colorMode={colorMode || LAYOUT_DEFAULT_COLOR_MODE} {...props} />;
         },
     });
 

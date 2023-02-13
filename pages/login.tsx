@@ -3,6 +3,7 @@ import Typography from "@mui/material/Typography";
 import { GetServerSideProps } from "next";
 import { ROUTES } from "~/constants/routes";
 import { useAuth } from "~/contexts/auth/hooks";
+import getSidCookie from "~/utils/getSidCookie";
 
 export default function Login() {
   const {
@@ -26,7 +27,7 @@ export default function Login() {
 }
 
 export const getServerSideProps: GetServerSideProps = async ({ req }) => {
-  const authSid = req?.cookies["connect.sid"];
+  const authSid = getSidCookie(req);
   if (authSid) return { redirect: { permanent: false, destination: ROUTES.PROGRAMS() }, props: {} };
   return { props: {} };
 };

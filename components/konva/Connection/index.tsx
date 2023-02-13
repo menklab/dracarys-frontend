@@ -1,4 +1,4 @@
-import { ArrowDropDown, Check, Delete, Loop } from "@mui/icons-material";
+import { ArrowDropDown, ArrowDropUp, Check, Delete, Loop } from "@mui/icons-material";
 import {
   Button,
   ButtonGroup,
@@ -10,15 +10,13 @@ import {
   MenuList,
   Paper,
   Popper,
+  ThemeProvider,
 } from "@mui/material";
 import { Arrow, Group } from "react-konva";
 import { Html } from "react-konva-utils";
 import useConnection from "~/components/konva/Connection/useConnection";
-import {
-  KONVA_CONNECTION_FILL_COLOR,
-  KONVA_CONNECTION_STROKE_COLOR,
-  KONVA_CONNECTION_STROKE_WIDTH,
-} from "~/constants/konva";
+import { KONVA_CONNECTION_STROKE_WIDTH } from "~/constants/konva";
+import { useTheme } from "~/contexts/theme/hooks";
 import { getConnectionId } from "~/utils/konva";
 
 interface ConnectionProps {
@@ -50,15 +48,18 @@ export default function KonvaConnection({ from, to }: ConnectionProps) {
     handleToClose,
     handleToMenuItemClick,
   } = useConnection(from, to);
+  const {
+    data: { theme },
+  } = useTheme();
 
   return (
     <Group>
       <Arrow
         ref={arrowRef}
         id={getConnectionId(from, to)}
-        stroke={KONVA_CONNECTION_STROKE_COLOR}
+        fill={theme.palette.text.primary}
+        stroke={theme.palette.text.primary}
         strokeWidth={KONVA_CONNECTION_STROKE_WIDTH}
-        fill={KONVA_CONNECTION_FILL_COLOR}
         onMouseEnter={onArrowMouseEnter}
         onMouseLeave={onArrowMouseLeave}
         onClick={onArrowClick}
@@ -66,120 +67,124 @@ export default function KonvaConnection({ from, to }: ConnectionProps) {
       />
       {isOpened && (
         <Html transformFunc={htmlTransformFunc}>
-          <ButtonGroup size="small" ref={buttonGroupRef} variant="contained" aria-label="contained button group">
-            <Button onClick={reverseConnection}>
-              <Loop fontSize="small" />
-            </Button>
-            <Button
-              aria-controls={fromOpen ? "split-button-menu" : undefined}
-              aria-expanded={fromOpen ? "true" : undefined}
-              aria-label="select merge strategy"
-              aria-haspopup="menu"
-              onClick={handleFromToggle}
-              endIcon={<ArrowDropDown />}
-            >
-              From
-            </Button>
-            <Button
-              aria-controls={toOpen ? "split-button-menu" : undefined}
-              aria-expanded={toOpen ? "true" : undefined}
-              aria-label="select merge strategy"
-              aria-haspopup="menu"
-              onClick={handleToToggle}
-              endIcon={<ArrowDropDown />}
-            >
-              To
-            </Button>
-            <Button onClick={deleteConnection}>
-              <Delete fontSize="small" />
-            </Button>
-          </ButtonGroup>
-          <Popper
-            sx={{ zIndex: 1 }}
-            open={fromOpen}
-            anchorEl={buttonGroupRef.current}
-            role={undefined}
-            transition
-            disablePortal
-          >
-            {({ TransitionProps, placement }) => (
-              <Grow
-                {...TransitionProps}
-                style={{
-                  transformOrigin: placement === "bottom" ? "center top" : "center bottom",
-                }}
+          <ThemeProvider theme={theme}>
+            <ButtonGroup size="small" ref={buttonGroupRef} variant="contained" aria-label="contained button group">
+              <Button onClick={reverseConnection} disabled={fromOpen || toOpen}>
+                <Loop fontSize="small" />
+              </Button>
+              <Button
+                disabled={toOpen}
+                aria-controls={fromOpen ? "split-button-menu" : undefined}
+                aria-expanded={fromOpen ? "true" : undefined}
+                aria-label="select merge strategy"
+                aria-haspopup="menu"
+                onClick={handleFromToggle}
+                endIcon={fromOpen ? <ArrowDropUp /> : <ArrowDropDown />}
               >
-                <Paper>
-                  <ClickAwayListener onClickAway={handleFromClose}>
-                    <MenuList id="split-button-menu" dense autoFocusItem>
-                      {accounts.map((account) => (
-                        <MenuItem
-                          key={account.id}
-                          disabled={fromOptionIsDisabled(account)}
-                          selected={account.id === from}
-                          onClick={() => handleFromMenuItemClick(account.id)}
-                        >
-                          {account.id === from ? (
-                            <>
-                              <ListItemIcon>
-                                <Check />
-                              </ListItemIcon>
-                              {account.name}
-                            </>
-                          ) : (
-                            <ListItemText inset>{account.name}</ListItemText>
-                          )}
-                        </MenuItem>
-                      ))}
-                    </MenuList>
-                  </ClickAwayListener>
-                </Paper>
-              </Grow>
-            )}
-          </Popper>
-          <Popper
-            sx={{ zIndex: 1 }}
-            open={toOpen}
-            anchorEl={buttonGroupRef.current}
-            role={undefined}
-            transition
-            disablePortal
-          >
-            {({ TransitionProps, placement }) => (
-              <Grow
-                {...TransitionProps}
-                style={{
-                  transformOrigin: placement === "bottom" ? "center top" : "center bottom",
-                }}
+                From
+              </Button>
+              <Button
+                disabled={fromOpen}
+                aria-controls={toOpen ? "split-button-menu" : undefined}
+                aria-expanded={toOpen ? "true" : undefined}
+                aria-label="select merge strategy"
+                aria-haspopup="menu"
+                onClick={handleToToggle}
+                endIcon={toOpen ? <ArrowDropUp /> : <ArrowDropDown />}
               >
-                <Paper>
-                  <ClickAwayListener onClickAway={handleToClose}>
-                    <MenuList id="split-button-menu" dense autoFocusItem>
-                      {accounts.map((account) => (
-                        <MenuItem
-                          key={account.id}
-                          disabled={toOptionIsDisabled(account)}
-                          selected={account.id === to}
-                          onClick={() => handleToMenuItemClick(account.id)}
-                        >
-                          {account.id === to ? (
-                            <>
-                              <ListItemIcon>
-                                <Check />
-                              </ListItemIcon>
-                              {account.name}
-                            </>
-                          ) : (
-                            <ListItemText inset>{account.name}</ListItemText>
-                          )}
-                        </MenuItem>
-                      ))}
-                    </MenuList>
-                  </ClickAwayListener>
-                </Paper>
-              </Grow>
-            )}
-          </Popper>
+                To
+              </Button>
+              <Button onClick={deleteConnection} disabled={fromOpen || toOpen}>
+                <Delete fontSize="small" />
+              </Button>
+            </ButtonGroup>
+            <Popper
+              sx={{ zIndex: 1 }}
+              open={fromOpen}
+              anchorEl={buttonGroupRef.current}
+              role={undefined}
+              transition
+              disablePortal
+            >
+              {({ TransitionProps, placement }) => (
+                <Grow
+                  {...TransitionProps}
+                  style={{
+                    transformOrigin: placement === "bottom" ? "center top" : "center bottom",
+                  }}
+                >
+                  <Paper>
+                    <ClickAwayListener onClickAway={handleFromClose}>
+                      <MenuList id="split-button-menu" dense autoFocusItem>
+                        {accounts.map((account) => (
+                          <MenuItem
+                            key={account.id}
+                            disabled={fromOptionIsDisabled(account)}
+                            selected={account.id === from}
+                            onClick={() => handleFromMenuItemClick(account.id)}
+                          >
+                            {account.id === from ? (
+                              <>
+                                <ListItemIcon>
+                                  <Check />
+                                </ListItemIcon>
+                                {account.name}
+                              </>
+                            ) : (
+                              <ListItemText inset>{account.name}</ListItemText>
+                            )}
+                          </MenuItem>
+                        ))}
+                      </MenuList>
+                    </ClickAwayListener>
+                  </Paper>
+                </Grow>
+              )}
+            </Popper>
+            <Popper
+              sx={{ zIndex: 1 }}
+              open={toOpen}
+              anchorEl={buttonGroupRef.current}
+              role={undefined}
+              transition
+              disablePortal
+            >
+              {({ TransitionProps, placement }) => (
+                <Grow
+                  {...TransitionProps}
+                  style={{
+                    transformOrigin: placement === "bottom" ? "center top" : "center bottom",
+                  }}
+                >
+                  <Paper>
+                    <ClickAwayListener onClickAway={handleToClose}>
+                      <MenuList id="split-button-menu" dense autoFocusItem>
+                        {accounts.map((account) => (
+                          <MenuItem
+                            key={account.id}
+                            disabled={toOptionIsDisabled(account)}
+                            selected={account.id === to}
+                            onClick={() => handleToMenuItemClick(account.id)}
+                          >
+                            {account.id === to ? (
+                              <>
+                                <ListItemIcon>
+                                  <Check />
+                                </ListItemIcon>
+                                {account.name}
+                              </>
+                            ) : (
+                              <ListItemText inset>{account.name}</ListItemText>
+                            )}
+                          </MenuItem>
+                        ))}
+                      </MenuList>
+                    </ClickAwayListener>
+                  </Paper>
+                </Grow>
+              )}
+            </Popper>
+          </ThemeProvider>
         </Html>
       )}
     </Group>

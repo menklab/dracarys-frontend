@@ -1,6 +1,6 @@
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { Button, IconButton, ToggleButton, ToggleButtonGroup } from "@mui/material";
+import { Box, Button, IconButton, ToggleButton, ToggleButtonGroup } from "@mui/material";
 import Link from "next/link";
 import { useInstructionsPage } from "~/components/pages/Instructions/context";
 import { ROUTES } from "~/constants/routes";
@@ -10,8 +10,8 @@ export default function AppBarContent() {
 
   return (
     <>
-      <div
-        style={{
+      <Box
+        sx={{
           display: "flex",
           justifyContent: "space-around",
           alignItems: "center",
@@ -27,7 +27,7 @@ export default function AppBarContent() {
           </IconButton>
         </Link>
         <p style={{ margin: "0 10px", fontSize: "24px" }}>All Instructions</p>
-      </div>
+      </Box>
       <ToggleButtonGroup
         size="small"
         sx={{ ml: "auto" }}

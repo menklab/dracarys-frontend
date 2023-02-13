@@ -1,3 +1,4 @@
+import { Box } from "@mui/material";
 import { Layer, Stage } from "react-konva";
 import KonvaAccount from "~/components/konva/Account";
 import KonvaConnection from "~/components/konva/Connection";
@@ -20,7 +21,7 @@ export default function KonvaStage() {
   } = useStage();
 
   return (
-    <div style={{ width: "100%", minHeight: "calc(100vh - 64px)" }} ref={containerRef}>
+    <Box sx={{ width: "100%", minHeight: "calc(100vh - 64px)" }} ref={containerRef}>
       <Stage
         width={size.width}
         height={size.height}
@@ -56,6 +57,6 @@ export default function KonvaStage() {
           ))}
         </Layer>
       </Stage>
-    </div>
+    </Box>
   );
 }

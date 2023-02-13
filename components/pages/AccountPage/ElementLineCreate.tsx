@@ -4,15 +4,19 @@ import Select from "@mui/material/Select";
 import TableCell from "@mui/material/TableCell";
 import TableRow from "@mui/material/TableRow";
 import TextField from "@mui/material/TextField";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Controller, SubmitHandler } from "react-hook-form";
 import { useAccountPage } from "~/components/pages/AccountPage/context";
+import { useTheme } from "~/contexts/theme/hooks";
 import { ElementType } from "~/enums/elementType";
 import { CreateAccountElementSchemaType, useCreateAccountElementForm } from "~/forms/createAccountElement";
 
 export default function ElementLineCreate() {
   const { saveCreateAccountElement, account } = useAccountPage();
   const [intervalId, setIntervalId] = useState<any>(undefined);
+  const {
+    data: { theme },
+  } = useTheme();
 
   const {
     register,
@@ -42,7 +46,7 @@ export default function ElementLineCreate() {
 
   return (
     <TableRow
-      sx={{ backgroundColor: "#ededed", "&:last-child td, &:last-child th": { border: 0 } }}
+      sx={{ backgroundColor: theme.palette.divider, "&:last-child td, &:last-child th": { border: 0 } }}
       onBlur={() => {
         const intervalIdTemp = setTimeout(() => {
           const newLineForm = window.document.getElementById(elementKey) as HTMLFormElement;
