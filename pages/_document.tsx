@@ -1,5 +1,6 @@
 import createEmotionServer from "@emotion/server/create-instance";
 import Document, { Head, Html, Main, NextScript } from "next/document";
+import { LAYOUT_COLOR_MODE_COOKIE_NAME } from "~/constants/cookies";
 import { LAYOUT_DEFAULT_COLOR_MODE } from "~/constants/layout";
 import createEmotionCache from "~/utils/createEmotionCache";
 import getValueFromCookie from "~/utils/getValueFromCookie";
@@ -26,7 +27,7 @@ export default class MyDocument extends Document {
 // `getInitialProps` belongs to `_document` (instead of `_app`),
 // it's compatible with static-site generation (SSG).
 MyDocument.getInitialProps = async (ctx) => {
-  const colorMode = getValueFromCookie(ctx.req?.headers.cookie || "", "colorMode");
+  const colorMode = getValueFromCookie(ctx.req?.headers.cookie || "", LAYOUT_COLOR_MODE_COOKIE_NAME);
   const originalRenderPage = ctx.renderPage;
 
   const cache = createEmotionCache();
