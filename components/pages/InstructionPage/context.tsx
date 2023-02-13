@@ -4,7 +4,9 @@ import createInstructionElement from "~/adapters/instruction/createInstructionEl
 import deleteInstruction from "~/adapters/instruction/deleteInstruction";
 import deleteInstructionElement from "~/adapters/instruction/deleteInstructionElement";
 import updateInstruction from "~/adapters/instruction/updateInstruction";
-import updateInstructionElement from "~/adapters/instruction/updateInstructionElement";
+import updateInstructionElement, {
+  UpdateInstructionElementResponse,
+} from "~/adapters/instruction/updateInstructionElement";
 import updateProgram from "~/adapters/program/updateProgram";
 import { ROUTES } from "~/constants/routes";
 import { AccountType } from "~/enums/instructionElementTypes";
@@ -35,7 +37,7 @@ interface InstructionPageContextDefaultValue {
     mut: boolean,
     accountType: AccountType,
     genericType: string
-  ) => Promise<void>;
+  ) => Promise<UpdateInstructionElementResponse | undefined>;
   saveEditProgramName: (name: string) => Promise<void>;
   editInstruction: (name: string, description: string) => Promise<void>;
   saveCreateInstructionElement: (
@@ -108,8 +110,9 @@ export const InstructionPageProvider = ({
     accountType: AccountType,
     genericType: string
   ) => {
+    let response = undefined;
     try {
-      await updateInstructionElement(elementId, {
+      response = await updateInstructionElement(elementId, {
         instructionId: instruction.id,
         name,
         order,
@@ -118,10 +121,10 @@ export const InstructionPageProvider = ({
         accountType,
         genericType,
       });
-      await triggerSSR();
     } catch (e) {
       displayCaughtError(e);
     }
+    return response;
   };
 
   const handleOpenInstructions = () => {
