@@ -1,5 +1,5 @@
 import { ServerResponse } from "http";
-import { SID_COOKIE_NAME } from "~/constants/auth";
+import { SID_COOKIE_NAME } from "~/constants/cookies";
 import { ROUTES } from "~/constants/routes";
 
 export default function serverLogout(res: ServerResponse) {
