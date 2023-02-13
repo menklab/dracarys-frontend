@@ -37,6 +37,7 @@ export default function CreateAccountDialog() {
         <Typography variant="h4">Add account</Typography>
         <TextField
           fullWidth
+          placeholder="ThisCase"
           error={!!errors["name"]}
           helperText={errors["name"] ? errors["name"].message : ""}
           {...register("name")}

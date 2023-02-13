@@ -4,7 +4,7 @@ import Select from "@mui/material/Select";
 import TableCell from "@mui/material/TableCell";
 import TableRow from "@mui/material/TableRow";
 import TextField from "@mui/material/TextField";
-import { useEffect, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { Controller, SubmitHandler } from "react-hook-form";
 import { useAccountPage } from "~/components/pages/AccountPage/context";
 import { useTheme } from "~/contexts/theme/hooks";
@@ -24,6 +24,8 @@ export default function ElementLineCreate() {
     handleSubmit,
     control,
     reset,
+    getValues,
+    clearErrors,
   } = useCreateAccountElementForm({});
 
   const defaultValues = {
@@ -35,6 +37,16 @@ export default function ElementLineCreate() {
     // @ts-ignore
     reset(defaultValues);
   }, [account]);
+
+  const customSubmit = async (event: FormEvent) => {
+    event.preventDefault();
+    const values = getValues();
+    if (values.name === "" && values.type.toString() === "") {
+      clearErrors();
+      return;
+    }
+    await handleSubmit(onSubmit)();
+  };
 
   const onSubmit: SubmitHandler<CreateAccountElementSchemaType> = async (values) => {
     await saveCreateAccountElement(values.name, values.type as ElementType);
@@ -56,7 +68,7 @@ export default function ElementLineCreate() {
       }}
     >
       <TableCell scope="row" align="center" sx={{ verticalAlign: "top" }}>
-        <form id={elementKey} onSubmit={handleSubmit(onSubmit)} />
+        <form id={elementKey} onSubmit={customSubmit} />
         <TextField
           fullWidth
           inputProps={{ style: { textAlign: "center" }, form: elementKey }}
@@ -75,7 +87,7 @@ export default function ElementLineCreate() {
             control={control}
             // @ts-ignore
             defaultValue=""
-            render={({ field, field: { value } }) => (
+            render={() => (
               <Select
                 native
                 fullWidth
