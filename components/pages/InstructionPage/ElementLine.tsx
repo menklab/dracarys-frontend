@@ -39,7 +39,7 @@ export default function ElementLine({ instructionElement, orderNumber }: Element
   });
 
   const onSubmit: SubmitHandler<EditInstructionElementSchemaType> = async (values) => {
-    await saveEditInstructionName(
+    const response = await saveEditInstructionName(
       instructionElement.id,
       values.name,
       orderNumber,
@@ -48,8 +48,16 @@ export default function ElementLine({ instructionElement, orderNumber }: Element
       values.accountType as AccountType,
       values.genericType
     );
-    // @ts-ignore
-    reset({});
+    if (response) {
+      reset({
+        name: response.name,
+        accountType: response.accountType,
+        description: response.description,
+        mut: response.mut,
+      });
+    } else {
+      reset();
+    }
   };
 
   const elementKey = `elementLine${instructionElement.id}`;
