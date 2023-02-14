@@ -6,7 +6,7 @@ import Select from "@mui/material/Select";
 import TableCell from "@mui/material/TableCell";
 import TableRow from "@mui/material/TableRow";
 import TextField from "@mui/material/TextField";
-import { useState } from "react";
+import { FormEvent, useState } from "react";
 import { Controller, SubmitHandler } from "react-hook-form";
 import { useInstructionPage } from "~/components/pages/InstructionPage/context";
 import { useTheme } from "~/contexts/theme/hooks";
@@ -29,6 +29,8 @@ export default function ElementLineCreate({ orderNumber }: CreateElementLineProp
     register,
     formState: { errors },
     handleSubmit,
+    getValues,
+    clearErrors,
     control,
     reset,
   } = useCreateInstructionElementForm({});
@@ -39,6 +41,17 @@ export default function ElementLineCreate({ orderNumber }: CreateElementLineProp
     mut: false,
     accountType: "",
     genericType: "",
+  };
+
+  const customSubmit = async (event: FormEvent) => {
+    event.preventDefault();
+    const values = getValues();
+    // @ts-ignore
+    if (values.name === "" && values.description === "" && values.accountType === "" && values.genericType === "") {
+      clearErrors();
+      return;
+    }
+    await handleSubmit(onSubmit)();
   };
 
   const onSubmit: SubmitHandler<CreateInstructionElementSchemaType> = async (values) => {
@@ -68,7 +81,7 @@ export default function ElementLineCreate({ orderNumber }: CreateElementLineProp
       }}
     >
       <TableCell scope="row" align="center" sx={{ verticalAlign: "top", width: "23%" }}>
-        <form id={elementKey} onSubmit={handleSubmit(onSubmit)} />
+        <form id={elementKey} onSubmit={customSubmit} />
         <TextField
           fullWidth
           inputProps={{ style: { textAlign: "center" }, form: elementKey }}
