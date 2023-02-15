@@ -34,72 +34,11 @@ export default function useAccount(account: Account): UseAccountHookReturn {
   const [lastPos, setLastPos] = useState<Position>(account.position || KONVA_ACCOUNT_DEFAULT_POSITION);
   const [canMove, setCanMove] = useState<boolean>(false);
   const [isHovered, setIsHovered] = useState<boolean>(false);
-  const konva = useKonva();
   const router = useRouter();
-
-  const onDragMove = () => konva.actions.repositionArrows(account.id);
-
-  const onDragStart = (pos: Position) => {
-    const stage = konva.data.stageRef.current;
-    if (!stage) return;
-
-    setCursorOnStage(stage, Cursor.MOVE);
-    setLastPos(pos);
-  };
-
-  const onDragEnd = async (pos: Position) => {
-    const stage = konva.data.stageRef.current;
-    const group = groupRef.current;
-    if (!stage || !group) return;
-
-    setCursorOnStage(stage, Cursor.POINTER);
-    setCanMove(false);
-    const cancelDragCb = () => {
-      group.position(lastPos);
-      konva.actions.redraw();
-    };
-
-    await konva.actions.saveAccountPosition(account.id, pos, cancelDragCb);
-    setCanMove(true);
-  };
-
-  const onClick = () => router.push(ROUTES.ACCOUNT(konva.data.program.id, account.id));
-
-  const onMouseEnter = () => {
-    const crown = crownRef.current;
-    const stage = konva.data.stageRef.current;
-    if (!crown || !stage) return;
-
-    crown.to({ opacity: 1, duration: 0.4 });
-    setIsHovered(true);
-    setCursorOnStage(stage, Cursor.POINTER);
-  };
-
-  const onMouseLeave = () => {
-    const crown = crownRef.current;
-    const stage = konva.data.stageRef.current;
-    if (!crown || !stage) return;
-
-    crown.to({ opacity: 0, duration: 0.4 });
-    setIsHovered(false);
-    setCursorOnStage(stage, Cursor.DEFAULT);
-  };
-
-  const onCrownMouseEnter = () => {
-    const stage = konva.data.stageRef.current;
-    if (!stage) return;
-
-    stage.draggable(false);
-    setCanMove(false);
-  };
-
-  const onCrownMouseLeave = () => {
-    const stage = konva.data.stageRef.current;
-    if (!stage) return;
-
-    stage.draggable(true);
-    setCanMove(true);
-  };
+  const {
+    data: { stageRef, program, isLoading },
+    actions: { redrawConnections, updateAccountPosition },
+  } = useKonva();
 
   useEffect(() => {
     const group = groupRef.current;
@@ -107,7 +46,6 @@ export default function useAccount(account: Account): UseAccountHookReturn {
     const crown = crownRef.current;
     const name = nameRef.current;
     if (!group || !rect || !crown || !name) return;
-
     group.position(account.position || KONVA_ACCOUNT_DEFAULT_POSITION);
     crown.opacity(0);
     name.position(calculateCenteredAccountNamePosition(rect, name));
@@ -119,16 +57,73 @@ export default function useAccount(account: Account): UseAccountHookReturn {
     //   attribute.position(calculateCenteredAttributeNamePosition(rect, idx + 1));
     // });
 
-    konva.actions.redraw();
     setCanMove(true);
   }, []);
+
+  const onDragMove = () => redrawConnections(account.id);
+
+  const onDragStart = (pos: Position) => {
+    const stage = stageRef.current;
+    if (!stage) return;
+    setCursorOnStage(stage, Cursor.MOVE);
+    setLastPos(pos);
+  };
+
+  const onDragEnd = async (pos: Position) => {
+    const stage = stageRef.current;
+    const group = groupRef.current;
+    if (!stage || !group) return;
+    setCursorOnStage(stage, Cursor.POINTER);
+    setCanMove(false);
+    await updateAccountPosition(account.id, pos, () => group.position(lastPos));
+    setCanMove(true);
+  };
+
+  const onClick = () => {
+    if (isLoading) return;
+    router.push(ROUTES.ACCOUNT(program.id, account.id));
+  };
+
+  const onMouseEnter = () => {
+    const crown = crownRef.current;
+    const stage = stageRef.current;
+    if (!crown || !stage) return;
+    crown.to({ opacity: 1, duration: 0.4 });
+    setIsHovered(true);
+    setCursorOnStage(stage, Cursor.POINTER);
+  };
+
+  const onMouseLeave = () => {
+    const crown = crownRef.current;
+    const stage = stageRef.current;
+    if (!crown || !stage) return;
+    crown.to({ opacity: 0, duration: 0.4 });
+    setIsHovered(false);
+    setCursorOnStage(stage, Cursor.DEFAULT);
+  };
+
+  const onCrownMouseEnter = () => {
+    if (isLoading) return;
+    const stage = stageRef.current;
+    if (!stage) return;
+    stage.draggable(false);
+    setCanMove(false);
+  };
+
+  const onCrownMouseLeave = () => {
+    if (isLoading) return;
+    const stage = stageRef.current;
+    if (!stage) return;
+    stage.draggable(true);
+    setCanMove(true);
+  };
 
   return {
     groupRef,
     rectRef,
     crownRef,
     nameRef,
-    canMove,
+    canMove: !isLoading && canMove,
     isHovered,
     onDragMove,
     onDragStart,

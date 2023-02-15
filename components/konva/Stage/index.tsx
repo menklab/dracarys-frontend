@@ -2,6 +2,7 @@ import { Box } from "@mui/material";
 import { Layer, Stage } from "react-konva";
 import KonvaAccount from "~/components/konva/Account";
 import KonvaConnection from "~/components/konva/Connection";
+import Loading from "~/components/konva/Stage/Loading";
 import useStage from "~/components/konva/Stage/useStage";
 
 export default function KonvaStage() {
@@ -14,6 +15,7 @@ export default function KonvaStage() {
     accounts,
     connections,
     onDoubleClick,
+    onDragStart,
     onDragEnd,
     onMouseUp,
     onMouseDown,
@@ -21,13 +23,14 @@ export default function KonvaStage() {
   } = useStage();
 
   return (
-    <Box sx={{ width: "100%", minHeight: "calc(100vh - 64px)" }} ref={containerRef}>
+    <Box sx={{ width: "100%", minHeight: "calc(100vh - 64px)", position: "relative" }} ref={containerRef}>
+      <Loading />
       <Stage
         width={size.width}
         height={size.height}
         ref={stageRef}
-        draggable
         onDblClick={onDoubleClick}
+        onDragStart={(e) => onDragStart(e.target.position())}
         onDragEnd={onDragEnd}
         onWheel={onWheel}
         onMouseUp={onMouseUp}
