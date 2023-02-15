@@ -56,6 +56,7 @@ export default function AppBarContent() {
           <Box component="form" noValidate autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
             <TextField
               size="small"
+              placeholder="ThisCase"
               variant="standard"
               error={!!errors["name"]}
               helperText={errors["name"] ? errors["name"].message : ""}
