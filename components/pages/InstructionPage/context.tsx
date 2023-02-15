@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import { createContext, ReactNode, useContext, useState } from "react";
+import { createContext, ReactNode, useContext, useEffect, useState } from "react";
 import createInstructionElement from "~/adapters/instruction/createInstructionElement";
 import deleteInstruction from "~/adapters/instruction/deleteInstruction";
 import deleteInstructionElement from "~/adapters/instruction/deleteInstructionElement";
@@ -97,6 +97,21 @@ export const InstructionPageProvider = ({
   const [isEditingProgramName, setIsEditingProgramName] = useState<boolean>(false);
   const [openInstructions, setOpenInstructions] = useState<boolean>(false);
 
+  useEffect(() => {
+    const openInstructionsJson = window.localStorage.getItem("openInstructions");
+    const openAccountsJson = window.localStorage.getItem("openAccounts");
+    if (openInstructionsJson !== null) setOpenInstructions(JSON.parse(openInstructionsJson));
+    if (openAccountsJson !== null) setOpenAccounts(JSON.parse(openAccountsJson));
+  }, []);
+
+  useEffect(() => {
+    window.localStorage.setItem("openInstructions", JSON.stringify(openInstructions));
+  }, [openInstructions]);
+
+  useEffect(() => {
+    window.localStorage.setItem("openAccounts", JSON.stringify(openAccounts));
+  }, [openAccounts]);
+
   const handleOpenAccounts = () => {
     setOpenAccounts(!openAccounts);
   };
@@ -105,13 +120,15 @@ export const InstructionPageProvider = ({
     elementId: number,
     name: string,
     order: number,
-    description: string,
+    description: string | null,
     mut: boolean,
     accountType: AccountType,
     genericType: string
   ) => {
     let response = undefined;
     try {
+      description = description?.trim() === "" ? null : description;
+
       response = await updateInstructionElement(elementId, {
         instructionId: instruction.id,
         name,
@@ -154,12 +171,14 @@ export const InstructionPageProvider = ({
   const saveCreateInstructionElement = async (
     name: string,
     order: number,
-    description: string,
+    description: string | null,
     mut: boolean,
     accountType: AccountType,
     genericType: string
   ) => {
     try {
+      description = description?.trim() === "" ? null : description;
+
       await createInstructionElement({
         instructionId: instruction.id,
         name,

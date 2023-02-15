@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import { createContext, ReactNode, useContext, useState } from "react";
+import { createContext, ReactNode, useContext, useEffect, useState } from "react";
 import createAccount from "~/adapters/account/createAccount";
 import generateAccountCode from "~/adapters/code/generateAccountCode";
 import createInstruction from "~/adapters/instruction/createInstruction";
@@ -70,6 +70,21 @@ export const AccountsPageProvider = ({ program, instructions, accounts, children
   const [openAccounts, setOpenAccounts] = useState<boolean>(false);
   const [openInstructions, setOpenInstructions] = useState<boolean>(false);
 
+  useEffect(() => {
+    const openInstructionsJson = window.localStorage.getItem("openInstructions");
+    const openAccountsJson = window.localStorage.getItem("openAccounts");
+    if (openInstructionsJson !== null) setOpenInstructions(JSON.parse(openInstructionsJson));
+    if (openAccountsJson !== null) setOpenAccounts(JSON.parse(openAccountsJson));
+  }, []);
+
+  useEffect(() => {
+    window.localStorage.setItem("openInstructions", JSON.stringify(openInstructions));
+  }, [openInstructions]);
+
+  useEffect(() => {
+    window.localStorage.setItem("openAccounts", JSON.stringify(openAccounts));
+  }, [openAccounts]);
+
   const updateGeneratedAccountCode = async () => {
     const code = await generateAccountCode(Number(program.id));
     if (!code) return;
@@ -101,8 +116,8 @@ export const AccountsPageProvider = ({ program, instructions, accounts, children
 
   const createNewInstruction = async (name: string, description?: string) => {
     try {
-      await createInstruction({ name, description, programId: program.id });
-      await triggerSSR();
+      const newInstruction = await createInstruction({ name, description, programId: program.id });
+      await router.push(ROUTES.INSTRUCTION(program.id, newInstruction.id));
     } catch (e) {
       displayCaughtError(e);
     }

@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import { createContext, ReactNode, useContext, useState } from "react";
+import { createContext, ReactNode, useContext, useEffect, useState } from "react";
 import generateInstructionCode from "~/adapters/code/generateInstructionCode";
 import deleteProgram from "~/adapters/program/deleteProgram";
 import updateProgram from "~/adapters/program/updateProgram";
@@ -61,6 +61,21 @@ export const InstructionsPageProvider = ({
   const [isEditingProgramName, setIsEditingProgramName] = useState<boolean>(false);
   const [openAccounts, setOpenAccounts] = useState<boolean>(false);
   const [openInstructions, setOpenInstructions] = useState<boolean>(false);
+
+  useEffect(() => {
+    const openInstructionsJson = window.localStorage.getItem("openInstructions");
+    const openAccountsJson = window.localStorage.getItem("openAccounts");
+    if (openInstructionsJson !== null) setOpenInstructions(JSON.parse(openInstructionsJson));
+    if (openAccountsJson !== null) setOpenAccounts(JSON.parse(openAccountsJson));
+  }, []);
+
+  useEffect(() => {
+    window.localStorage.setItem("openInstructions", JSON.stringify(openInstructions));
+  }, [openInstructions]);
+
+  useEffect(() => {
+    window.localStorage.setItem("openAccounts", JSON.stringify(openAccounts));
+  }, [openAccounts]);
 
   const updateGeneratedInstructionCode = async () => {
     const code = await generateInstructionCode(Number(program.id));
