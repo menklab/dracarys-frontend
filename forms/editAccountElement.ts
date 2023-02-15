@@ -21,6 +21,7 @@ export type EditAccountElementSchemaType = TypeOf<typeof editAccountElementSchem
 
 export const useEditAccountElementForm = (defaultValues: DefaultValues<EditAccountElementSchemaType>) => {
   return useForm<EditAccountElementSchemaType>({
+    shouldFocusError: false,
     mode: "onBlur",
     resolver: zodResolver(editAccountElementSchema),
     defaultValues,

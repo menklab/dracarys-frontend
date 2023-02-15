@@ -5,7 +5,7 @@ interface UpdateInstructionElementBody {
   instructionId: number;
   name: string;
   order: number;
-  description: string;
+  description: string | null;
   mut: boolean;
   accountType: AccountType;
   genericType: string;

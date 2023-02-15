@@ -32,6 +32,7 @@ export type CreateInstructionElementSchemaType = TypeOf<typeof createInstruction
 
 export const useCreateInstructionElementForm = (defaultValues: DefaultValues<CreateInstructionElementSchemaType>) => {
   return useForm<CreateInstructionElementSchemaType>({
+    shouldFocusError: false,
     mode: "onBlur",
     resolver: zodResolver(createInstructionElementSchema),
     defaultValues,

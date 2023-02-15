@@ -1,11 +1,12 @@
 import DeleteOutline from "@mui/icons-material/DeleteOutline";
 import { IconButton } from "@mui/material";
+import FormControl from "@mui/material/FormControl";
 import FormHelperText from "@mui/material/FormHelperText";
-import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 import TableCell from "@mui/material/TableCell";
 import TableRow from "@mui/material/TableRow";
 import TextField from "@mui/material/TextField";
+import { useState } from "react";
 import { SubmitHandler } from "react-hook-form";
 import { useAccountPage } from "~/components/pages/AccountPage/context";
 import { ElementType } from "~/enums/elementType";
@@ -18,6 +19,7 @@ interface ElementLineProps {
 
 export default function ElementLine({ accountElement }: ElementLineProps) {
   const { saveEditAccountElement, removeAccountElement } = useAccountPage();
+  const [intervalId, setIntervalId] = useState<any>(undefined);
 
   const {
     register,
@@ -27,14 +29,31 @@ export default function ElementLine({ accountElement }: ElementLineProps) {
   } = useEditAccountElementForm({ name: accountElement.name, type: accountElement.type });
 
   const onSubmit: SubmitHandler<EditAccountElementSchemaType> = async (values) => {
-    await saveEditAccountElement(accountElement.id, values.name, values.type as ElementType);
-    reset({});
+    const response = await saveEditAccountElement(accountElement.id, values.name, values.type as ElementType);
+    if (response) {
+      reset({
+        name: response.name,
+        type: response.type,
+      });
+    } else {
+      reset();
+    }
   };
 
   const elementKey = `elementLine${accountElement.id}`;
 
   return (
-    <TableRow key={accountElement.name} sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
+    <TableRow
+      key={accountElement.name}
+      sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+      onBlur={() => {
+        const intervalIdTemp = setTimeout(() => {
+          const editLineForm = window.document.getElementById(elementKey) as HTMLFormElement;
+          editLineForm.requestSubmit();
+        }, 1000);
+        setIntervalId(intervalIdTemp);
+      }}
+    >
       <TableCell component="th" scope="row" align="center">
         <form id={elementKey} onSubmit={handleSubmit(onSubmit)} />
         <TextField
@@ -44,31 +63,32 @@ export default function ElementLine({ accountElement }: ElementLineProps) {
           error={!!errors["name"]}
           helperText={errors["name"] ? errors["name"].message : ""}
           {...register("name")}
-          onBlur={(e) => {
-            e.preventDefault();
-            e.currentTarget.form?.requestSubmit();
+          onFocus={() => {
+            clearTimeout(intervalId);
           }}
         />
       </TableCell>
       <TableCell align="center" sx={{ width: "40%" }}>
-        <Select
-          fullWidth
-          error={!!errors["type"]}
-          defaultValue={accountElement.type}
-          {...register("type")}
-          inputProps={{ form: elementKey }}
-          onBlur={(e) => {
-            e.preventDefault();
-            e.currentTarget.form?.requestSubmit();
-          }}
-        >
-          {Object.keys(ElementType).map((keyObj) => (
-            <MenuItem value={ElementType[keyObj as keyof typeof ElementType]} key={keyObj}>
-              {ElementType[keyObj as keyof typeof ElementType]}
-            </MenuItem>
-          ))}
-        </Select>
-        <FormHelperText>{errors.type?.message}</FormHelperText>
+        <FormControl fullWidth error={!!errors["type"]}>
+          <Select
+            native
+            fullWidth
+            defaultValue=""
+            {...register("type")}
+            inputProps={{ form: elementKey }}
+            onFocus={() => {
+              clearTimeout(intervalId);
+            }}
+          >
+            <option aria-label="None" value="" />
+            {Object.keys(ElementType).map((keyObj) => (
+              <option key={`create-type-${keyObj}`} value={ElementType[keyObj as keyof typeof ElementType]}>
+                {ElementType[keyObj as keyof typeof ElementType]}
+              </option>
+            ))}
+          </Select>
+          <FormHelperText>{errors.type?.message}</FormHelperText>
+        </FormControl>
       </TableCell>
       <TableCell align="center" sx={{ width: "72px" }}>
         <IconButton

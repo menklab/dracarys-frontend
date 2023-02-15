@@ -6,8 +6,19 @@ interface UpdateAccountElementBody {
   type: ElementType;
 }
 
+export interface UpdateAccountElementBodyResponse {
+  id: number;
+  name: string;
+  type: ElementType;
+  createdAt: string;
+  updatedAt: string;
+}
+
 // FE usage only
-export default async function updateAccountElement(elementId: number, body: UpdateAccountElementBody): Promise<void> {
+export default async function updateAccountElement(
+  elementId: number,
+  body: UpdateAccountElementBody
+): Promise<UpdateAccountElementBodyResponse> {
   const res = await fetch(API_ROUTES.ACCOUNTS_ELEMENTS() + `/${elementId}`, {
     method: "PATCH",
     body: JSON.stringify(body),
@@ -15,4 +26,6 @@ export default async function updateAccountElement(elementId: number, body: Upda
     headers: { "Content-Type": "application/json" },
   });
   if (!res.ok) throw await res.json();
+  const data = (await res.json()) as UpdateAccountElementBodyResponse;
+  return data || {};
 }
