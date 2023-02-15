@@ -1,10 +1,10 @@
 import { useRouter } from "next/router";
-import { createContext, ReactNode, useContext, useState } from "react";
+import { createContext, ReactNode, useContext, useEffect, useState } from "react";
 import createAccountElement from "~/adapters/account/createAccountElement";
 import deleteAccount from "~/adapters/account/deleteAccount";
 import deleteAccountElement from "~/adapters/account/deleteAccountElement";
 import updateAccount from "~/adapters/account/updateAccount";
-import updateAccountElement from "~/adapters/account/updateAccountElement";
+import updateAccountElement, { UpdateAccountElementBodyResponse } from "~/adapters/account/updateAccountElement";
 import updateProgram from "~/adapters/program/updateProgram";
 import { ROUTES } from "~/constants/routes";
 import { ElementType } from "~/enums/elementType";
@@ -29,12 +29,14 @@ interface AccountPageContextDefaultValue {
   saveEditAccountName: (name: string) => Promise<void>;
   saveEditProgramName: (name: string) => Promise<void>;
   saveCreateAccountElement: (name: string, type: ElementType) => Promise<void>;
-  saveEditAccountElement: (id: number, name: string, type: ElementType) => Promise<void>;
+  saveEditAccountElement: (
+    id: number,
+    name: string,
+    type: ElementType
+  ) => Promise<UpdateAccountElementBodyResponse | undefined>;
   removeAccountElement: (id: number) => Promise<void>;
   removeAccount: () => Promise<void>;
   cancelEditProgramName: () => void;
-  createInstructionDialogOpen: () => void;
-  createInstructionDialogClose: () => void;
   createAccountDialogOpen: () => void;
   openDeleteAccountDialog: () => void;
   closeDeleteAccountDialog: () => void;
@@ -74,10 +76,24 @@ export const AccountPageProvider = ({
   const [isDeleteAccountDialogOpen, setIsDeleteAccountDialogOpen] = useState<boolean>(false);
   const [isAccountDeleting, setIsAccountDeleting] = useState<boolean>(false);
   const [createAccountDialogIsOpened, setCreateAccountDialogIsOpened] = useState<boolean>(false);
-  const [createInstructionDialogIsOpened, setCreateInstructionDialogIsOpened] = useState<boolean>(false);
   const [isEditingAccountName, setIsEditingAccountName] = useState<boolean>(false);
   const [isEditingProgramName, setIsEditingProgramName] = useState<boolean>(false);
   const [openInstructions, setOpenInstructions] = useState<boolean>(false);
+
+  useEffect(() => {
+    const openInstructionsJson = window.localStorage.getItem("openInstructions");
+    const openAccountsJson = window.localStorage.getItem("openAccounts");
+    if (openInstructionsJson !== null) setOpenInstructions(JSON.parse(openInstructionsJson));
+    if (openAccountsJson !== null) setOpenAccounts(JSON.parse(openAccountsJson));
+  }, []);
+
+  useEffect(() => {
+    window.localStorage.setItem("openInstructions", JSON.stringify(openInstructions));
+  }, [openInstructions]);
+
+  useEffect(() => {
+    window.localStorage.setItem("openAccounts", JSON.stringify(openAccounts));
+  }, [openAccounts]);
 
   const handleOpenAccounts = () => {
     setOpenAccounts(!openAccounts);
@@ -118,12 +134,14 @@ export const AccountPageProvider = ({
   };
 
   const saveEditAccountElement = async (id: number, name: string, type: ElementType) => {
+    let response = undefined;
     try {
-      await updateAccountElement(id, { name, type });
+      response = await updateAccountElement(id, { name, type });
       await triggerSSR();
     } catch (e) {
       displayCaughtError(e);
     }
+    return response;
   };
 
   const saveCreateAccountElement = async (name: string, type: ElementType) => {
@@ -173,8 +191,6 @@ export const AccountPageProvider = ({
         handleOpenInstructions,
         openDeleteAccountDialog: () => setIsDeleteAccountDialogOpen(true),
         closeDeleteAccountDialog: () => setIsDeleteAccountDialogOpen(false),
-        createInstructionDialogOpen: () => setCreateInstructionDialogIsOpened(true),
-        createInstructionDialogClose: () => setCreateInstructionDialogIsOpened(false),
         removeAccountElement,
         removeAccount,
         goBackToProgramsList: () => router.push(ROUTES.PROGRAMS()),

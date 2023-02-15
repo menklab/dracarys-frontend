@@ -25,6 +25,7 @@ export type CreateAccountElementSchemaType = TypeOf<typeof createAccountElementS
 
 export const useCreateAccountElementForm = (defaultValues: DefaultValues<CreateAccountElementSchemaType>) => {
   return useForm<CreateAccountElementSchemaType>({
+    shouldFocusError: false,
     mode: "onSubmit",
     resolver: zodResolver(createAccountElementSchema),
     defaultValues,

@@ -32,6 +32,7 @@ export type EditInstructionElementSchemaType = TypeOf<typeof editInstructionElem
 
 export const useEditInstructionElementForm = (defaultValues: DefaultValues<EditInstructionElementSchemaType>) => {
   return useForm<EditInstructionElementSchemaType>({
+    shouldFocusError: false,
     mode: "onBlur",
     resolver: zodResolver(editInstructionElementSchema),
     defaultValues,
