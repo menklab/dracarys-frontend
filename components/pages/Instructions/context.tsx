@@ -3,7 +3,7 @@ import { createContext, ReactNode, useContext, useEffect, useState } from "react
 import generateInstructionCode from "~/adapters/code/generateInstructionCode";
 import deleteProgram from "~/adapters/program/deleteProgram";
 import updateProgram from "~/adapters/program/updateProgram";
-import { LAYOUT_DEFAULT_VIEW_VARIANT } from "~/constants/layout";
+import { LAYOUT_DEFAULT_VIEW_VARIANT_IN_INSTRUCTIONS } from "~/constants/layout";
 import { ROUTES } from "~/constants/routes";
 import useErrorHandler from "~/hooks/useErrorHandler";
 import useTriggerSSR from "~/hooks/useTriggerSSR";
@@ -54,7 +54,7 @@ export const InstructionsPageProvider = ({
   const { triggerSSR } = useTriggerSSR();
   const router = useRouter();
   const { displayCaughtError } = useErrorHandler();
-  const [viewVariant, setViewVariant] = useState<LayoutViewVariant>(LAYOUT_DEFAULT_VIEW_VARIANT);
+  const [viewVariant, setViewVariant] = useState<LayoutViewVariant>(LAYOUT_DEFAULT_VIEW_VARIANT_IN_INSTRUCTIONS);
   const [generatedCodeString, setGeneratedCodeString] = useState<string>("");
   const [isDeleteProgramDialogOpen, setIsDeleteProgramDialogOpen] = useState<boolean>(false);
   const [isProgramDeleting, setIsProgramDeleting] = useState<boolean>(false);

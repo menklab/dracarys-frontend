@@ -23,16 +23,14 @@ export default function InstructionsList() {
         </TableHead>
         <TableBody>
           {instructions.map((instruction) => (
-            <TableRow key={`instructions-${instruction.id}`}>
-              <TableCell align="center">
-                <Link
-                  key={`account-${instruction.id}`}
-                  href={ROUTES.INSTRUCTION(program.id, instruction.id)}
-                  style={{ textDecoration: "none", color: "unset" }}
-                >
-                  {instruction.name}
-                </Link>
-              </TableCell>
+            <TableRow
+              hover
+              key={`instructions-${instruction.id}`}
+              component={Link}
+              style={{ textDecoration: "none", color: "unset" }}
+              href={ROUTES.INSTRUCTION(program.id, instruction.id)}
+            >
+              <TableCell align="center">{instruction.name}</TableCell>
               <TableCell align="center" sx={{ width: "60%" }}>
                 {instruction.description}
               </TableCell>

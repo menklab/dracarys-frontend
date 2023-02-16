@@ -119,7 +119,9 @@ export default function DrawerContent() {
             href={ROUTES.INSTRUCTIONS(program.id)}
             style={{ textDecoration: "none", color: "unset" }}
           >
-            <ListItemText>Instructions</ListItemText>
+            <ListItemText>
+              <b>Instructions</b>
+            </ListItemText>
           </Link>
         </ListItemButton>
       </ListItem>
@@ -128,7 +130,7 @@ export default function DrawerContent() {
           return (
             <Link
               key={`account-${instruction.id}`}
-              href={ROUTES.ACCOUNT(program.id, instruction.id)}
+              href={ROUTES.INSTRUCTION(program.id, instruction.id)}
               style={{ textDecoration: "none", color: "unset" }}
             >
               <List component="div" disablePadding>

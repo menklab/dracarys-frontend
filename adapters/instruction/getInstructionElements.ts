@@ -12,7 +12,7 @@ type GetInstructionElementsJsonResponse = {
 
 // SSR usage only
 export default async function getInstructionElements(sid: string, instructionId: number): Promise<AccountElement[]> {
-  const res = await fetch(API_ROUTES.INSTRUCTION_ELEMENT() + `/?accountId=${instructionId}`, {
+  const res = await fetch(API_ROUTES.INSTRUCTION_ELEMENT() + `/?instructionId=${instructionId}`, {
     method: "GET",
     headers: { cookie: `connect.sid=${sid}` },
   });

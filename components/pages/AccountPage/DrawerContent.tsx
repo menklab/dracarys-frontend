@@ -92,7 +92,9 @@ export default function DrawerContent() {
       <Divider />
       <ListItem>
         <IconButton onClick={handleOpenAccounts}>{openAccounts ? <ExpandLess /> : <ExpandMore />}</IconButton>
-        <ListItemText>Accounts</ListItemText>
+        <ListItemText>
+          <b>Accounts</b>
+        </ListItemText>
       </ListItem>
       <Collapse in={openAccounts} timeout="auto" unmountOnExit>
         {accounts.map((account) => {
