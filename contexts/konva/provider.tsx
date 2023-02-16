@@ -1,7 +1,10 @@
 import Konva from "konva";
-import { useRef } from "react";
+import { useRouter } from "next/router";
+import { useEffect, useRef, useState } from "react";
 import updateAccount from "~/adapters/account/updateAccount";
 import updateAccountLinks from "~/adapters/account/updateAccountLinks";
+import updateProgram from "~/adapters/program/updateProgram";
+import { KONVA_DEFAULT_STAGE_POSITION, KONVA_DEFAULT_STAGE_SCALE } from "~/constants/konva";
 import useErrorHandler from "~/hooks/useErrorHandler";
 import useTriggerSSR from "~/hooks/useTriggerSSR";
 import { Connection } from "~/interfaces/connection";
@@ -9,164 +12,221 @@ import {
   calculatePointsForConnection,
   getAccountGroupId,
   getConnectionId,
-  getUnrelatedConnections,
+  getConnectionsFromAccounts,
   moveConnectionRelativeToStage,
 } from "~/utils/konva";
 import { KonvaContext } from "./context";
 import { KonvaContextActions, KonvaProviderProps } from "./types";
 
 export default function KonvaProvider({ program, accounts, children }: KonvaProviderProps) {
+  const [connections, setConnections] = useState<Connection[]>(getConnectionsFromAccounts(accounts));
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const stageRef = useRef<Konva.Stage>(null);
   const { displayCaughtError } = useErrorHandler();
   const { triggerSSR } = useTriggerSSR();
-  const stageRef = useRef<Konva.Stage>(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    const confirmationMessage = "Changes you made may not be saved.";
+    const beforeUnloadHandler = (e: BeforeUnloadEvent) => {
+      (e || window.event).returnValue = confirmationMessage;
+      return confirmationMessage;
+    };
+    const beforeRouteHandler = (url: string) => {
+      if (router.asPath !== url && !confirm(confirmationMessage)) {
+        router.events.emit("routeChangeError");
+        throw `Route change to "${url}" was aborted.`;
+      }
+    };
+    if (isLoading) {
+      window.addEventListener("beforeunload", beforeUnloadHandler);
+      router.events.on("routeChangeStart", beforeRouteHandler);
+    } else {
+      window.removeEventListener("beforeunload", beforeUnloadHandler);
+      router.events.off("routeChangeStart", beforeRouteHandler);
+    }
+    return () => {
+      window.removeEventListener("beforeunload", beforeUnloadHandler);
+      router.events.off("routeChangeStart", beforeRouteHandler);
+    };
+  }, [isLoading, router.asPath, router.events]);
 
   const actions: KonvaContextActions = {
-    redraw: () => stageRef.current?.draw(),
     findNode: (nodeId) => stageRef.current?.findOne(`#${nodeId}`),
-    saveAccountPosition: async (accountId, dragTo, cancelDragCb) => {
+    resetStageAppearance: async (cancelCb) => {
       try {
-        await updateAccount(accountId, { coordinates: dragTo });
+        setIsLoading(true);
+        await updateProgram(program.id, {
+          name: program.name,
+          center: KONVA_DEFAULT_STAGE_POSITION,
+          zoom: KONVA_DEFAULT_STAGE_SCALE,
+        });
+        await triggerSSR();
       } catch (e) {
         displayCaughtError(e);
-        cancelDragCb();
-        actions.repositionArrows(accountId);
+        cancelCb();
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    updateStagePosition: async (position, cancelCb) => {
+      try {
+        setIsLoading(true);
+        await updateProgram(program.id, { name: program.name, center: position, zoom: program.zoom });
+        await triggerSSR();
+      } catch (e) {
+        displayCaughtError(e);
+        cancelCb();
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    updateStageScale: async (position, zoom) => {
+      try {
+        setIsLoading(true);
+        await updateProgram(program.id, { name: program.name, center: position, zoom });
+        await triggerSSR();
+      } catch (e) {
+        displayCaughtError(e);
+        await triggerSSR();
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    updateAccountPosition: async (accountId, dragTo, cancelCb) => {
+      try {
+        setIsLoading(true);
+        await updateAccount(accountId, { coordinates: dragTo });
+        await triggerSSR();
+      } catch (e) {
+        displayCaughtError(e);
+        cancelCb();
+        actions.redrawConnections(accountId);
+      } finally {
+        setIsLoading(false);
       }
     },
     createConnection: async (fromAccountId, toAccountId) => {
+      const oldConnections = [...connections];
       try {
-        const accountFrom = accounts.find((account) => account.id === fromAccountId);
-        const accountTo = accounts.find((account) => account.id === toAccountId);
-        if (!accountFrom || !accountTo) return;
-
+        setIsLoading(true);
         if (
-          accounts.find((account) => account.id === toAccountId && account.linkedAccounts.includes(fromAccountId)) ||
-          accounts.find((account) => account.id === fromAccountId && account.linkedAccounts.includes(toAccountId))
+          connections.find((c) => c.from === toAccountId && c.to === fromAccountId) ||
+          connections.find((c) => c.from === fromAccountId && c.to === toAccountId)
         )
           return;
-
-        const connections: Connection[] = [
-          { from: fromAccountId, to: toAccountId },
-          ...accountFrom.linkedAccounts.map((to) => ({ from: fromAccountId, to })),
-          ...getUnrelatedConnections(accounts, fromAccountId, toAccountId),
-        ];
-
-        await updateAccountLinks(connections);
+        const newConnections = [...connections, { from: fromAccountId, to: toAccountId }];
+        setConnections(newConnections);
+        await updateAccountLinks(newConnections);
         await triggerSSR();
       } catch (e) {
         displayCaughtError(e);
+        setConnections(oldConnections);
+      } finally {
+        setIsLoading(false);
       }
     },
-    changeConnectionTo: async (fromAccountId, oldToAccountId, newToAccountId) => {
+    updateConnectionFrom: async (oldFromAccountId, newFromAccountId, toAccountId) => {
+      const oldConnections = [...connections];
       try {
-        const accountFrom = accounts.find((account) => account.id === fromAccountId);
-        const accountToOld = accounts.find((account) => account.id === oldToAccountId);
-        if (!accountFrom || !accountToOld) return;
-
-        const connections: Partial<Connection>[] = [
-          { from: fromAccountId, to: newToAccountId },
-          ...accountFrom.linkedAccounts.map((to) => ({
-            from: fromAccountId,
-            to: to === oldToAccountId ? undefined : to,
-          })),
-          ...getUnrelatedConnections(accounts, fromAccountId, oldToAccountId),
-        ];
-
-        await updateAccountLinks(connections);
+        setIsLoading(true);
+        const newConnections: Partial<Connection>[] = connections.reduce(
+          (prev: Partial<Connection>[], curr) =>
+            curr.from === oldFromAccountId && curr.to === toAccountId
+              ? [...prev, { from: curr.from }]
+              : [...prev, { ...curr }],
+          [{ from: newFromAccountId, to: toAccountId }]
+        );
+        setConnections(newConnections.filter((c) => c.to !== undefined) as Connection[]);
+        await updateAccountLinks(newConnections);
         await triggerSSR();
       } catch (e) {
         displayCaughtError(e);
+        setConnections(oldConnections);
+      } finally {
+        setIsLoading(false);
       }
     },
-    changeConnectionFrom: async (oldFromAccountId, newFromAccountId, toAccountId) => {
+    updateConnectionTo: async (fromAccountId, oldToAccountId, newToAccountId) => {
+      const oldConnections = [...connections];
       try {
-        const oldAccountFrom = accounts.find((account) => account.id === oldFromAccountId);
-        const newAccountFrom = accounts.find((account) => account.id === newFromAccountId);
-        if (!oldAccountFrom || !newAccountFrom) return;
-
-        const connections: Partial<Connection>[] = [
-          { from: newFromAccountId, to: toAccountId },
-          ...newAccountFrom.linkedAccounts.map((to) => ({ from: newFromAccountId, to })),
-          ...oldAccountFrom.linkedAccounts.map((to) => ({
-            from: oldFromAccountId,
-            to: to === toAccountId ? undefined : to,
-          })),
-          ...getUnrelatedConnections(accounts, oldFromAccountId, toAccountId),
-        ];
-
-        await updateAccountLinks(connections);
+        setIsLoading(true);
+        const newConnections: Partial<Connection>[] = connections.reduce(
+          (prev: Partial<Connection>[], curr) =>
+            curr.from === fromAccountId && curr.to === oldToAccountId
+              ? [...prev, { from: curr.from }]
+              : [...prev, { ...curr }],
+          [{ from: fromAccountId, to: newToAccountId }]
+        );
+        setConnections(newConnections.filter((c) => c.to !== undefined) as Connection[]);
+        await updateAccountLinks(newConnections);
         await triggerSSR();
       } catch (e) {
         displayCaughtError(e);
+        setConnections(oldConnections);
+      } finally {
+        setIsLoading(false);
       }
     },
-    reverseConnection: async (fromAccountId, toAccountId) => {
+    updateConnectionReverse: async (fromAccountId, toAccountId) => {
+      const oldConnections = [...connections];
       try {
-        const accountFrom = accounts.find((account) => account.id === fromAccountId);
-        const accountTo = accounts.find((account) => account.id === toAccountId);
-        if (!accountFrom || !accountTo) return;
-
-        const connections: Partial<Connection>[] = [
+        setIsLoading(true);
+        const newConnections = [
           { from: toAccountId, to: fromAccountId },
-          ...accountTo.linkedAccounts.map((to) => ({ from: toAccountId, to })),
-          ...accountFrom.linkedAccounts.map((to) => ({ from: fromAccountId, to: to === toAccountId ? undefined : to })),
-          ...getUnrelatedConnections(accounts, fromAccountId, toAccountId),
+          ...connections.filter((c) => !(c.from === fromAccountId && c.to === toAccountId)),
         ];
-
-        await updateAccountLinks(connections);
+        setConnections(newConnections);
+        await updateAccountLinks(newConnections);
         await triggerSSR();
       } catch (e) {
         displayCaughtError(e);
+        setConnections(oldConnections);
+      } finally {
+        setIsLoading(false);
       }
     },
     deleteConnection: async (fromAccountId, toAccountId) => {
+      const oldConnections = [...connections];
       try {
-        const connections: Partial<Connection>[] = accounts.reduce((prev: Partial<Connection>[], curr) => {
-          if (curr.linkedAccounts.length === 0) return prev;
-          if (curr.id === fromAccountId && curr.linkedAccounts.includes(toAccountId))
-            return [
-              ...prev,
-              ...curr.linkedAccounts.map((to) => ({ from: curr.id, to: to === toAccountId ? undefined : to })),
-            ];
-          return [...prev, ...curr.linkedAccounts.map((to) => ({ from: curr.id, to }))];
-        }, []);
-
-        await updateAccountLinks(connections);
+        setIsLoading(true);
+        const newConnections: Partial<Connection>[] = connections.reduce(
+          (prev: Partial<Connection>[], curr) =>
+            curr.from === fromAccountId && curr.to === toAccountId
+              ? [...prev, { from: curr.from }]
+              : [...prev, { ...curr }],
+          []
+        );
+        setConnections(newConnections.filter((c) => c.to !== undefined) as Connection[]);
+        await updateAccountLinks(newConnections);
         await triggerSSR();
       } catch (e) {
         displayCaughtError(e);
+        setConnections(oldConnections);
+      } finally {
+        setIsLoading(false);
       }
     },
-    repositionArrows: (movedAccountId: number) => {
+    redrawConnections: (movedAccountId: number) => {
       const stage = stageRef.current;
-      const account = accounts.find((account) => account.id === movedAccountId);
-      if (!account || !stage) return;
-
-      const connectionsFromAccount: Connection[] = account.linkedAccounts.map((to) => ({ from: account.id, to })) || [];
-      const connectionsToAccount: Connection[] = accounts.reduce(
-        (prev: Connection[], curr) =>
-          curr.linkedAccounts.includes(account.id) ? [...prev, { from: curr.id, to: account.id }] : prev,
-        []
-      );
-
-      const relatedConnections = [...connectionsFromAccount, ...connectionsToAccount];
+      if (!stage) return;
+      const relatedConnections = connections.filter((c) => c.from === movedAccountId || c.to === movedAccountId);
       for (const relatedConnection of relatedConnections) {
         const { from, to } = relatedConnection;
         const connection = actions.findNode<Konva.Arrow>(getConnectionId(from, to));
         if (!connection) return;
-
         const accountGroupFrom = actions.findNode<Konva.Group>(getAccountGroupId(from))?.getClientRect();
         const accountGroupTo = actions.findNode<Konva.Group>(getAccountGroupId(to))?.getClientRect();
         if (!accountGroupFrom || !accountGroupTo) return;
-
         const points = calculatePointsForConnection(accountGroupFrom, accountGroupTo);
         connection.points(moveConnectionRelativeToStage(points, stage));
       }
-
-      actions.redraw();
     },
   };
 
   return (
-    <KonvaContext.Provider value={{ actions, data: { program, accounts, stageRef } }}>{children}</KonvaContext.Provider>
+    <KonvaContext.Provider value={{ actions, data: { isLoading, program, accounts, connections, stageRef } }}>
+      {children}
+    </KonvaContext.Provider>
   );
 }

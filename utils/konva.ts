@@ -140,13 +140,11 @@ export const setCursorOnStage = (stage: Konva.Stage, cursor: Cursor) => {
   stage.container().style.cursor = cursor;
 };
 
-export const getUnrelatedConnections = (accounts: Account[], fromAccountId: number, toAccountId: number) =>
+export const getConnectionsFromAccounts = (accounts: Account[]): Connection[] =>
   accounts.reduce(
-    (prev: Connection[], curr) =>
-      [fromAccountId, toAccountId].includes(curr.id) ||
-      curr.linkedAccounts.includes(fromAccountId) ||
-      curr.linkedAccounts.includes(toAccountId)
-        ? prev
-        : [...prev, ...curr.linkedAccounts.map((to) => ({ from: curr.id, to }))],
+    (prev: Connection[], curr) => [
+      ...prev,
+      ...(curr.linkedAccounts.map((connection) => ({ from: curr.id, to: connection })) || []),
+    ],
     []
   );

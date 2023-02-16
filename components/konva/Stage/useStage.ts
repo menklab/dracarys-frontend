@@ -1,7 +1,6 @@
 import Konva from "konva";
 import { debounce } from "lodash";
 import { Ref, RefObject, useEffect, useMemo, useRef, useState } from "react";
-import updateProgram from "~/adapters/program/updateProgram";
 import {
   KONVA_ACCOUNT_CROWN_MAKER_ID,
   KONVA_CONNECTION_MAKER_ID,
@@ -12,11 +11,11 @@ import {
 import { useKonva } from "~/contexts/konva/hooks";
 import { useTheme } from "~/contexts/theme/hooks";
 import { Cursor } from "~/enums/cursor";
-import useErrorHandler from "~/hooks/useErrorHandler";
 import { Account } from "~/interfaces/account";
 import { Connection } from "~/interfaces/connection";
 import { Position } from "~/interfaces/position";
 import { Size } from "~/types/konva";
+import { setCursorOnStage } from "~/utils/konva";
 
 interface UseStageHookReturn {
   stageRef: RefObject<Konva.Stage>;
@@ -24,6 +23,7 @@ interface UseStageHookReturn {
   containerRef: RefObject<HTMLDivElement>;
   size: Size;
   onDoubleClick: (e: Konva.KonvaEventObject<MouseEvent>) => Promise<void>;
+  onDragStart: (pos: Position) => void;
   onDragEnd: (e: Konva.KonvaEventObject<DragEvent>) => Promise<void>;
   onWheel: (e: Konva.KonvaEventObject<WheelEvent>) => Promise<void>;
   accounts: Account[];
@@ -31,32 +31,21 @@ interface UseStageHookReturn {
   onMouseDown: () => void;
   onMouseUp: () => void;
   onMouseMove: () => void;
+  isLoading: boolean;
 }
 
 export default function useStage(): UseStageHookReturn {
   const [size, setSize] = useState<Size>({ width: 0, height: 0 });
+  const [oldPosition, setOldPosition] = useState<Position | undefined>();
   const layerRef = useRef<Konva.Layer>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const { displayCaughtError } = useErrorHandler();
-  const konva = useKonva();
   const {
-    data: { program, accounts, stageRef },
-  } = konva;
+    data: { program, accounts, stageRef, connections, isLoading },
+    actions: { findNode, resetStageAppearance, updateStagePosition, updateStageScale, createConnection },
+  } = useKonva();
   const {
     data: { theme },
   } = useTheme();
-
-  const connections = useMemo(
-    () =>
-      accounts.reduce(
-        (prev: Connection[], curr) => [
-          ...prev,
-          ...(curr.linkedAccounts.map((connection) => ({ from: curr.id, to: connection })) || []),
-        ],
-        []
-      ),
-    [accounts]
-  );
 
   useEffect(() => {
     if (containerRef.current)
@@ -66,92 +55,72 @@ export default function useStage(): UseStageHookReturn {
   useEffect(() => {
     const stage = stageRef.current;
     if (!stage) return;
-
     if (program.zoom) stage.scale({ x: program.zoom, y: program.zoom });
     if (program.center) stage.position(program.center);
   }, [program.center, program.zoom, stageRef]);
 
+  useEffect(() => {
+    const stage = stageRef.current;
+    if (!stage) return;
+    stage.draggable(!isLoading);
+  }, [isLoading, stageRef]);
+
   const onDoubleClick = async () => {
-    try {
-      const stage = stageRef.current;
-      if (!stage) return;
-
-      await updateProgram(program.id, {
-        name: program.name,
-        center: KONVA_DEFAULT_STAGE_POSITION,
-        zoom: KONVA_DEFAULT_STAGE_SCALE,
-      });
-
-      stage.position(KONVA_DEFAULT_STAGE_POSITION);
-      stage.scale({ x: KONVA_DEFAULT_STAGE_SCALE, y: KONVA_DEFAULT_STAGE_SCALE });
-    } catch (e) {
-      displayCaughtError(e);
-    }
+    const stage = stageRef.current;
+    if (!stage) return;
+    const oldScale = stage.scale();
+    const oldPosition = stage.position();
+    stage.scale({ x: KONVA_DEFAULT_STAGE_SCALE, y: KONVA_DEFAULT_STAGE_SCALE });
+    stage.position(KONVA_DEFAULT_STAGE_POSITION);
+    await resetStageAppearance(() => {
+      stage.scale(oldScale);
+      stage.position(oldPosition);
+    });
   };
+
+  const onDragStart = (pos: Position) => setOldPosition(pos);
 
   const onDragEnd = async (e: Konva.KonvaEventObject<DragEvent>) => {
-    try {
-      const stage = stageRef.current;
-      if (!stage) return;
-      if (e.target !== stage) return; // NOTE: drag on stage only
-
-      await updateProgram(program.id, { name: program.name, center: e.target.position(), zoom: program.zoom });
-    } catch (e) {
-      displayCaughtError(e);
-    }
+    const stage = stageRef.current;
+    if (!stage) return;
+    if (e.target !== stage) return; // NOTE: drag on stage only
+    await updateStagePosition(e.target.position(), () => stage.position(oldPosition!));
   };
 
-  const debouncedChangeHandler = useMemo(
-    () =>
-      debounce(
-        (center: Position, zoom: number) =>
-          updateProgram(program.id, {
-            name: program.name,
-            center,
-            zoom,
-          }),
-        100
-      ),
-    [program.id, program.name]
+  const debouncedUpdateStageScale = useMemo(
+    () => debounce((center: Position, zoom: number) => updateStageScale(center, zoom), 100),
+    [updateStageScale]
   );
 
-  useEffect(() => () => debouncedChangeHandler.cancel(), [debouncedChangeHandler]);
+  useEffect(() => () => debouncedUpdateStageScale.cancel(), [debouncedUpdateStageScale]);
 
   const onWheel = async (e: Konva.KonvaEventObject<WheelEvent>) => {
-    try {
-      e.evt.preventDefault();
-      const stage = stageRef.current;
-      if (!stage) return;
-
-      const oldScale = stage.scaleX();
-      const pointer = stage.getPointerPosition()!;
-      const mousePointTo = { x: (pointer.x - stage.x()) / oldScale, y: (pointer.y - stage.y()) / oldScale };
-      let direction = e.evt.deltaY > 0 ? 1 : -1;
-      // NOTE: when we zoom on trackpad, e.evt.ctrlKey is true in that case lets revert direction
-      if (e.evt.ctrlKey) direction = -direction;
-      const newScale = direction > 0 ? oldScale * 1.025 : oldScale / 1.025;
-      const newPos = { x: pointer.x - mousePointTo.x * newScale, y: pointer.y - mousePointTo.y * newScale };
-
-      await debouncedChangeHandler(newPos, newScale);
-      stage.scale({ x: newScale, y: newScale });
-      stage.position(newPos);
-    } catch (e) {
-      displayCaughtError(e);
-    }
+    e.evt.preventDefault();
+    const stage = stageRef.current;
+    if (!stage) return;
+    const oldScale = stage.scaleX();
+    const pointer = stage.getPointerPosition()!;
+    const mousePointTo = { x: (pointer.x - stage.x()) / oldScale, y: (pointer.y - stage.y()) / oldScale };
+    let direction = e.evt.deltaY > 0 ? 1 : -1;
+    // NOTE: when we zoom on trackpad, e.evt.ctrlKey is true in that case lets revert direction
+    if (e.evt.ctrlKey) direction = -direction;
+    const newScale = direction > 0 ? oldScale * 1.025 : oldScale / 1.025;
+    const newPos = { x: pointer.x - mousePointTo.x * newScale, y: pointer.y - mousePointTo.y * newScale };
+    stage.scale({ x: newScale, y: newScale });
+    stage.position(newPos);
+    await debouncedUpdateStageScale(newPos, newScale);
   };
 
   const onMouseDown = () => {
+    if (isLoading) return;
     const stage = stageRef.current;
     const layer = layerRef.current;
     const pointer = stage?.getPointerPosition();
     if (!stage || !layer || !pointer) return;
-
     const shape = stage.getIntersection({ x: pointer.x, y: pointer.y });
     if (!shape?.attrs?.id?.startsWith(KONVA_ACCOUNT_CROWN_MAKER_ID)) return;
-
     const scale = stage.scaleX();
     const mousePointTo = { x: (pointer.x - stage.x()) / scale, y: (pointer.y - stage.y()) / scale };
-
     layer.add(
       new Konva.Arrow({
         id: KONVA_CONNECTION_MAKER_ID,
@@ -165,25 +134,22 @@ export default function useStage(): UseStageHookReturn {
 
   const onMouseMove = () => {
     const stage = stageRef.current;
-    const arrow = konva.actions.findNode<Konva.Arrow>(KONVA_CONNECTION_MAKER_ID);
+    const arrow = findNode<Konva.Arrow>(KONVA_CONNECTION_MAKER_ID);
     const pointer = stage?.getPointerPosition();
     if (!stage || !arrow || !pointer) return;
-
-    stage.container().style.cursor = Cursor.POINTER;
+    setCursorOnStage(stage, Cursor.POINTER);
     const scale = stage.scaleX();
     const mousePointTo = { x: (pointer.x - stage.x()) / scale, y: (pointer.y - stage.y()) / scale };
     const points = [arrow.points()[0], arrow.points()[1], mousePointTo.x, mousePointTo.y];
     arrow.points(points);
-    stage.draw();
   };
 
   const onMouseUp = async () => {
     const stage = stageRef.current;
-    const arrow = konva.actions.findNode<Konva.Arrow>(KONVA_CONNECTION_MAKER_ID);
+    const arrow = findNode<Konva.Arrow>(KONVA_CONNECTION_MAKER_ID);
     if (!stage || !arrow) return;
-
     arrow.destroy();
-    stage.container().style.cursor = Cursor.DEFAULT;
+    setCursorOnStage(stage, Cursor.DEFAULT);
 
     const positionFrom: Position = {
       x: arrow.points()[0] * stage.scaleX() + stage.x(),
@@ -220,7 +186,7 @@ export default function useStage(): UseStageHookReturn {
     if (accountIdFrom < 0 || accountIdTo < 0) return;
     if (accountIdFrom === accountIdTo) return;
 
-    await konva.actions.createConnection(accountIdFrom, accountIdTo);
+    await createConnection(accountIdFrom, accountIdTo);
   };
 
   return {
@@ -232,9 +198,11 @@ export default function useStage(): UseStageHookReturn {
     accounts,
     connections,
     onDoubleClick,
+    onDragStart,
     onDragEnd,
     onMouseDown,
     onMouseUp,
     onMouseMove,
+    isLoading,
   };
 }

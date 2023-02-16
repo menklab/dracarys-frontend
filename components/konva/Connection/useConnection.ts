@@ -5,7 +5,12 @@ import { useKonva } from "~/contexts/konva/hooks";
 import { Cursor } from "~/enums/cursor";
 import { Account } from "~/interfaces/account";
 import { Line } from "~/types/konva";
-import { calculatePointsForConnection, getAccountGroupId, moveConnectionRelativeToStage } from "~/utils/konva";
+import {
+  calculatePointsForConnection,
+  getAccountGroupId,
+  moveConnectionRelativeToStage,
+  setCursorOnStage,
+} from "~/utils/konva";
 
 interface UseAccountHookReturn {
   onArrowMouseEnter: () => void;
@@ -38,8 +43,10 @@ export default function useConnection(from: number, to: number): UseAccountHookR
   const [fromOpen, setFromOpen] = useState<boolean>(false);
   const [toOpen, setToOpen] = useState<boolean>(false);
   const [points, setPoints] = useState<Line | []>([]);
-  const konva = useKonva();
-  const { accounts, stageRef } = konva.data;
+  const {
+    data: { accounts, stageRef, isLoading },
+    actions: { findNode, updateConnectionReverse, deleteConnection, updateConnectionFrom, updateConnectionTo },
+  } = useKonva();
 
   const accountFrom = accounts.find((account) => account.id === from)!;
   const accountTo = accounts.find((account) => account.id === to)!;
@@ -47,7 +54,6 @@ export default function useConnection(from: number, to: number): UseAccountHookR
   useEffect(() => {
     const stage = stageRef.current;
     if (!stage) return;
-
     stage.on("mousedown", () => {
       setFromOpen(false);
       setToOpen(false);
@@ -57,24 +63,23 @@ export default function useConnection(from: number, to: number): UseAccountHookR
 
   useEffect(() => {
     const stage = stageRef.current;
-    const accountGroupFrom = konva.actions.findNode<Konva.Group>(getAccountGroupId(from))?.getClientRect();
-    const accountGroupTo = konva.actions.findNode<Konva.Group>(getAccountGroupId(to))?.getClientRect();
+    const accountGroupFrom = findNode<Konva.Group>(getAccountGroupId(from))?.getClientRect();
+    const accountGroupTo = findNode<Konva.Group>(getAccountGroupId(to))?.getClientRect();
     if (!stage || !accountGroupFrom || !accountGroupTo) return;
-
     const points = calculatePointsForConnection(accountGroupFrom, accountGroupTo);
     setPoints(moveConnectionRelativeToStage(points, stage));
-  }, [from, konva.actions, stageRef, to]);
+  }, [findNode, from, stageRef, to]);
 
   const onArrowMouseEnter = () => {
     const stage = stageRef.current;
     if (!stage) return;
-    stage.container().style.cursor = Cursor.POINTER;
+    setCursorOnStage(stage, Cursor.POINTER);
   };
 
   const onArrowMouseLeave = () => {
     const stage = stageRef.current;
     if (!stage) return;
-    stage.container().style.cursor = Cursor.DEFAULT;
+    setCursorOnStage(stage, Cursor.DEFAULT);
   };
 
   const htmlTransformFunc = (attrs: HtmlTransformAttrs) => {
@@ -87,11 +92,14 @@ export default function useConnection(from: number, to: number): UseAccountHookR
     return attrs;
   };
 
-  const onArrowClick = () => setIsOpened(true);
+  const onArrowClick = () => {
+    if (isLoading) return;
+    setIsOpened(true);
+  };
 
-  const reverseConnection = async () => await konva.actions.reverseConnection(from, to);
+  const reverseConnection = async () => await updateConnectionReverse(from, to);
 
-  const deleteConnection = async () => await konva.actions.deleteConnection(from, to);
+  const _deleteConnection = async () => await deleteConnection(from, to);
 
   const fromOptionIsDisabled = (account: Account) =>
     accounts
@@ -109,12 +117,12 @@ export default function useConnection(from: number, to: number): UseAccountHookR
 
   const handleFromMenuItemClick = async (fromAccountId: number) => {
     setFromOpen(false);
-    await konva.actions.changeConnectionFrom(from, fromAccountId, to);
+    await updateConnectionFrom(from, fromAccountId, to);
   };
 
   const handleToMenuItemClick = async (toAccountId: number) => {
     setToOpen(false);
-    await konva.actions.changeConnectionTo(from, to, toAccountId);
+    await updateConnectionTo(from, to, toAccountId);
   };
 
   const handleFromToggle = () => {
@@ -151,7 +159,7 @@ export default function useConnection(from: number, to: number): UseAccountHookR
     handleFromToggle,
     toOpen,
     handleToToggle,
-    deleteConnection,
+    deleteConnection: _deleteConnection,
     handleFromClose,
     accounts,
     fromOptionIsDisabled,
