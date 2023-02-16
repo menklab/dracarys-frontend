@@ -172,11 +172,14 @@ export default function KonvaProvider({ program, accounts, children }: KonvaProv
       const oldConnections = [...connections];
       try {
         setIsLoading(true);
-        const newConnections = [
-          { from: toAccountId, to: fromAccountId },
-          ...connections.filter((c) => !(c.from === fromAccountId && c.to === toAccountId)),
-        ];
-        setConnections(newConnections);
+        const newConnections: Partial<Connection>[] = connections.reduce(
+          (prev: Partial<Connection>[], curr) =>
+            curr.from === fromAccountId && curr.to === toAccountId
+              ? [...prev, { from: curr.from }]
+              : [...prev, { ...curr }],
+          [{ from: toAccountId, to: fromAccountId }]
+        );
+        setConnections(newConnections.filter((c) => c.to !== undefined) as Connection[]);
         await updateAccountLinks(newConnections);
         await triggerSSR();
       } catch (e) {
