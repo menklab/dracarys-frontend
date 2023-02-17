@@ -5,6 +5,7 @@ import getInstructionElements from "~/adapters/instruction/getInstructionElement
 import getInstructions from "~/adapters/instruction/getInstructions";
 import getProgram from "~/adapters/program/getProgram";
 import InstructionPage from "~/components/pages/InstructionPage";
+import { ROUTES } from "~/constants/routes";
 import { Account } from "~/interfaces/account";
 import { Instruction } from "~/interfaces/instruction";
 import { InstructionElement } from "~/interfaces/instructionElement";
@@ -47,6 +48,11 @@ export const getServerSideProps: GetServerSideProps<InstructionPageProps> = asyn
     const instructions = await getInstructions(sid, Number(programId));
     const instruction = await getInstruction(sid, Number(instructionId));
     const instructionElements = await getInstructionElements(sid, Number(instructionId));
+
+    if (!instructions.some((a) => a.id === instruction.id)) {
+      return { redirect: { permanent: false, destination: ROUTES.INSTRUCTIONS(Number(programId)) }, props: {} };
+    }
+
     return {
       props: {
         program: JSON.parse(JSON.stringify(program)),
