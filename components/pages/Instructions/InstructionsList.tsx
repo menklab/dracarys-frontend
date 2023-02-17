@@ -33,7 +33,10 @@ export default function InstructionsList() {
                   {instruction.name}
                 </Link>
               </TableCell>
-              <TableCell align="center" sx={{ width: "60%" }}>
+              <TableCell
+                align="center"
+                sx={{ width: "60%", overflow: "hidden", textOverflow: "ellipsis", maxWidth: 0 }}
+              >
                 {instruction.description}
               </TableCell>
             </TableRow>
