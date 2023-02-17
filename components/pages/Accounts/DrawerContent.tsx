@@ -103,16 +103,23 @@ export default function DrawerContent() {
       </ListItem>
       <Divider />
       <ListItem
+        disablePadding
         secondaryAction={
           <IconButton onClick={createAccountDialogOpen}>
             <AddIcon />
           </IconButton>
         }
       >
-        <IconButton onClick={handleOpenAccounts}>{openAccounts ? <ExpandLess /> : <ExpandMore />}</IconButton>
-        <ListItemText>
-          <b>Accounts</b>
-        </ListItemText>
+        <ListItemButton>
+          <IconButton onClick={handleOpenAccounts}>{openAccounts ? <ExpandLess /> : <ExpandMore />}</IconButton>
+          <Link
+            key={`accounts-${program.id}`}
+            href={ROUTES.ACCOUNTS(program.id)}
+            style={{ textDecoration: "none", color: "unset" }}
+          >
+            <ListItemText><b>Accounts</b></ListItemText>
+          </Link>
+        </ListItemButton>
       </ListItem>
       <Collapse in={openAccounts} timeout="auto" unmountOnExit>
         {accounts.map((account) => {
