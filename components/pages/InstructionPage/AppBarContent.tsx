@@ -20,7 +20,7 @@ export default function AppBarContent() {
       >
         <Link
           key={`program-${program.id}`}
-          href={ROUTES.ACCOUNTS(program.id)}
+          href={ROUTES.INSTRUCTIONS(program.id)}
           style={{ textDecoration: "none", color: "unset" }}
         >
           <IconButton sx={{ alignSelf: "self-end" }}>
