@@ -1,2 +1,2 @@
-export type LayoutViewVariant = "visual" | "code";
+export type LayoutViewVariant = "visual" | "code" | "list";
 export type LayoutColorMode = "dark" | "light";

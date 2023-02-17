@@ -8,8 +8,7 @@ export const createInstructionSchema = object({
     .trim()
     .min(1, "Name must be between 1 and 50 characters long")
     .max(50, "Name must be between 1 and 50 characters long")
-    .regex(/^[A-Za-z0-9]+$/, "Field can only include letters and numbers")
-    .refine((val) => val[0] === val[0]?.toUpperCase(), "The first letter must be UpperCase")
+    .regex(/^[a-z0-9_]+$/, "Field can only include lowercase letters, numbers and underscore")
     .refine(
       (val) => !RUST_KEYWORDS.includes(val),
       "Field can not include Rust reserved keywords. " +

@@ -118,7 +118,9 @@ export default function DrawerContent() {
             href={ROUTES.INSTRUCTIONS(program.id)}
             style={{ textDecoration: "none", color: "unset" }}
           >
-            <ListItemText>Instructions</ListItemText>
+            <ListItemText>
+              <b>Instructions</b>
+            </ListItemText>
           </Link>
         </ListItemButton>
       </ListItem>
