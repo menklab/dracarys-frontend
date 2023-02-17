@@ -95,21 +95,23 @@ export default function DrawerContent() {
         <ListItemText>Accounts</ListItemText>
       </ListItem>
       <Collapse in={openAccounts} timeout="auto" unmountOnExit>
-        {accounts.map((account) => {
-          return (
-            <Link
-              key={`account-${account.id}`}
-              href={ROUTES.ACCOUNT(program.id, account.id)}
-              style={{ textDecoration: "none", color: "unset" }}
-            >
-              <List component="div" disablePadding>
-                <ListItemButton sx={{ pl: 7 }}>
-                  <ListItemText primary={account.name} />
-                </ListItemButton>
-              </List>
-            </Link>
-          );
-        })}
+        {accounts
+          .sort((a, b) => b.id - a.id)
+          .map((account) => {
+            return (
+              <Link
+                key={`account-${account.id}`}
+                href={ROUTES.ACCOUNT(program.id, account.id)}
+                style={{ textDecoration: "none", color: "unset" }}
+              >
+                <List component="div" disablePadding>
+                  <ListItemButton sx={{ pl: 7 }}>
+                    <ListItemText primary={account.name} />
+                  </ListItemButton>
+                </List>
+              </Link>
+            );
+          })}
       </Collapse>
       <ListItem disablePadding>
         <ListItemButton>
