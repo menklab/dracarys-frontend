@@ -1,3 +1,4 @@
+import AddIcon from "@mui/icons-material/Add";
 import CancelIcon from "@mui/icons-material/Cancel";
 import CheckIcon from "@mui/icons-material/Check";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
@@ -36,6 +37,8 @@ export default function DrawerContent() {
     goBackToProgramsList,
     openAccounts,
     handleOpenAccounts,
+    createAccountDialogOpen,
+    createInstructionDialogOpen,
   } = useInstructionsPage();
 
   const {
@@ -89,9 +92,24 @@ export default function DrawerContent() {
         </ListItemText>
       </ListItem>
       <Divider />
-      <ListItem>
-        <IconButton onClick={handleOpenAccounts}>{openAccounts ? <ExpandLess /> : <ExpandMore />}</IconButton>
-        <ListItemText>Accounts</ListItemText>
+      <ListItem
+        disablePadding
+        secondaryAction={
+          <IconButton onClick={createAccountDialogOpen}>
+            <AddIcon />
+          </IconButton>
+        }
+      >
+        <ListItemButton>
+          <IconButton onClick={handleOpenAccounts}>{openAccounts ? <ExpandLess /> : <ExpandMore />}</IconButton>
+          <Link
+            key={`accounts-${program.id}`}
+            href={ROUTES.ACCOUNTS(program.id)}
+            style={{ textDecoration: "none", color: "unset" }}
+          >
+            <ListItemText>Accounts</ListItemText>
+          </Link>
+        </ListItemButton>
       </ListItem>
       <Collapse in={openAccounts} timeout="auto" unmountOnExit>
         {accounts
@@ -112,7 +130,14 @@ export default function DrawerContent() {
             );
           })}
       </Collapse>
-      <ListItem disablePadding>
+      <ListItem
+        secondaryAction={
+          <IconButton onClick={createInstructionDialogOpen}>
+            <AddIcon />
+          </IconButton>
+        }
+        disablePadding
+      >
         <ListItemButton>
           <IconButton onClick={handleOpenInstructions}>{openInstructions ? <ExpandLess /> : <ExpandMore />}</IconButton>
           <Link
@@ -120,7 +145,9 @@ export default function DrawerContent() {
             href={ROUTES.INSTRUCTIONS(program.id)}
             style={{ textDecoration: "none", color: "unset" }}
           >
-            <ListItemText>Instructions</ListItemText>
+            <ListItemText>
+              <b>Instructions</b>
+            </ListItemText>
           </Link>
         </ListItemButton>
       </ListItem>
@@ -128,7 +155,7 @@ export default function DrawerContent() {
         {instructions.map((instruction) => {
           return (
             <Link
-              key={`account-${instruction.id}`}
+              key={`instruction-${instruction.id}`}
               href={ROUTES.INSTRUCTION(program.id, instruction.id)}
               style={{ textDecoration: "none", color: "unset" }}
             >

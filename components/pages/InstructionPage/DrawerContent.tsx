@@ -90,9 +90,17 @@ export default function DrawerContent() {
         </ListItemText>
       </ListItem>
       <Divider />
-      <ListItem>
-        <IconButton onClick={handleOpenAccounts}>{openAccounts ? <ExpandLess /> : <ExpandMore />}</IconButton>
-        <ListItemText>Accounts</ListItemText>
+      <ListItem disablePadding>
+        <ListItemButton>
+          <IconButton onClick={handleOpenAccounts}>{openAccounts ? <ExpandLess /> : <ExpandMore />}</IconButton>
+          <Link
+            key={`accounts-${program.id}`}
+            href={ROUTES.ACCOUNTS(program.id)}
+            style={{ textDecoration: "none", color: "unset" }}
+          >
+            <ListItemText>Accounts</ListItemText>
+          </Link>
+        </ListItemButton>
       </ListItem>
       <Collapse in={openAccounts} timeout="auto" unmountOnExit>
         {accounts
@@ -121,7 +129,9 @@ export default function DrawerContent() {
             href={ROUTES.INSTRUCTIONS(program.id)}
             style={{ textDecoration: "none", color: "unset" }}
           >
-            <ListItemText>Instructions</ListItemText>
+            <ListItemText>
+              <b>Instructions</b>
+            </ListItemText>
           </Link>
         </ListItemButton>
       </ListItem>
@@ -130,7 +140,7 @@ export default function DrawerContent() {
           return (
             <Link
               key={`account-${instruction.id}`}
-              href={ROUTES.ACCOUNT(program.id, instruction.id)}
+              href={ROUTES.INSTRUCTION(program.id, instruction.id)}
               style={{ textDecoration: "none", color: "unset" }}
             >
               <List component="div" disablePadding>

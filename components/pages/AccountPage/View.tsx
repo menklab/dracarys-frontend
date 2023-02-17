@@ -34,13 +34,12 @@ export default function View() {
     control,
     setError,
     formState: { errors },
-    watch,
+    getValues,
   } = useAccountElementForm({
     elements: [...accountElements.map((a) => ({ id: a.id, name: a.name, type: a.type })), { name: "", type: "" }],
   });
 
   const { fields, append, remove, update } = useFieldArray({ control, name: "elements", keyName: "customId" });
-  const elements = watch("elements");
 
   const onSubmit: SubmitHandler<AccountElementSchemaType> = useCallback(
     async (values) => {
@@ -89,7 +88,7 @@ export default function View() {
   useEffect(() => () => debouncedHandleSubmit.cancel(), [debouncedHandleSubmit]);
 
   const onChange = () => {
-    const appendNew = !elements.find((e) => !e.name || !e.type);
+    const appendNew = !getValues().elements.find((e) => !e.name || !e.type);
     if (appendNew) append({ name: "", type: "" }, { shouldFocus: false });
   };
 
