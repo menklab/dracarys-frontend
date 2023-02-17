@@ -1,6 +1,8 @@
 import { useRouter } from "next/router";
 import { createContext, ReactNode, useContext, useEffect, useState } from "react";
+import createAccount from "~/adapters/account/createAccount";
 import generateInstructionCode from "~/adapters/code/generateInstructionCode";
+import createInstruction from "~/adapters/instruction/createInstruction";
 import deleteProgram from "~/adapters/program/deleteProgram";
 import updateProgram from "~/adapters/program/updateProgram";
 import { LAYOUT_DEFAULT_VIEW_VARIANT_IN_INSTRUCTIONS } from "~/constants/layout";
@@ -34,6 +36,14 @@ interface InstructionsPageContextDefaultValue {
   saveEditProgramName: (name: string) => Promise<void>;
   cancelEditProgramName: () => void;
   goBackToProgramsList: () => Promise<boolean>;
+  createNewInstruction: (name: string, description?: string) => Promise<void>;
+  createNewAccount: (name: string) => Promise<void>;
+  createAccountDialogIsOpened: boolean;
+  createAccountDialogOpen: () => void;
+  createAccountDialogClose: () => void;
+  createInstructionDialogOpen: () => void;
+  createInstructionDialogClose: () => void;
+  createInstructionDialogIsOpened: boolean;
 }
 
 const InstructionsPageContext = createContext<InstructionsPageContextDefaultValue | undefined>(undefined);
@@ -61,6 +71,8 @@ export const InstructionsPageProvider = ({
   const [isEditingProgramName, setIsEditingProgramName] = useState<boolean>(false);
   const [openAccounts, setOpenAccounts] = useState<boolean>(false);
   const [openInstructions, setOpenInstructions] = useState<boolean>(false);
+  const [createAccountDialogIsOpened, setCreateAccountDialogIsOpened] = useState<boolean>(false);
+  const [createInstructionDialogIsOpened, setCreateInstructionDialogIsOpened] = useState<boolean>(false);
 
   useEffect(() => {
     const openInstructionsJson = window.localStorage.getItem("openInstructions");
@@ -119,6 +131,24 @@ export const InstructionsPageProvider = ({
     }
   };
 
+  const createNewInstruction = async (name: string, description?: string) => {
+    try {
+      const newInstruction = await createInstruction({ name, description, programId: program.id });
+      await router.push(ROUTES.INSTRUCTION(program.id, newInstruction.id));
+    } catch (e) {
+      displayCaughtError(e);
+    }
+  };
+
+  const createNewAccount = async (name: string) => {
+    try {
+      const newAccount = await createAccount({ name, programId: program.id });
+      await router.push(ROUTES.ACCOUNT(program.id, newAccount.id));
+    } catch (e) {
+      displayCaughtError(e);
+    }
+  };
+
   return (
     <InstructionsPageContext.Provider
       value={{
@@ -143,6 +173,14 @@ export const InstructionsPageProvider = ({
         goBackToProgramsList: () => router.push(ROUTES.PROGRAMS()),
         handleOpenAccounts,
         handleOpenInstructions,
+        createNewInstruction,
+        createNewAccount,
+        createAccountDialogIsOpened,
+        createInstructionDialogIsOpened,
+        createAccountDialogOpen: () => setCreateAccountDialogIsOpened(true),
+        createAccountDialogClose: () => setCreateAccountDialogIsOpened(false),
+        createInstructionDialogOpen: () => setCreateInstructionDialogIsOpened(true),
+        createInstructionDialogClose: () => setCreateInstructionDialogIsOpened(false),
       }}
     >
       {children}
