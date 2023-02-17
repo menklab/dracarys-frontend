@@ -6,10 +6,10 @@ import getMsg from "~/adapters/auth/getMsg";
 import logout from "~/adapters/auth/logout";
 import validateMsg from "~/adapters/auth/validateMsg";
 import { ROUTES } from "~/constants/routes";
+import { AuthContext } from "~/contexts/auth/context";
+import { AuthProviderProps, Provider } from "~/contexts/auth/types";
 import useErrorHandler from "~/hooks/useErrorHandler";
 import { PubKey } from "~/types/phantom";
-import { AuthContext } from "./context";
-import { AuthProviderProps, Provider } from "./types";
 
 declare global {
   interface Window {

@@ -5,6 +5,8 @@ import updateAccount from "~/adapters/account/updateAccount";
 import updateAccountLinks from "~/adapters/account/updateAccountLinks";
 import updateProgram from "~/adapters/program/updateProgram";
 import { KONVA_DEFAULT_STAGE_POSITION, KONVA_DEFAULT_STAGE_SCALE } from "~/constants/konva";
+import { KonvaContext } from "~/contexts/konva/context";
+import { KonvaContextActions, KonvaProviderProps } from "~/contexts/konva/types";
 import useErrorHandler from "~/hooks/useErrorHandler";
 import useTriggerSSR from "~/hooks/useTriggerSSR";
 import { Connection } from "~/interfaces/connection";
@@ -15,8 +17,6 @@ import {
   getConnectionsFromAccounts,
   moveConnectionRelativeToStage,
 } from "~/utils/konva";
-import { KonvaContext } from "./context";
-import { KonvaContextActions, KonvaProviderProps } from "./types";
 
 export default function KonvaProvider({ program, accounts, children }: KonvaProviderProps) {
   const [connections, setConnections] = useState<Connection[]>(getConnectionsFromAccounts(accounts));
