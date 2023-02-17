@@ -139,7 +139,13 @@ export default function View() {
                 </TableCell>
                 <TableCell align="center" sx={{ width: "40%" }}>
                   <FormControl fullWidth error={!!errors.elements?.[idx]?.type}>
-                    <Select native fullWidth defaultValue={field.type} {...register(`elements.${idx}.type`)}>
+                    <Select
+                      native
+                      fullWidth
+                      defaultValue={field.type}
+                      inputProps={{ min: 0, style: { textAlign: "center" } }}
+                      {...register(`elements.${idx}.type`)}
+                    >
                       <option aria-label="None" value="" disabled />
                       {Object.keys(ElementType).map((keyObj) => (
                         <option
