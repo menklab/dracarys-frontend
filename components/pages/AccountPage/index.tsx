@@ -27,7 +27,7 @@ export default function AccountPage({ program, accounts, account, accountElement
       instructions={instructions}
     >
       <Layout drawerContent={<DrawerContent />} appBarContent={<AppBarContent />}>
-        <View />
+        <View key={`view-${account.id}`} />
         <DeleteAccountDialog />
       </Layout>
     </AccountPageProvider>
