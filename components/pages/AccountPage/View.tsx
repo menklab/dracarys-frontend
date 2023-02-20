@@ -46,26 +46,36 @@ export default function View() {
       for (const [idx, element] of values.elements.entries()) {
         if (idx === values.elements.length - 1) continue;
         const { id, name, type } = element;
-        if (name) {
-          if (name.length < 1 || name.length >= 50) {
-            setError(`elements.${idx}.name`, { message: "Name must be between 1 and 50 characters long" });
-            continue;
-          }
-          if (RUST_KEYWORDS.includes(name)) {
-            setError(`elements.${idx}.name`, { message: "Field can not include Rust reserved keywords." });
-            continue;
-          }
-        } else {
+
+        if (!name) {
           setError(`elements.${idx}.name`, { message: "Name is required" });
           continue;
         }
-        if (type) {
-          if (!(TypeArrayValidation as ReadonlyArray<string>).includes(type)) {
-            setError(`elements.${idx}.name`, { message: "Value must be in type range" });
-            continue;
-          }
-        } else {
+
+        if (!/^[a-z0-9_]+$/.test(name)) {
+          setError(`elements.${idx}.name`, {
+            message: "Field can only include lowercase letters, numbers and underscore",
+          });
+          continue;
+        }
+
+        if (name.length < 1 || name.length >= 50) {
+          setError(`elements.${idx}.name`, { message: "Name must be between 1 and 50 characters long" });
+          continue;
+        }
+
+        if (RUST_KEYWORDS.includes(name)) {
+          setError(`elements.${idx}.name`, { message: "Field can not include Rust reserved keywords." });
+          continue;
+        }
+
+        if (!type) {
           setError(`elements.${idx}.type`, { message: "Type is required" });
+          continue;
+        }
+
+        if (!(TypeArrayValidation as ReadonlyArray<string>).includes(type)) {
+          setError(`elements.${idx}.name`, { message: "Value must be in type range" });
           continue;
         }
 
