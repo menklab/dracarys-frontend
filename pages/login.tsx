@@ -36,6 +36,6 @@ export default function Login() {
 
 export const getServerSideProps: GetServerSideProps = async ({ req }) => {
   const authSid = getSidCookie(req);
-  if (authSid) return { redirect: { permanent: false, destination: ROUTES.PROGRAMS() }, props: {} };
+  if (!!authSid) return { redirect: { permanent: false, destination: ROUTES.PROGRAMS() }, props: {} };
   return { props: {} };
 };

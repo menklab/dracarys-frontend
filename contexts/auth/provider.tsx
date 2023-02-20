@@ -47,7 +47,6 @@ export default function AuthProvider({ children }: AuthProviderProps) {
       }
     } catch (e) {
       await logoutFN();
-      cookie.remove("connect.sid");
       displayCaughtError(e);
     }
   };
@@ -66,7 +65,6 @@ export default function AuthProvider({ children }: AuthProviderProps) {
 
   const disconnectFromPhantom = async () => {
     await provider?.disconnect();
-    cookie.remove("connect.sid");
     return await router.push(ROUTES.LOGIN());
   };
 
