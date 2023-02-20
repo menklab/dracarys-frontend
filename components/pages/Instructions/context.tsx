@@ -131,8 +131,9 @@ export const InstructionsPageProvider = ({
     }
   };
 
-  const createNewInstruction = async (name: string, description?: string) => {
+  const createNewInstruction = async (name: string, description?: string | null) => {
     try {
+      description = description?.trim() === "" ? null : description;
       const newInstruction = await createInstruction({ name, description, programId: program.id });
       await router.push(ROUTES.INSTRUCTION(program.id, newInstruction.id));
     } catch (e) {

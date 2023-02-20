@@ -2,7 +2,7 @@ import { API_ROUTES } from "~/constants/api_routes";
 
 interface UpdateInstructionBody {
   name: string;
-  description: string;
+  description: string | null;
 }
 
 // FE usage only
