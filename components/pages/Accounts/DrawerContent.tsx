@@ -135,7 +135,10 @@ export default function DrawerContent() {
               >
                 <List component="div" disablePadding>
                   <ListItemButton sx={{ pl: 7 }}>
-                    <ListItemText primary={account.name} />
+                    <ListItemText
+                      primary={account.name}
+                      primaryTypographyProps={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}
+                    />
                   </ListItemButton>
                 </List>
               </Link>
@@ -171,7 +174,10 @@ export default function DrawerContent() {
             >
               <List component="div" disablePadding>
                 <ListItemButton sx={{ pl: 7 }}>
-                  <ListItemText primary={instruction.name} />
+                  <ListItemText
+                    primary={instruction.name}
+                    primaryTypographyProps={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}
+                  />
                 </ListItemButton>
               </List>
             </Link>
