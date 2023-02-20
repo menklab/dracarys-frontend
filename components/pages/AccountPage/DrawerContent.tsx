@@ -98,7 +98,9 @@ export default function DrawerContent() {
             href={ROUTES.ACCOUNTS(program.id)}
             style={{ textDecoration: "none", color: "unset" }}
           >
-            <ListItemText><b>Accounts</b></ListItemText>
+            <ListItemText>
+              <b>Accounts</b>
+            </ListItemText>
           </Link>
         </ListItemButton>
       </ListItem>
@@ -114,7 +116,10 @@ export default function DrawerContent() {
               >
                 <List component="div" disablePadding>
                   <ListItemButton sx={{ pl: 7 }}>
-                    <ListItemText primary={account.name} />
+                    <ListItemText
+                      primary={account.name}
+                      primaryTypographyProps={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}
+                    />
                   </ListItemButton>
                 </List>
               </Link>
@@ -143,7 +148,10 @@ export default function DrawerContent() {
             >
               <List component="div" disablePadding>
                 <ListItemButton sx={{ pl: 7 }}>
-                  <ListItemText primary={instruction.name} />
+                  <ListItemText
+                    primary={instruction.name}
+                    primaryTypographyProps={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}
+                  />
                 </ListItemButton>
               </List>
             </Link>
