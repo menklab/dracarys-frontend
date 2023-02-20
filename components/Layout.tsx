@@ -84,7 +84,15 @@ export default function Layout(props: LayoutProps) {
           </LoadingButton>
         </Toolbar>
 
-        <Box sx={{ overflowY: "scroll" }}>{drawerContent}</Box>
+        <Box
+          sx={{
+            overflowX: "hidden",
+            overflowY: "scroll",
+            "::-webkit-scrollbar": { width: 0, background: "transparent" },
+          }}
+        >
+          {drawerContent}
+        </Box>
 
         <List sx={{ mt: "auto" }}>
           <Divider />
