@@ -48,6 +48,11 @@ export const getServerSideProps: GetServerSideProps<AccountPageProps> = async ({
     const account = await getAccount(sid, Number(accountId));
     const instructions = await getInstructions(sid, Number(programId));
     const accountElements = await getAccountElements(sid, Number(accountId));
+
+    if (!accounts.some((a) => a.id === account.id)) {
+      return { redirect: { permanent: false, destination: ROUTES.ACCOUNTS(Number(programId)) }, props: {} };
+    }
+
     return {
       props: {
         program: JSON.parse(JSON.stringify(program)),

@@ -34,7 +34,7 @@ export default function InstructionPage({
       instructionElements={instructionElements}
     >
       <Layout drawerContent={<DrawerContent />} appBarContent={<AppBarContent />}>
-        <View />
+        <View key={`instruction-${instruction.id}`} />
         <DeleteInstructionDialog />
         <EditInstructionDialog />
       </Layout>

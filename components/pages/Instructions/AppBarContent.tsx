@@ -3,7 +3,7 @@ import { Box, Button, ToggleButton, ToggleButtonGroup } from "@mui/material";
 import { useInstructionsPage } from "~/components/pages/Instructions/context";
 
 export default function AppBarContent() {
-  const { program, openDeleteProgramDialog, viewVariant, changeViewVariant } = useInstructionsPage();
+  const { openDeleteProgramDialog, viewVariant, changeViewVariant } = useInstructionsPage();
 
   return (
     <>

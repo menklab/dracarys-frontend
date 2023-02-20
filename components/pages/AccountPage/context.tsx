@@ -1,6 +1,6 @@
 import { useRouter } from "next/router";
 import { createContext, ReactNode, useContext, useEffect, useState } from "react";
-import createAccountElement from "~/adapters/account/createAccountElement";
+import createAccountElement, { CreateAccountElementBodyResponse } from "~/adapters/account/createAccountElement";
 import deleteAccount from "~/adapters/account/deleteAccount";
 import deleteAccountElement from "~/adapters/account/deleteAccountElement";
 import updateAccount from "~/adapters/account/updateAccount";
@@ -28,7 +28,7 @@ interface AccountPageContextDefaultValue {
   changeProgramName: (name: string) => Promise<void>;
   saveEditAccountName: (name: string) => Promise<void>;
   saveEditProgramName: (name: string) => Promise<void>;
-  saveCreateAccountElement: (name: string, type: ElementType) => Promise<void>;
+  saveCreateAccountElement: (name: string, type: ElementType) => Promise<CreateAccountElementBodyResponse | undefined>;
   saveEditAccountElement: (
     id: number,
     name: string,
@@ -145,12 +145,14 @@ export const AccountPageProvider = ({
   };
 
   const saveCreateAccountElement = async (name: string, type: ElementType) => {
+    let response = undefined;
     try {
-      await createAccountElement({ accountId: account.id, name, type });
+      response = await createAccountElement({ accountId: account.id, name, type });
       await triggerSSR();
     } catch (e) {
       displayCaughtError(e);
     }
+    return response;
   };
 
   const changeProgramName = async (name: string) => {

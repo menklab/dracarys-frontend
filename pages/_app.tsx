@@ -22,6 +22,7 @@ export default function App(props: AppProps) {
   return (
     <CacheProvider value={emotionCache}>
       <Head>
+        <title>Dracarys App</title>
         <meta name="viewport" content="initial-scale=1, width=device-width" />
       </Head>
       <ThemeProvider defaultColorMode={colorMode}>

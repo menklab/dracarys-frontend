@@ -3,10 +3,10 @@ import cookie from "js-cookie";
 import { useMemo, useState } from "react";
 import { LAYOUT_COLOR_MODE_COOKIE_NAME } from "~/constants/cookies";
 import { LAYOUT_DEFAULT_COLOR_MODE } from "~/constants/layout";
+import { ThemeContext } from "~/contexts/theme/context";
+import { ThemeContextActions, ThemeProviderProps } from "~/contexts/theme/types";
 import { LayoutColorMode } from "~/types/layout";
 import { getDesignTokens } from "~/utils/muiTheme";
-import { ThemeContext } from "./context";
-import { ThemeContextActions, ThemeProviderProps } from "./types";
 
 export default function ThemeProvider({ defaultColorMode, children }: ThemeProviderProps) {
   const [mode, setMode] = useState<LayoutColorMode>(
