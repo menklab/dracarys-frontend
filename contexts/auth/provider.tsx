@@ -93,16 +93,15 @@ export default function AuthProvider({ children }: AuthProviderProps) {
     connectToPhantom();
   }, [provider]);
 
-  useEffect(() => {
-    if (window?.solana?.isPhantom) {
+  const checkProvider = () => {
+    if (window?.solana?.isPhantom && provider === undefined) {
       setProvider(window.phantom.solana);
-    } else {
-      enqueueSnackbar("Phantom wallet is required!\nPlease install phantom wallet browser extension", {
-        style: { whiteSpace: "pre-line" },
-        variant: "warning",
-        persist: true,
-      });
     }
+  };
+
+  useEffect(() => {
+    checkProvider();
+    setTimeout(checkProvider, 1000);
   }, []);
 
   return (
