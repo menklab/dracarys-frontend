@@ -117,7 +117,9 @@ export default function DrawerContent() {
             href={ROUTES.ACCOUNTS(program.id)}
             style={{ textDecoration: "none", color: "unset" }}
           >
-            <ListItemText><b>Accounts</b></ListItemText>
+            <ListItemText>
+              <b>Accounts</b>
+            </ListItemText>
           </Link>
         </ListItemButton>
       </ListItem>

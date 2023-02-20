@@ -1,6 +1,8 @@
 import { useRouter } from "next/router";
 import { createContext, ReactNode, useContext, useEffect, useState } from "react";
-import createInstructionElement from "~/adapters/instruction/createInstructionElement";
+import createInstructionElement, {
+  CreateInstructionElementJsonResponse,
+} from "~/adapters/instruction/createInstructionElement";
 import deleteInstruction from "~/adapters/instruction/deleteInstruction";
 import deleteInstructionElement from "~/adapters/instruction/deleteInstructionElement";
 import updateInstruction from "~/adapters/instruction/updateInstruction";
@@ -47,7 +49,7 @@ interface InstructionPageContextDefaultValue {
     mut: boolean,
     accountType: AccountType,
     genericType: string
-  ) => Promise<void>;
+  ) => Promise<CreateInstructionElementJsonResponse | undefined>;
   removeInstruction: () => Promise<void>;
   removeInstructionElement: (id: number) => Promise<void>;
   cancelEditProgramName: () => void;
@@ -179,7 +181,7 @@ export const InstructionPageProvider = ({
     try {
       description = description?.trim() === "" ? null : description;
 
-      await createInstructionElement({
+      const res = await createInstructionElement({
         instructionId: instruction.id,
         name,
         order,
@@ -189,6 +191,7 @@ export const InstructionPageProvider = ({
         genericType,
       });
       await triggerSSR();
+      return res;
     } catch (e) {
       displayCaughtError(e);
     }
@@ -219,7 +222,7 @@ export const InstructionPageProvider = ({
         program,
         instructions,
         instruction,
-        instructionElements,
+        instructionElements: instructionElements.sort((a, b) => a.order - b.order),
         accounts,
         openInstructions,
         handleOpenInstructions,

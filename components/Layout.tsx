@@ -1,6 +1,6 @@
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 import { LoadingButton } from "@mui/lab";
-import { AppBar, Box, Drawer, IconButton, List, ListItem, ListItemText, Toolbar } from "@mui/material";
+import { AppBar, Box, Divider, Drawer, IconButton, List, ListItem, ListItemText, Toolbar } from "@mui/material";
 import { ReactNode } from "react";
 import logout from "~/adapters/auth/logout";
 import ThemeChanger from "~/components/ThemeChanger";
@@ -84,9 +84,10 @@ export default function Layout(props: LayoutProps) {
           </LoadingButton>
         </Toolbar>
 
-        {drawerContent}
+        <Box sx={{ overflowY: "scroll" }}>{drawerContent}</Box>
 
         <List sx={{ mt: "auto" }}>
+          <Divider />
           <ListItem sx={{ px: 4, py: 2 }} secondaryAction={<ThemeChanger />}>
             <ListItemText primary="Change theme" />
           </ListItem>
