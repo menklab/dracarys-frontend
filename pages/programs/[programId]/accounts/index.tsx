@@ -3,6 +3,7 @@ import getAccounts from "~/adapters/account/getAccounts";
 import getInstructions from "~/adapters/instruction/getInstructions";
 import getProgram from "~/adapters/program/getProgram";
 import Accounts from "~/components/pages/Accounts";
+import { ROUTES } from "~/constants/routes";
 import { Account } from "~/interfaces/account";
 import { Instruction } from "~/interfaces/instruction";
 import { Program } from "~/interfaces/program";
@@ -33,8 +34,16 @@ export const getServerSideProps: GetServerSideProps<ProgramAccountsPageProps> = 
         instructions: JSON.parse(JSON.stringify(instructions)),
       },
     };
-  } catch (e) {
+  } catch (e: any) {
     if ((e as { statusCode: number }).statusCode === 403) serverLogout(res);
+    const errorType = e?.errors.find((error: any) => {
+      return error.code === "PROGRAM_NOT_FOUND" || error.code === "NOT_AUTHORIZED";
+    })?.code;
+    if (errorType === "PROGRAM_NOT_FOUND") {
+      res.writeHead(302, { Location: ROUTES.PROGRAMS() });
+      res.end();
+    }
+    if (errorType === "NOT_AUTHORIZED") serverLogout(res);
     return { props: { program: {}, accounts: [], instructions: [] } };
   }
 };
