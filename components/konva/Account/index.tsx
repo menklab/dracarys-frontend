@@ -6,6 +6,7 @@ import {
   KONVA_ACCOUNT_CROWN_OFFSET_X,
   KONVA_ACCOUNT_CROWN_OFFSET_Y,
   KONVA_ACCOUNT_CROWN_SHADOW_BLUR,
+  KONVA_ACCOUNT_CROWN_STROKE_WIDTH,
   KONVA_ACCOUNT_CROWN_WIDTH,
   KONVA_ACCOUNT_HEADER_HEIGHT,
   KONVA_ACCOUNT_NAME_FONT_SIZE,
@@ -56,7 +57,7 @@ export default function KonvaAccount(account: Account) {
         width={KONVA_ACCOUNT_CROWN_WIDTH}
         height={KONVA_ACCOUNT_CROWN_HEIGHT}
         cornerRadius={KONVA_ACCOUNT_CORNER_RADIUS}
-        strokeWidth={KONVA_ACCOUNT_STROKE_WIDTH}
+        strokeWidth={KONVA_ACCOUNT_CROWN_STROKE_WIDTH}
         shadowBlur={KONVA_ACCOUNT_CROWN_SHADOW_BLUR}
         stroke={theme.palette.text.primary}
         onMouseEnter={onCrownMouseEnter}
