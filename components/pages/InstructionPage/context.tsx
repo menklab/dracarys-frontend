@@ -197,8 +197,9 @@ export const InstructionPageProvider = ({
     }
   };
 
-  const editInstruction = async (name: string, description: string) => {
+  const editInstruction = async (name: string, description: string | null) => {
     try {
+      description = description?.trim() === "" ? null : description;
       await updateInstruction(instruction.id, { name, description });
       await triggerSSR();
     } catch (e) {

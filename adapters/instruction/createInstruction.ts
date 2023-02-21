@@ -2,7 +2,7 @@ import { API_ROUTES } from "~/constants/api_routes";
 
 interface CreateInstructionBody {
   name: string;
-  description?: string;
+  description?: string | null;
   programId: number;
 }
 
