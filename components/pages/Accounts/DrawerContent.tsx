@@ -125,7 +125,7 @@ export default function DrawerContent() {
       </ListItem>
       <Collapse in={openAccounts} timeout="auto" unmountOnExit>
         {accounts
-          .sort((a, b) => new Date(a.createdAt).valueOf() - new Date(b.createdAt).valueOf())
+          .sort((a, b) => a.id - b.id)
           .map((account) => {
             return (
               <Link
