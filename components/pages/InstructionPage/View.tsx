@@ -50,6 +50,7 @@ export default function View() {
         id: ie.id,
         name: ie.name,
         accountType: ie.accountType,
+        genericType: ie.genericType,
         description: ie.description || "",
         mut: ie.mut,
       })),
