@@ -5,6 +5,6 @@ export interface Account {
   name: string;
   linkedAccounts: number[];
   position?: Position;
-  createdAt?: string;
-  updatedAt?: string;
+  createdAt: string;
+  updatedAt: string;
 }
