@@ -9,6 +9,8 @@ export const API_ROUTES = {
   ACCOUNTS: () => `${process.env.NEST_HOST}/api/account`,
   ACCOUNTS_LINKS: () => `${process.env.NEST_HOST}/api/account/links`,
   ACCOUNTS_ELEMENTS: () => `${process.env.NEST_HOST}/api/account-element`,
+  GENERIC_TYPES: (programId: number) =>
+    `${process.env.NEST_HOST}/api/instruction-element/generic-types?programId=${programId}`,
   INSTRUCTION: () => `${process.env.NEST_HOST}/api/instruction`,
   INSTRUCTION_ELEMENT: () => `${process.env.NEST_HOST}/api/instruction-element`,
 } as const;

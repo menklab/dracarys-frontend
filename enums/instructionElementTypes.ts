@@ -7,9 +7,3 @@ export enum AccountType {
   SYSVAR = "Sysvar",
   UNCHECKED_ACCOUNT = "UncheckedAccount",
 }
-
-export const GenericType = {
-  Program: ["System", "AssociatedToken", "Token"],
-  Account: ["TokenAccount", "Mint", "BPFUpgradableLoaderState", "ProgramData"],
-  Sysvar: ["Rent", "Clock"],
-} as const;

@@ -15,6 +15,7 @@ import { AccountType } from "~/enums/instructionElementTypes";
 import useErrorHandler from "~/hooks/useErrorHandler";
 import useTriggerSSR from "~/hooks/useTriggerSSR";
 import { Account } from "~/interfaces/account";
+import { GenericCustomSubType, GenericSubType, GenericType } from "~/interfaces/genericType";
 import { Instruction } from "~/interfaces/instruction";
 import { InstructionElement } from "~/interfaces/instructionElement";
 import { Program } from "~/interfaces/program";
@@ -31,14 +32,14 @@ interface InstructionPageContextDefaultValue {
   isDeleteInstructionDialogOpen: boolean;
   isInstructionDeleting: boolean;
   changeProgramName: (name: string) => Promise<void>;
-  saveEditInstructionName: (
+  saveEditInstructionElement: (
     elementId: number,
     name: string,
     order: number,
     description: string,
     mut: boolean,
     accountType: AccountType,
-    genericType: string
+    genericType: GenericSubType | GenericCustomSubType
   ) => Promise<UpdateInstructionElementResponse | undefined>;
   saveEditProgramName: (name: string) => Promise<void>;
   editInstruction: (name: string, description: string) => Promise<void>;
@@ -48,7 +49,7 @@ interface InstructionPageContextDefaultValue {
     description: string,
     mut: boolean,
     accountType: AccountType,
-    genericType: string
+    genericType: GenericSubType | GenericCustomSubType
   ) => Promise<CreateInstructionElementJsonResponse | undefined>;
   removeInstruction: () => Promise<void>;
   removeInstructionElement: (id: number) => Promise<void>;
@@ -66,6 +67,7 @@ interface InstructionPageContextDefaultValue {
   openAccounts: boolean;
   isEditingProgramName: boolean;
   goBackToProgramsList: () => Promise<boolean>;
+  genericTypes: GenericType;
 }
 
 const InstructionPageContext = createContext<InstructionPageContextDefaultValue | undefined>(undefined);
@@ -77,6 +79,7 @@ interface InstructionPageProviderProps {
   instructions: Instruction[];
   accounts: Account[];
   children: ReactNode;
+  genericTypes: GenericType;
 }
 
 export const InstructionPageProvider = ({
@@ -84,6 +87,7 @@ export const InstructionPageProvider = ({
   instruction,
   instructionElements,
   instructions,
+  genericTypes,
   accounts,
   children,
 }: InstructionPageProviderProps) => {
@@ -118,14 +122,14 @@ export const InstructionPageProvider = ({
     setOpenAccounts(!openAccounts);
   };
 
-  const saveEditInstructionName = async (
+  const saveEditInstructionElement = async (
     elementId: number,
     name: string,
     order: number,
     description: string | null,
     mut: boolean,
     accountType: AccountType,
-    genericType: string
+    genericType: GenericSubType | GenericCustomSubType
   ) => {
     let response = undefined;
     try {
@@ -176,7 +180,7 @@ export const InstructionPageProvider = ({
     description: string | null,
     mut: boolean,
     accountType: AccountType,
-    genericType: string
+    genericType: GenericSubType | GenericCustomSubType
   ) => {
     try {
       description = description?.trim() === "" ? null : description;
@@ -240,9 +244,10 @@ export const InstructionPageProvider = ({
         saveEditProgramName: changeProgramName,
         cancelEditProgramName: () => setIsEditingProgramName(false),
         createAccountDialogOpen: () => setCreateAccountDialogIsOpened(true),
-        saveEditInstructionName,
+        saveEditInstructionElement,
         saveCreateInstructionElement,
         editInstruction,
+        genericTypes,
         editInstructionDialogIsOpened,
         openDeleteInstructionDialog: () => setIsDeleteInstructionDialogOpen(true),
         closeDeleteInstructionDialog: () => setIsDeleteInstructionDialogOpen(false),

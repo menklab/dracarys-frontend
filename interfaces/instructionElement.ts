@@ -1,4 +1,5 @@
 import { AccountType } from "~/enums/instructionElementTypes";
+import { GenericCustomSubType, GenericSubType } from "~/interfaces/genericType";
 
 export interface InstructionElement {
   id: number;
@@ -7,7 +8,7 @@ export interface InstructionElement {
   description: string;
   mut: boolean;
   accountType: AccountType;
-  genericType: string;
+  genericType: GenericSubType | GenericCustomSubType;
   createdAt?: string;
   updatedAt?: string;
 }
