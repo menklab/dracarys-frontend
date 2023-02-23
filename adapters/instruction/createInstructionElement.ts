@@ -1,5 +1,6 @@
 import { API_ROUTES } from "~/constants/api_routes";
 import { AccountType } from "~/enums/instructionElementTypes";
+import { GenericCustomSubType, GenericSubType } from "~/interfaces/genericType";
 
 interface CreateInstructionElementBody {
   instructionId: number;
@@ -8,7 +9,7 @@ interface CreateInstructionElementBody {
   description: string | null;
   mut: boolean;
   accountType: AccountType;
-  genericType: string;
+  genericType: GenericSubType | GenericCustomSubType;
 }
 
 export interface CreateInstructionElementJsonResponse {

@@ -6,6 +6,7 @@ import DrawerContent from "~/components/pages/InstructionPage/DrawerContent";
 import EditInstructionDialog from "~/components/pages/InstructionPage/EditInstructionDialog";
 import View from "~/components/pages/InstructionPage/View";
 import { Account } from "~/interfaces/account";
+import { GenericType } from "~/interfaces/genericType";
 import { Instruction } from "~/interfaces/instruction";
 import { InstructionElement } from "~/interfaces/instructionElement";
 import { Program } from "~/interfaces/program";
@@ -16,6 +17,7 @@ interface InstructionProps {
   instructions: Instruction[];
   instruction: Instruction;
   instructionElements: InstructionElement[];
+  genericTypes: GenericType;
 }
 
 export default function InstructionPage({
@@ -23,6 +25,7 @@ export default function InstructionPage({
   accounts,
   instructions,
   instruction,
+  genericTypes,
   instructionElements,
 }: InstructionProps) {
   return (
@@ -30,6 +33,7 @@ export default function InstructionPage({
       program={program}
       accounts={accounts}
       instructions={instructions}
+      genericTypes={genericTypes}
       instruction={instruction}
       instructionElements={instructionElements}
     >

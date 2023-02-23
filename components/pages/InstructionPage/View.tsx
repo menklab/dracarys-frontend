@@ -19,16 +19,16 @@ import { Controller, SubmitHandler, useFieldArray } from "react-hook-form";
 import { useInstructionPage } from "~/components/pages/InstructionPage/context";
 import { RUST_KEYWORDS } from "~/constants/rust_keywords";
 import { useTheme } from "~/contexts/theme/hooks";
-import { AccountType, GenericType } from "~/enums/instructionElementTypes";
+import { AccountType } from "~/enums/instructionElementTypes";
 import { InstructionElementSchemaType, useInstructionElementForm } from "~/forms/instructionElement";
-import { Account } from "~/interfaces/account";
+import { GenericCustomSubType, GenericSubType, GenericType } from "~/interfaces/genericType";
 
 export default function View() {
   const {
     instructionElements,
-    accounts,
+    genericTypes,
     removeInstructionElement,
-    saveEditInstructionName,
+    saveEditInstructionElement,
     saveCreateInstructionElement,
   } = useInstructionPage();
   const [isLoading, setIsLoading] = useState(false);
@@ -50,7 +50,7 @@ export default function View() {
         id: ie.id,
         name: ie.name,
         accountType: ie.accountType,
-        genericType: ie.genericType,
+        genericType: ie.genericType.name,
         description: ie.description || "",
         mut: ie.mut,
       })),
@@ -59,6 +59,20 @@ export default function View() {
   });
 
   const { fields, append, remove, update } = useFieldArray({ control, name: "elements", keyName: "customId" });
+
+  const searchGenTypeObj = (genTypeName: string) => {
+    let result = null;
+    Object.keys(genericTypes).forEach((genKey) => {
+      genericTypes[genKey as keyof GenericType].options.forEach(
+        (subType: GenericSubType | GenericCustomSubType, index) => {
+          if (subType.name == genTypeName) {
+            result = subType;
+          }
+        }
+      );
+    });
+    return result;
+  };
 
   const onSubmit: SubmitHandler<InstructionElementSchemaType> = useCallback(
     async (values) => {
@@ -113,27 +127,41 @@ export default function View() {
           if (
             instructionElements[idx].name === name &&
             instructionElements[idx].accountType === accountType &&
-            instructionElements[idx].genericType === genericType &&
+            instructionElements[idx].genericType.name === genericType &&
             instructionElements[idx].mut === mut &&
             instructionElements[idx].description === description
           )
             continue;
-          await saveEditInstructionName(id, name, idx, description || "", mut, accountType as AccountType, genericType);
+
+          const genericTypeToSend = searchGenTypeObj(genericType);
+          await saveEditInstructionElement(
+            id,
+            name,
+            idx,
+            description || "",
+            mut,
+            accountType as AccountType,
+            // @ts-ignore
+            genericTypeToSend
+          );
         } else {
+          const genericTypeToSend = searchGenTypeObj(genericType);
+
           const res = await saveCreateInstructionElement(
             name,
             idx,
             description || "",
             mut,
             accountType as AccountType,
-            genericType
+            // @ts-ignore
+            genericTypeToSend
           );
           update(idx, { id: res?.id!, name, accountType, genericType, mut, description });
         }
       }
       setIsLoading(false);
     },
-    [instructionElements, isLoading, saveCreateInstructionElement, saveEditInstructionName, setError, update]
+    [instructionElements, isLoading, saveCreateInstructionElement, saveEditInstructionElement, setError, update]
   );
 
   const debouncedHandleSubmit = useMemo(() => debounce(handleSubmit(onSubmit), 1000), [handleSubmit, onSubmit]);
@@ -221,26 +249,25 @@ export default function View() {
                       {...register(`elements.${idx}.genericType`)}
                     >
                       <option aria-label="None" value="" disabled />
-                      {Object.keys(GenericType).map((keyObjLabel) => (
-                        <optgroup key={`generic-type-${keyObjLabel}`} label={keyObjLabel}>
-                          {GenericType[keyObjLabel as keyof typeof GenericType].map((subType: string) => {
-                            return (
-                              <option key={`generic-subtype-${subType}`} value={subType}>
-                                {subType}
+                      {Object.keys(genericTypes).map((genType) => (
+                        <optgroup
+                          key={`generic-type-${genType}`}
+                          label={genericTypes[genType as keyof GenericType].name}
+                        >
+                          {genericTypes[genType as keyof GenericType].options.map(
+                            (subType: GenericSubType | GenericCustomSubType) => (
+                              <option
+                                key={`generic-subtype-${genericTypes[genType as keyof GenericType].name}-${
+                                  subType.name
+                                }`}
+                                value={subType.name}
+                              >
+                                {subType.name}
                               </option>
-                            );
-                          })}
+                            )
+                          )}
                         </optgroup>
                       ))}
-                      <optgroup label="Custom Accounts">
-                        {accounts.map((accountType: Account) => {
-                          return (
-                            <option key={`generic-subtype-${accountType.name}`} value={accountType.name}>
-                              {accountType.name}
-                            </option>
-                          );
-                        })}
-                      </optgroup>
                     </Select>
                     <FormHelperText>{errors.elements?.[idx]?.genericType?.message}</FormHelperText>
                   </FormControl>
