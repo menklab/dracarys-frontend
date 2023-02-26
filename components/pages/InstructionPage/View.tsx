@@ -1,24 +1,17 @@
-import DeleteOutline from "@mui/icons-material/DeleteOutline";
-import { Box, Fade, IconButton, LinearProgress } from "@mui/material";
-import Checkbox from "@mui/material/Checkbox";
-import FormControl from "@mui/material/FormControl";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import FormHelperText from "@mui/material/FormHelperText";
+import { Box, Fade, LinearProgress } from "@mui/material";
 import Paper from "@mui/material/Paper";
-import Select from "@mui/material/Select";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
-import TextField from "@mui/material/TextField";
 import { debounce } from "lodash";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Controller, SubmitHandler, useFieldArray } from "react-hook-form";
+import { SubmitHandler, useFieldArray } from "react-hook-form";
 import { useInstructionPage } from "~/components/pages/InstructionPage/context";
+import TableLine from "~/components/pages/InstructionPage/TableLine";
 import { RUST_KEYWORDS } from "~/constants/rust_keywords";
-import { useTheme } from "~/contexts/theme/hooks";
 import { AccountType } from "~/enums/instructionElementTypes";
 import { InstructionElementSchemaType, useInstructionElementForm } from "~/forms/instructionElement";
 import { GenericCustomSubType, GenericSubType, GenericType } from "~/interfaces/genericType";
@@ -34,10 +27,6 @@ export default function View() {
   const [isLoading, setIsLoading] = useState(false);
 
   const {
-    data: { theme },
-  } = useTheme();
-
-  const {
     register,
     handleSubmit,
     control,
@@ -46,19 +35,23 @@ export default function View() {
     getValues,
   } = useInstructionElementForm({
     elements: [
-      ...instructionElements.map((ie) => ({
-        id: ie.id,
-        name: ie.name,
-        accountType: ie.accountType,
-        genericType: ie.genericType.name,
-        description: ie.description || "",
-        mut: ie.mut,
-      })),
+      ...instructionElements
+        .sort((ie) => ie.order - ie.order)
+        .map((ie) => {
+          return {
+            id: ie.id,
+            name: ie.name,
+            accountType: ie.accountType,
+            genericType: ie.genericType.name,
+            description: ie.description || "",
+            mut: ie.mut,
+          };
+        }),
       { name: "", accountType: "", genericType: "", mut: false, description: "" },
     ],
   });
 
-  const { fields, append, remove, update } = useFieldArray({ control, name: "elements", keyName: "customId" });
+  const { fields, append, remove, update, move } = useFieldArray({ control, name: "elements", keyName: "customId" });
 
   const searchGenTypeObj = (genTypeName: string) => {
     let result = null;
@@ -184,6 +177,29 @@ export default function View() {
     remove(idx);
   };
 
+  const moveRow = useCallback((dragIndex: number, hoverIndex: number) => {
+    move(dragIndex, hoverIndex);
+    debouncedHandleSubmit();
+  }, []);
+
+  const renderRow = useCallback((field: any, idx: number) => {
+    return (
+      <TableLine
+        key={`instruction-element-fn-${idx}`}
+        idx={idx}
+        id={field.id}
+        field={field}
+        moveRow={moveRow}
+        control={control}
+        isLoading={isLoading}
+        onDelete={onDelete}
+        register={register}
+        errors={errors}
+        fieldsLength={fields.length}
+      />
+    );
+  }, []);
+
   return (
     <Box component="form" onBlur={debouncedHandleSubmit} onChange={onChange}>
       <Fade in={isLoading}>
@@ -193,6 +209,7 @@ export default function View() {
         <Table sx={{ minWidth: 650 }} aria-label="simple table">
           <TableHead>
             <TableRow>
+              <TableCell align="center" />
               <TableCell align="center">Name</TableCell>
               <TableCell align="center">Account type</TableCell>
               <TableCell align="center">Generic type</TableCell>
@@ -201,114 +218,7 @@ export default function View() {
               <TableCell align="center" />
             </TableRow>
           </TableHead>
-          <TableBody>
-            {fields.map((field, idx) => (
-              <TableRow
-                key={`instruction-element-${idx}`}
-                sx={{
-                  ...(fields.length - 1 === idx ? { backgroundColor: theme.palette.divider } : {}),
-                  "&:last-child ttyped, &:last-child th": { border: 0 },
-                }}
-              >
-                <TableCell align="center" sx={{ width: "20%" }}>
-                  <TextField
-                    fullWidth
-                    inputProps={{ style: { textAlign: "center" } }}
-                    error={!!errors.elements?.[idx]?.name}
-                    helperText={errors.elements?.[idx]?.name?.message}
-                    {...register(`elements.${idx}.name`)}
-                  />
-                </TableCell>
-                <TableCell align="center" sx={{ width: "20%" }}>
-                  <FormControl fullWidth error={!!errors.elements?.[idx]?.accountType}>
-                    <Select
-                      native
-                      fullWidth
-                      defaultValue={field.accountType}
-                      {...register(`elements.${idx}.accountType`)}
-                    >
-                      <option aria-label="None" value="" disabled />
-                      {Object.keys(AccountType).map((keyAccountLabel) => (
-                        <option
-                          key={`account-type-${keyAccountLabel}`}
-                          value={AccountType[keyAccountLabel as keyof typeof AccountType]}
-                        >
-                          {AccountType[keyAccountLabel as keyof typeof AccountType]}
-                        </option>
-                      ))}
-                    </Select>
-                    <FormHelperText>{errors.elements?.[idx]?.accountType?.message}</FormHelperText>
-                  </FormControl>
-                </TableCell>
-                <TableCell align="center" sx={{ width: "20%" }}>
-                  <FormControl fullWidth error={!!errors.elements?.[idx]?.genericType}>
-                    <Select
-                      native
-                      fullWidth
-                      defaultValue={field.genericType}
-                      {...register(`elements.${idx}.genericType`)}
-                    >
-                      <option aria-label="None" value="" disabled />
-                      {Object.keys(genericTypes).map((genType) => (
-                        <optgroup
-                          key={`generic-type-${genType}`}
-                          label={genericTypes[genType as keyof GenericType].name}
-                        >
-                          {genericTypes[genType as keyof GenericType].options.map(
-                            (subType: GenericSubType | GenericCustomSubType) => (
-                              <option
-                                key={`generic-subtype-${genericTypes[genType as keyof GenericType].name}-${
-                                  subType.name
-                                }`}
-                                value={subType.name}
-                              >
-                                {subType.name}
-                              </option>
-                            )
-                          )}
-                        </optgroup>
-                      ))}
-                    </Select>
-                    <FormHelperText>{errors.elements?.[idx]?.genericType?.message}</FormHelperText>
-                  </FormControl>
-                </TableCell>
-                <TableCell align="center" sx={{ width: "10%" }}>
-                  <Controller
-                    name={`elements.${idx}.mut`}
-                    control={control}
-                    defaultValue={false}
-                    render={({ field: mutField, field: { value: mutValue } }) => (
-                      <FormControlLabel
-                        control={
-                          <Checkbox
-                            inputProps={{ style: { textAlign: "center" } }}
-                            {...mutField}
-                            checked={!!mutValue}
-                          />
-                        }
-                        label={mutValue ? "Yes" : "No"}
-                        labelPlacement="start"
-                      />
-                    )}
-                  />
-                </TableCell>
-                <TableCell align="center" sx={{ width: "20%" }}>
-                  <TextField
-                    fullWidth
-                    inputProps={{ style: { textAlign: "center" } }}
-                    error={!!errors.elements?.[idx]?.description}
-                    helperText={errors.elements?.[idx]?.description?.message}
-                    {...register(`elements.${idx}.description`)}
-                  />
-                </TableCell>
-                <TableCell align="center" sx={{ width: "5%" }}>
-                  <IconButton disabled={idx === fields.length - 1 || isLoading} onClick={() => onDelete(idx)}>
-                    <DeleteOutline />
-                  </IconButton>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
+          <TableBody>{fields.map((field, idx) => renderRow(field, idx))}</TableBody>
         </Table>
       </TableContainer>
     </Box>

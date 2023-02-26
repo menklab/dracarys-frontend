@@ -1,3 +1,5 @@
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
 import Layout from "~/components/Layout";
 import AppBarContent from "~/components/pages/InstructionPage/AppBarContent";
 import { InstructionPageProvider } from "~/components/pages/InstructionPage/context";
@@ -38,7 +40,9 @@ export default function InstructionPage({
       instructionElements={instructionElements}
     >
       <Layout drawerContent={<DrawerContent />} appBarContent={<AppBarContent />}>
-        <View key={`instruction-${instruction.id}`} />
+        <DndProvider backend={HTML5Backend}>
+          <View key={`instruction-${instruction.id}`} />
+        </DndProvider>
         <DeleteInstructionDialog />
         <EditInstructionDialog />
       </Layout>
