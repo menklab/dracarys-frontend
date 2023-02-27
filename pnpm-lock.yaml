@@ -30,6 +30,7 @@ specifiers:
   prettier-plugin-organize-imports: ^3.2.1
   react: 18.2.0
   react-dnd: ^16.0.1
+  react-dnd-html5-backend: ^16.0.1
   react-dom: 18.2.0
   react-hook-form: ^7.41.2
   react-konva: ^18.2.3
@@ -58,6 +59,7 @@ dependencies:
   notistack: 2.0.8_xi2qqm4afs7e77tnkkiyk5lfne
   react: 18.2.0
   react-dnd: 16.0.1_uqw6rmshllsnsa7jjbo2hvworm
+  react-dnd-html5-backend: 16.0.1
   react-dom: 18.2.0_react@18.2.0
   react-hook-form: 7.43.2_react@18.2.0
   react-konva: 18.2.5_d7gpxn44oibr567fgtt3qmuz5a
@@ -2625,6 +2627,12 @@ packages:
   /queue-microtask/1.2.3:
     resolution: {integrity: sha512-NuaNSa6flKT5JaSYQzJok04JzTL1CA6aGhv5rfLW3PgqA+M2ChpZQnAC8h8i4ZFkBS8X5RqkDBHA7r4hej3K9A==}
     dev: true
+
+  /react-dnd-html5-backend/16.0.1:
+    resolution: {integrity: sha512-Wu3dw5aDJmOGw8WjH1I1/yTH+vlXEL4vmjk5p+MHxP8HuHJS1lAGeIdG/hze1AvNeXWo/JgULV87LyQOr+r5jw==}
+    dependencies:
+      dnd-core: 16.0.1
+    dev: false
 
   /react-dnd/16.0.1_uqw6rmshllsnsa7jjbo2hvworm:
     resolution: {integrity: sha512-QeoM/i73HHu2XF9aKksIUuamHPDvRglEwdHL4jsp784BgUuWcg6mzfxT0QDdQz8Wj0qyRKx2eMg8iZtWvU4E2Q==}
