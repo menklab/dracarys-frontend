@@ -14,7 +14,7 @@ export default function EditInstructionDialog() {
     formState: { errors, isSubmitting },
     reset,
     handleSubmit,
-  } = useEditInstructionForm({ name: instruction.name, description: instruction.description });
+  } = useEditInstructionForm({ name: instruction.name, description: instruction.description || "" });
 
   const onSubmit: SubmitHandler<EditInstructionSchemaType> = async (values) => {
     await new Promise((resolve) => setTimeout(resolve, 1000));
